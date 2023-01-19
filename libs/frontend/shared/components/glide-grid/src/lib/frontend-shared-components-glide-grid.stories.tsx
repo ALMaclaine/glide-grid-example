@@ -40,7 +40,7 @@ const data: User[] = [
   },
 ];
 
-function getData([col, row]: Item): GridCell {
+function getCellContent([col, row]: Item): GridCell {
   const person = data[row];
 
   if (col === 0) {
@@ -64,6 +64,6 @@ function getData([col, row]: Item): GridCell {
 
 Primary.args = {
   columns,
-  getData,
+  getCellContent,
   rows: columns.length,
 };

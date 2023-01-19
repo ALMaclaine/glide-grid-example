@@ -11,17 +11,17 @@ type GlideGridCellGenerator = (item: Item) => GridCell;
 
 type GlideGridProps = {
   columns: GridColumn[];
-  getData: GlideGridCellGenerator;
+  getCellContent: GlideGridCellGenerator;
   rows: number;
 };
 
-function GlideGrid({ columns, getData, rows }: GlideGridProps) {
+function GlideGrid({ columns, getCellContent, rows }: GlideGridProps) {
   return (
     <DataEditor
       overscrollX={0}
       overscrollY={0}
       columns={columns}
-      getCellContent={getData}
+      getCellContent={getCellContent}
       rows={rows}
     />
   );

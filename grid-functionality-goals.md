@@ -8,6 +8,7 @@
 - custom headers
 - reorder rows/columns
 - smooth scrolling
+- row hover highlight
 
 ## Functionality
 - get selected rows
