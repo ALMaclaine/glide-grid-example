@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@glide/frontend/shared/components/glide-grid": [
+        "libs/frontend/shared/components/glide-grid/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
