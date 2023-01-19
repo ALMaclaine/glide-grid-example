@@ -40,7 +40,7 @@
       "outputs": ["{options.outputDir}"],
       "options": {
         "uiFramework": "@storybook/react",
-        "outputDir": "dist/storybook/frontend-shared-components-glide-grid",
+        "outputDir": "docs",
         "configDir": "libs/frontend/shared/components/glide-grid/.storybook"
       },
       "configurations": {

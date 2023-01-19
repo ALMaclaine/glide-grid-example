@@ -56,6 +56,7 @@
   "dependencies": {
     "@glideapps/glide-data-grid": "^5.2.1",
     "@ngneat/falso": "^6.4.0",
+    "core-js": "^3.27.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tslib": "^2.3.0"
