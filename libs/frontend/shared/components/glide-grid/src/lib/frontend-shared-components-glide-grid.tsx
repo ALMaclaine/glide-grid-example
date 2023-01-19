@@ -6,6 +6,8 @@ import {
   Item,
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
+import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
+import { useCallback } from 'react';
 
 type GlideGridCellGenerator = (item: Item) => GridCell;
 
@@ -16,11 +18,16 @@ type GlideGridProps = {
 };
 
 function GlideGrid({ columns, getCellContent, rows }: GlideGridProps) {
+  const getRowThemeOverride = useCallback<GetRowThemeCallback>((row) => {
+    console.log(row);
+    return undefined;
+  }, []);
   return (
     <DataEditor
-      verticalBorder={false}
+      verticalBorder={true}
       columns={columns}
       getCellsForSelection={true}
+      getRowThemeOverride={getRowThemeOverride}
       onCellClicked={(cell, event) => {
         const out = getCellContent(cell);
         console.log(out);
