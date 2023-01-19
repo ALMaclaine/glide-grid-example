@@ -5,8 +5,9 @@ import type {
   Cell,
   Indexable,
   WrappedGridColumn,
+  GenUriCellProps,
 } from './types';
-import { GlideGridCellGenerator } from '@glide/frontend/shared/components/glide-grid';
+import { GlideGridCellGenerator } from './types';
 
 function genGridCell<T extends Indexable>({
   data,
@@ -24,6 +25,10 @@ function genGridCell<T extends Indexable>({
 
 function genTextCell<T extends Indexable>(props: GenTextCellProps<T>): Cell<T> {
   return genGridCell({ kind: GridCellKind.Text, ...props });
+}
+
+function genUriCell<T extends Indexable>(props: GenUriCellProps<T>): Cell<T> {
+  return genGridCell({ kind: GridCellKind.Uri, ...props });
 }
 
 function genGetCellContent<T extends Indexable>(
@@ -48,4 +53,4 @@ function genGetCellContent<T extends Indexable>(
   };
 }
 
-export { genTextCell, genGridCell, genGetCellContent };
+export { genTextCell, genGridCell, genGetCellContent, genUriCell };

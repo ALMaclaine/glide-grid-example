@@ -1,9 +1,16 @@
-import { GridCell, GridColumn } from '@glideapps/glide-data-grid';
+import {
+  EditableGridCell,
+  GridCell,
+  GridColumn,
+  Item,
+  UriCell,
+} from '@glideapps/glide-data-grid';
 
-type Cell<T> = Omit<GridCell, 'data' | 'displayData'> & {
-  data: keyof T;
-  displayData: keyof T;
-};
+type Cell<T> = Omit<GridCell, 'data' | 'displayData'> &
+  Pick<UriCell, 'readonly'> & {
+    data: keyof T;
+    displayData: keyof T;
+  };
 
 type Indexable = Record<string, unknown>;
 
@@ -17,6 +24,19 @@ type GenGridCellProps<T extends Indexable> = {
 } & Partial<Omit<Cell<T>, 'kind' | 'data'>>;
 
 type GenTextCellProps<T extends Indexable> = Omit<GenGridCellProps<T>, 'kind'>;
+type GenUriCellProps<T extends Indexable> = Omit<
+  GenGridCellProps<T>,
+  'kind' | 'displayData'
+> &
+  Pick<Cell<T>, 'displayData'>;
+
+type GlideGridCellGenerator = (item: Item) => GridCell;
+
+type GlideGridProps = {
+  columns: GridColumn[];
+  getCellContent: GlideGridCellGenerator;
+  rows: number;
+};
 
 export type {
   Cell,
@@ -24,4 +44,7 @@ export type {
   WrappedGridColumn,
   GenTextCellProps,
   GenGridCellProps,
+  GlideGridProps,
+  GlideGridCellGenerator,
+  GenUriCellProps,
 };

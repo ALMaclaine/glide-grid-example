@@ -1,44 +1,54 @@
-import styles from './frontend-shared-components-glide-grid.module.css';
 import {
   DataEditor,
-  GridCell,
-  GridColumn,
+  GridMouseEventArgs,
   Item,
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
+import { GlideGridProps } from './types';
+import { useCallback, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
-import { useCallback } from 'react';
-
-type GlideGridCellGenerator = (item: Item) => GridCell;
-
-type GlideGridProps = {
-  columns: GridColumn[];
-  getCellContent: GlideGridCellGenerator;
-  rows: number;
-};
 
 function GlideGrid({ columns, getCellContent, rows }: GlideGridProps) {
-  const getRowThemeOverride = useCallback<GetRowThemeCallback>((row) => {
-    console.log(row);
-    return undefined;
+  const [hoverRow, setHoverRow] = useState<number | undefined>(undefined);
+
+  const onItemHovered = useCallback((args: GridMouseEventArgs) => {
+    const [, row] = args.location;
+    setHoverRow(args.kind !== 'cell' ? undefined : row);
   }, []);
+
+  const getRowThemeOverride = useCallback<GetRowThemeCallback>(
+    (row) => {
+      if (row !== hoverRow) return undefined;
+      return {
+        bgCell: '#f7f7f7',
+        bgCellMedium: '#f0f0f0',
+      };
+    },
+    [hoverRow]
+  );
+
   return (
     <DataEditor
-      verticalBorder={true}
+      // width 100% needed otherwise grow/resizing animates slowly to fill extra width
+      width="100%"
+      verticalBorder={false}
       columns={columns}
       getCellsForSelection={true}
-      getRowThemeOverride={getRowThemeOverride}
-      onCellClicked={(cell, event) => {
-        const out = getCellContent(cell);
-        console.log(out);
-        // if (data === 'Alex') {
-        //   window.location = 'www.reddit.com';
-        // }
-      }}
       getCellContent={getCellContent}
+      onCellClicked={(item: Item) => {
+        const { kind, ...rest } = getCellContent(item);
+        if (kind === 'uri') {
+          const { data } = rest;
+          window.alert('Navigating to: ' + data);
+        }
+      }}
+      smoothScrollX={true}
+      smoothScrollY={true}
+      onItemHovered={onItemHovered}
+      getRowThemeOverride={getRowThemeOverride}
       rows={rows}
     />
   );
 }
 
-export { GlideGrid, GlideGridProps, GlideGridCellGenerator };
+export { GlideGrid, GlideGridProps };
