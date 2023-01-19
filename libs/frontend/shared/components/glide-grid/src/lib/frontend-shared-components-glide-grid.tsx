@@ -18,13 +18,20 @@ type GlideGridProps = {
 function GlideGrid({ columns, getCellContent, rows }: GlideGridProps) {
   return (
     <DataEditor
-      overscrollX={0}
-      overscrollY={0}
+      verticalBorder={false}
       columns={columns}
+      getCellsForSelection={true}
+      onCellClicked={(cell, event) => {
+        const out = getCellContent(cell);
+        console.log(out);
+        // if (data === 'Alex') {
+        //   window.location = 'www.reddit.com';
+        // }
+      }}
       getCellContent={getCellContent}
       rows={rows}
     />
   );
 }
 
-export { GlideGrid, GlideGridProps };
+export { GlideGrid, GlideGridProps, GlideGridCellGenerator };
