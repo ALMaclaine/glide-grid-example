@@ -20,3 +20,7 @@
 - freeze starting columns
 - save visible region position
 - summary rows
+
+# sort utils
+- https://github.com/snovakovic/fast-sort
+- https://www.npmjs.com/package/fast-sort

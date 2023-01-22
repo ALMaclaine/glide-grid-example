@@ -1,12 +1,11 @@
 import {
-  EditableGridCell,
   GridCell,
   GridColumn,
   Item,
   UriCell,
 } from '@glideapps/glide-data-grid';
 
-type Cell<T> = Omit<GridCell, 'data' | 'displayData'> &
+type Cell<T> = Omit<GridCell, 'data'> &
   Pick<UriCell, 'readonly'> & {
     data: keyof T;
     displayData: keyof T;
