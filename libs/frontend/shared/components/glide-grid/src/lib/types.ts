@@ -1,9 +1,11 @@
 import {
   GridCell,
   GridColumn,
+  GridMouseEventArgs,
   Item,
   UriCell,
 } from '@glideapps/glide-data-grid';
+import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 
 type Cell<T> = Omit<GridCell, 'data'> &
   Pick<UriCell, 'readonly'> & {
@@ -15,6 +17,10 @@ type Indexable = Record<string, unknown>;
 
 type WrappedGridColumn<T extends Indexable> = GridColumn & {
   cell: Cell<T>;
+};
+
+type IdRow<T extends Indexable> = T & {
+  rowUuid: string;
 };
 
 type GenGridCellProps<T extends Indexable> = {
@@ -31,19 +37,35 @@ type GenUriCellProps<T extends Indexable> = Omit<
 
 type GlideGridCellGenerator = (item: Item) => GridCell;
 
-type GlideGridProps = {
-  columns: GridColumn[];
-  getCellContent: GlideGridCellGenerator;
-  rows: number;
+type HoverHandler = (args: GridMouseEventArgs) => void;
+
+type UserRowHoverHighlightReturn = {
+  hoverRow: number;
+  onItemHovered: HoverHandler;
+  getRowThemeOverride: GetRowThemeCallback;
 };
+
+type GlideGridProps<T extends Indexable> = {
+  columns: WrappedGridColumn<T>[];
+  rows: number;
+  onItemHovered: HoverHandler;
+  data: T[];
+  getRowThemeOverride: GetRowThemeCallback;
+};
+
+type RowGetter<T extends Indexable> = (row: number) => T;
 
 export type {
   Cell,
-  Indexable,
-  WrappedGridColumn,
-  GenTextCellProps,
   GenGridCellProps,
-  GlideGridProps,
-  GlideGridCellGenerator,
+  GenTextCellProps,
   GenUriCellProps,
+  GlideGridCellGenerator,
+  GlideGridProps,
+  HoverHandler,
+  IdRow,
+  Indexable,
+  RowGetter,
+  UserRowHoverHighlightReturn,
+  WrappedGridColumn,
 };

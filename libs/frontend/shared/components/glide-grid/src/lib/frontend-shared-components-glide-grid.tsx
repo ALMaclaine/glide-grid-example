@@ -2,30 +2,72 @@ import {
   DataEditor,
   GridMouseEventArgs,
   Item,
+  UriCell,
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
-import { GlideGridProps } from './types';
-import { useCallback, useState } from 'react';
+import type { GlideGridProps, Indexable, RowGetter } from './types';
+import { useCallback, useMemo } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
+import { addIdsToRows, genGetCellContent, noOp, noOpObj } from './utils';
+import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 
-function GlideGrid({ columns, getCellContent, rows }: GlideGridProps) {
-  const [hoverRow, setHoverRow] = useState<number | undefined>(undefined);
+const useGenGetCellContent = <T extends Indexable>({
+  columns,
+  getRow,
+}: Pick<GlideGridProps<T>, 'columns'> & { getRow: RowGetter<T> }) => {
+  // useCallback can't be used for generating functions because it expects an inline function definition
+  // https://kyleshevlin.com/debounce-and-throttle-callbacks-with-react-hooks
+  // https://stackoverflow.com/questions/69830440/react-hook-usecallback-received-a-function-whose-dependencies-are-unknown-pass
+  const getCellContent = useMemo(
+    () => genGetCellContent(columns, getRow),
+    [columns, getRow]
+  );
+  return { getCellContent };
+};
 
-  const onItemHovered = useCallback((args: GridMouseEventArgs) => {
-    const [, row] = args.location;
-    setHoverRow(args.kind !== 'cell' ? undefined : row);
-  }, []);
+const useSetupData = <T extends Indexable>(data: T[]) => {
+  const dataWithIds = useMemo(() => addIdsToRows(data), [data]);
+  console.log(dataWithIds);
+  const getRow = useCallback(
+    (row: number) => dataWithIds[row] ?? {},
+    [dataWithIds]
+  );
+  return { getRow };
+};
 
-  const getRowThemeOverride = useCallback<GetRowThemeCallback>(
+function GlideGrid<T extends Indexable>({
+  columns,
+  data,
+  rows,
+  onItemHovered = noOp,
+  getRowThemeOverride = noOpObj,
+}: GlideGridProps<T>) {
+  const { getRow } = useSetupData(data);
+
+  const {
+    onItemHovered: onItemHoveredHighlight,
+    getRowThemeOverride: getRowHoveredThemeOverride,
+  } = useRowHoverHighlight();
+
+  const _onItemHovered = useCallback(
+    (args: GridMouseEventArgs) => {
+      onItemHoveredHighlight(args);
+      onItemHovered(args);
+    },
+    [onItemHovered, onItemHoveredHighlight]
+  );
+
+  const _getRowThemeOverride = useCallback<GetRowThemeCallback>(
     (row) => {
-      if (row !== hoverRow) return undefined;
       return {
-        bgCell: '#f7f7f7',
-        bgCellMedium: '#f0f0f0',
+        ...getRowThemeOverride(row),
+        ...getRowHoveredThemeOverride(row),
       };
     },
-    [hoverRow]
+    [getRowHoveredThemeOverride, getRowThemeOverride]
   );
+
+  const { getCellContent } = useGenGetCellContent({ columns, getRow });
 
   return (
     <DataEditor
@@ -38,14 +80,15 @@ function GlideGrid({ columns, getCellContent, rows }: GlideGridProps) {
       onCellClicked={(item: Item) => {
         const { kind, ...rest } = getCellContent(item);
         if (kind === 'uri') {
-          const { data } = rest;
+          // TODO: use type guard
+          const { data } = rest as UriCell;
           window.alert('Navigating to: ' + data);
         }
       }}
       smoothScrollX={true}
       smoothScrollY={true}
-      onItemHovered={onItemHovered}
-      getRowThemeOverride={getRowThemeOverride}
+      onItemHovered={_onItemHovered}
+      getRowThemeOverride={_getRowThemeOverride}
       rows={rows}
     />
   );

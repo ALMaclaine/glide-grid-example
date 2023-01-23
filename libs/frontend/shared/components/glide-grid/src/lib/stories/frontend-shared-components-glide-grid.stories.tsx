@@ -4,7 +4,7 @@ import {
   GlideGrid,
   GlideGridProps,
 } from '../frontend-shared-components-glide-grid';
-import type { WrappedGridColumn } from '../types';
+import type { Indexable, WrappedGridColumn } from '../types';
 import { genGetCellContent, genTextCell, genUriCell } from '../utils';
 import { randAddress, randCompanyName, randFloat } from '@ngneat/falso';
 
@@ -21,8 +21,8 @@ export default {
   ],
 } as Meta;
 
-export const Primary: ComponentStory<typeof GlideGrid> = (
-  args: GlideGridProps
+export const Primary: ComponentStory<typeof GlideGrid> = <T extends Indexable>(
+  args: GlideGridProps<T>
 ) => {
   return (
     <div
@@ -99,10 +99,8 @@ function genProperty(): Property {
 
 const data: Property[] = [...Array(50).fill(0).map(genProperty)];
 
-const getData = (row: number): Property => data[row] ?? {};
-
 Primary.args = {
   columns,
-  getCellContent: genGetCellContent(columns, getData),
+  data,
   rows: data.length,
 };
