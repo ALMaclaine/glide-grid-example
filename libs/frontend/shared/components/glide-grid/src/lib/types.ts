@@ -53,7 +53,7 @@ type GlideGridProps<T extends Indexable> = {
   getRowThemeOverride: GetRowThemeCallback;
 };
 
-type RowGetter<T extends Indexable> = (row: number) => T;
+type RowGetter<T extends Indexable> = (row: number) => IdRow<T>;
 
 export type {
   Cell,

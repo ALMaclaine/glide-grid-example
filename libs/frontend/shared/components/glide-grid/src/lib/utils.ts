@@ -33,12 +33,45 @@ function genUriCell<T extends Indexable>(props: GenUriCellProps<T>): Cell<T> {
   return genGridCell({ kind: GridCellKind.Uri, ...props });
 }
 
+class ContentCache<T extends Indexable> {
+  // column -> row -> value
+  private cachedContent: Map<string, Map<number, GridCell>> = new Map();
+
+  get(rowUuid: string, col: number): GridCell {
+    const rowCache = this.cachedContent.get(rowUuid);
+
+    if (rowCache === undefined) {
+      throw new Error('Cache should be set before accessing');
+    }
+
+    return rowCache.get(col) as GridCell;
+  }
+
+  hasRow(rowUuid: string) {
+    return this.cachedContent.has(rowUuid);
+  }
+
+  has(rowUuid: string, col: number) {
+    return this.hasRow(rowUuid) && this.cachedContent.get(rowUuid)?.has(col);
+  }
+
+  set(rowUuid: string, col: number, value: GridCell) {
+    if (this.cachedContent.get(rowUuid) === undefined) {
+      this.cachedContent.set(rowUuid, new Map());
+    }
+
+    const rowCache = this.cachedContent.get(rowUuid) as Map<number, GridCell>;
+    rowCache.set(col, value);
+  }
+}
+
 function genGetCellContent<T extends Indexable>(
   columns: WrappedGridColumn<T>[],
-  getData: (row: number) => T
+  getData: (row: number) => IdRow<T>
 ): GlideGridCellGenerator {
   return ([col, row]: Item): GridCell => {
     const item = getData(row);
+    const { rowUuid } = item;
     if (col < columns.length) {
       const {
         cell: { data, displayData, ...rest },
@@ -75,6 +108,7 @@ const addIdsToRows = <T extends Indexable>(rows: T[]): IdRow<T>[] => {
 };
 
 export {
+  ContentCache,
   genTextCell,
   genGridCell,
   genGetCellContent,
