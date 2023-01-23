@@ -23,7 +23,6 @@ const useGenGetCellContent = <T extends Indexable>({
       const rowItem = getRow(row);
       const { rowUuid } = rowItem;
       if (!cache.current?.has(rowItem.rowUuid, col)) {
-        console.log('cache miss');
         const cell = getCellContentInner([row, col]);
         cache?.current?.set(rowUuid, col, cell);
       }
@@ -31,6 +30,7 @@ const useGenGetCellContent = <T extends Indexable>({
     },
     [getCellContentInner, getRow]
   );
+
   return { getCellContent };
 };
 
