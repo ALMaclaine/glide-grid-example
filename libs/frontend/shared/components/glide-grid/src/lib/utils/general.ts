@@ -1,7 +1,11 @@
-import { useMemo } from 'react';
+import type { Indexable, IdRow } from '../types';
 import { v4 as uuid } from 'uuid';
-import type { Indexable } from '../types/general';
-import type { IdRow } from '../types/grid';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOpObj = () => ({});
 
 const addIdToRow = <T extends Indexable>(row: T): IdRow<T> => {
   // mutate directly to avoid performance issues on large tables
@@ -16,9 +20,4 @@ const addIdsToRows = <T extends Indexable>(rows: T[]): IdRow<T>[] => {
   return rows as IdRow<T>[];
 };
 
-const useAddIds = <T extends Indexable>(data: T[]) => {
-  const dataWithIds = useMemo(() => addIdsToRows(data), [data]);
-  return { dataWithIds };
-};
-
-export { useAddIds };
+export { noOp, noOpObj, addIdToRow, addIdsToRows };

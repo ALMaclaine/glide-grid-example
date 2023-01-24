@@ -1,16 +1,23 @@
-import { CellCache } from '../Cache';
 import { useCallback, useRef } from 'react';
-import { genGetCellContent } from '../utils';
-import { ColumnsProps, Indexable, RowIndexGetterProps } from '../types';
+import { CellCache } from '../cache/CellCache';
+import type { Indexable } from '../types/general';
+import type {
+  ColumnsProps,
+  RowIndexGetterProps,
+  RowsProps,
+} from '../types/props';
+
+type UseCellCacheProps<T extends Indexable> = ColumnsProps<T> &
+  RowIndexGetterProps<T> &
+  RowsProps;
 
 const useCellCache = <T extends Indexable>({
   columns,
   getRowByIndex,
   rows,
-}: ColumnsProps<T> & RowIndexGetterProps<T> & { rows: number }) => {
+}: UseCellCacheProps<T>) => {
   const cache = useRef<CellCache<T>>(
     new CellCache({
-      cellGen: genGetCellContent(columns, getRowByIndex),
       columns,
       rows,
       getRowByIndex,
@@ -27,3 +34,4 @@ const useCellCache = <T extends Indexable>({
 };
 
 export { useCellCache };
+export type { UseCellCacheProps };

@@ -4,29 +4,27 @@ import {
   Item,
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
-import type {
-  ColumnsProps,
-  HeaderClickHandler,
-  Indexable,
-  HoverHandler,
-} from './types';
+
 import { useCallback, useMemo, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
-import { noOp, noOpObj } from './utils';
+import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { useSetupData } from './hooks/use-setup-data';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
 import { useAddIds } from './hooks/use-add-ids';
 import { useHeaderClicked } from './hooks/use-header-clicked';
 import { sort } from 'fast-sort';
+import type { Indexable } from './types/general';
+import type { HeaderClickHandler, HoverHandler } from './types/func';
+import type { ColumnsProps, RowsProps } from './types/props';
 
 type GlideGridProps<T extends Indexable> = {
-  rows: number;
   onItemHovered: HoverHandler;
   data: T[];
   getRowThemeOverride: GetRowThemeCallback;
   onHeaderClicked: HeaderClickHandler;
-} & ColumnsProps<T>;
+} & ColumnsProps<T> &
+  RowsProps;
 
 function GlideGrid<T extends Indexable>({
   columns,

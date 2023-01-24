@@ -1,9 +1,15 @@
-import type { UserRowHoverHighlightReturn } from '../types';
 import { useCallback, useState } from 'react';
 import { GridMouseEventArgs } from '@glideapps/glide-data-grid';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
+import type { HoverHandler } from '../types/func';
 
-const useRowHoverHighlight: () => UserRowHoverHighlightReturn = () => {
+type UseRowHoverHighlightReturn = {
+  hoverRow: number;
+  onItemHovered: HoverHandler;
+  getRowThemeOverride: GetRowThemeCallback;
+};
+
+const useRowHoverHighlight: () => UseRowHoverHighlightReturn = () => {
   const [hoverRow, setHoverRow] = useState<number>(-1);
 
   const onItemHovered = useCallback((args: GridMouseEventArgs) => {
@@ -25,3 +31,4 @@ const useRowHoverHighlight: () => UserRowHoverHighlightReturn = () => {
 };
 
 export { useRowHoverHighlight };
+export type { UseRowHoverHighlightReturn };
