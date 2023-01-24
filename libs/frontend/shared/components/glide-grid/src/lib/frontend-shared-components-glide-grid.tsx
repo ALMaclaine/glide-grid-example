@@ -5,7 +5,7 @@ import {
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
@@ -13,10 +13,10 @@ import { useSetupData } from './hooks/use-setup-data';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
 import { useAddIds } from './hooks/use-add-ids';
 import { useHeaderClicked } from './hooks/use-header-clicked';
-import { sort } from 'fast-sort';
 import type { Indexable } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
+import { useSort } from './hooks/use-sort';
 
 type GlideGridProps<T extends Indexable> = {
   onItemHovered: HoverHandler;
@@ -36,21 +36,20 @@ function GlideGrid<T extends Indexable>({
 }: GlideGridProps<T>) {
   const { dataWithIds } = useAddIds(data);
   const { getRowByIndex } = useSetupData(dataWithIds);
+  const { sorted, onHeaderClickSort } = useSort(dataWithIds);
 
-  const [asc, setAsc] = useState(false);
-  const { onHeaderClicked: _onHeaderClicked, selectedHeader } =
-    useHeaderClicked({
-      columns,
-      onHeaderClicked: () => setAsc((val) => !val),
-    });
-
-  const sorted = useMemo(
-    () =>
-      asc
-        ? sort(dataWithIds).asc(selectedHeader)
-        : sort(dataWithIds).desc(selectedHeader),
-    [dataWithIds, selectedHeader, asc]
+  const onHeaderClickedIn = useCallback(
+    (headerVal: string) => {
+      onHeaderClicked(headerVal);
+      onHeaderClickSort(headerVal);
+    },
+    [onHeaderClickSort, onHeaderClicked]
   );
+
+  const { onHeaderClicked: _onHeaderClicked } = useHeaderClicked({
+    columns,
+    onHeaderClicked: onHeaderClickedIn,
+  });
 
   const {
     onItemHovered: onItemHoveredHighlight,
