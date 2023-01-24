@@ -1,37 +1,7 @@
-import { GridCell, GridCellKind, Item } from '@glideapps/glide-data-grid';
-import type {
-  GenTextCellProps,
-  GenGridCellProps,
-  Cell,
-  Indexable,
-  WrappedGridColumn,
-  GenUriCellProps,
-  IdRow,
-} from './types';
-import { GlideGridCellGenerator } from './types';
+import { GridCell, Item } from '@glideapps/glide-data-grid';
+import type { Indexable, WrappedGridColumn, IdRow } from './types';
+import type { GlideGridCellGenerator } from './types';
 import { v4 as uuid } from 'uuid';
-
-function genGridCell<T extends Indexable>({
-  data,
-  displayData = data,
-  allowOverlay = false,
-  ...rest
-}: GenGridCellProps<T>): Cell<T> {
-  return {
-    data,
-    displayData,
-    allowOverlay,
-    ...rest,
-  };
-}
-
-function genTextCell<T extends Indexable>(props: GenTextCellProps<T>): Cell<T> {
-  return genGridCell({ kind: GridCellKind.Text, ...props });
-}
-
-function genUriCell<T extends Indexable>(props: GenUriCellProps<T>): Cell<T> {
-  return genGridCell({ kind: GridCellKind.Uri, ...props });
-}
 
 function genGetCellContent<T extends Indexable>(
   columns: WrappedGridColumn<T>[],
@@ -74,13 +44,4 @@ const addIdsToRows = <T extends Indexable>(rows: T[]): IdRow<T>[] => {
   return rows as IdRow<T>[];
 };
 
-export {
-  addIdToRow,
-  addIdsToRows,
-  genTextCell,
-  genGridCell,
-  genGetCellContent,
-  genUriCell,
-  noOp,
-  noOpObj,
-};
+export { addIdToRow, addIdsToRows, genGetCellContent, noOp, noOpObj };

@@ -1,4 +1,4 @@
-import { IdRow, Indexable } from '../types';
+import type { IdRow, Indexable } from '../types';
 import { RowCache } from '../Cache';
 import { useRowCache } from './use-row-cache';
 

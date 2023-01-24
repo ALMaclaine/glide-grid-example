@@ -9,15 +9,17 @@ import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-gri
 
 type Cell<T> = Omit<GridCell, 'data'> &
   Pick<UriCell, 'readonly'> & {
-    data: keyof T;
-    displayData: keyof T;
+    data: Extract<keyof T, string>;
+    displayData: Extract<keyof T, string>;
   };
 
-type Indexable = { [key: string]: any };
+type Indexable = { [key: string]: unknown };
 
 type WrappedGridColumn<T extends Indexable> = GridColumn & {
   cell: Cell<T>;
 };
+
+type ColumnsProps<T extends Indexable> = { columns: WrappedGridColumn<T>[] };
 
 type IdRow<T extends Indexable> = T & {
   rowUuid: string;
@@ -45,27 +47,51 @@ type UserRowHoverHighlightReturn = {
   getRowThemeOverride: GetRowThemeCallback;
 };
 
-type GlideGridProps<T extends Indexable> = {
-  columns: WrappedGridColumn<T>[];
-  rows: number;
-  onItemHovered: HoverHandler;
-  data: T[];
-  getRowThemeOverride: GetRowThemeCallback;
-};
-
 type RowGetter<T extends Indexable> = (uuid: string) => IdRow<T>;
+
+type ObjectValues<T> = T[keyof T];
+
+const SORT_STATES = {
+  initial: 'initial',
+  ascending: 'ascending',
+  descending: 'descending',
+} as const;
+
+type SortStates = ObjectValues<typeof SORT_STATES>;
+
+type RowIndexGetter<T extends Indexable> = (rowNumber: number) => IdRow<T>;
+
+type RowIndexGetterProps<T extends Indexable> = {
+  getRowByIndex: RowIndexGetter<T>;
+};
+type RowIdGetter<T extends Indexable> = (uuid: string) => IdRow<T>;
+
+type ItemToGridCell = (item: Item) => GridCell;
+
+type HeaderClickHandler = (n: string, col?: number) => void;
+type HeaderClickProps = {
+  onHeaderClicked: HeaderClickHandler;
+};
 
 export type {
   Cell,
+  ColumnsProps,
   GenGridCellProps,
   GenTextCellProps,
   GenUriCellProps,
   GlideGridCellGenerator,
-  GlideGridProps,
   HoverHandler,
   IdRow,
   Indexable,
+  ItemToGridCell,
   RowGetter,
+  RowIndexGetter,
+  RowIndexGetterProps,
+  HeaderClickHandler,
+  HeaderClickProps,
+  SORT_STATES,
+  RowIdGetter,
+  SortStates,
   UserRowHoverHighlightReturn,
   WrappedGridColumn,
 };

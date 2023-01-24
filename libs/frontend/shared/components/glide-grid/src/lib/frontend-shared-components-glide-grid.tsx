@@ -4,14 +4,29 @@ import {
   Item,
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
-import type { GlideGridProps, Indexable } from './types';
-import { useCallback } from 'react';
+import type {
+  ColumnsProps,
+  HeaderClickHandler,
+  Indexable,
+  HoverHandler,
+} from './types';
+import { useCallback, useMemo, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { useSetupData } from './hooks/use-setup-data';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
 import { useAddIds } from './hooks/use-add-ids';
+import { useHeaderClicked } from './hooks/use-header-clicked';
+import { sort } from 'fast-sort';
+
+type GlideGridProps<T extends Indexable> = {
+  rows: number;
+  onItemHovered: HoverHandler;
+  data: T[];
+  getRowThemeOverride: GetRowThemeCallback;
+  onHeaderClicked: HeaderClickHandler;
+} & ColumnsProps<T>;
 
 function GlideGrid<T extends Indexable>({
   columns,
@@ -19,9 +34,25 @@ function GlideGrid<T extends Indexable>({
   rows,
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
+  onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
   const { dataWithIds } = useAddIds(data);
   const { getRowByIndex } = useSetupData(dataWithIds);
+
+  const [asc, setAsc] = useState(false);
+  const { onHeaderClicked: _onHeaderClicked, selectedHeader } =
+    useHeaderClicked({
+      columns,
+      onHeaderClicked: () => setAsc((val) => !val),
+    });
+
+  const sorted = useMemo(
+    () =>
+      asc
+        ? sort(dataWithIds).asc(selectedHeader)
+        : sort(dataWithIds).desc(selectedHeader),
+    [dataWithIds, selectedHeader, asc]
+  );
 
   const {
     onItemHovered: onItemHoveredHighlight,
@@ -46,7 +77,12 @@ function GlideGrid<T extends Indexable>({
     [getRowHoveredThemeOverride, getRowThemeOverride]
   );
 
-  const { getCellContent } = useGenGetCellContent({ columns, getRowByIndex });
+  const { getCellContent } = useGenGetCellContent({
+    columns,
+    getRowByIndex,
+    sorted,
+    rows,
+  });
 
   return (
     <DataEditor
@@ -54,6 +90,7 @@ function GlideGrid<T extends Indexable>({
       width="100%"
       verticalBorder={false}
       columns={columns}
+      // turns on copy support
       getCellsForSelection={true}
       getCellContent={getCellContent}
       onCellClicked={(item: Item) => {
@@ -64,6 +101,7 @@ function GlideGrid<T extends Indexable>({
         //   window.alert('Navigating to: ' + data);
         // }
       }}
+      onHeaderClicked={_onHeaderClicked}
       smoothScrollX={true}
       smoothScrollY={true}
       onItemHovered={_onItemHovered}
@@ -73,4 +111,5 @@ function GlideGrid<T extends Indexable>({
   );
 }
 
-export { GlideGrid, GlideGridProps };
+export { GlideGrid };
+export type { GlideGridProps };

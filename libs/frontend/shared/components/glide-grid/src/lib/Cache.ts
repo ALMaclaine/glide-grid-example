@@ -1,5 +1,10 @@
-import { IdRow, Indexable } from './types';
-import { addIdToRow } from './utils';
+import type {
+  ColumnsProps,
+  GlideGridCellGenerator,
+  IdRow,
+  Indexable,
+  RowIndexGetterProps,
+} from './types';
 import { GridCell } from '@glideapps/glide-data-grid';
 
 class BaseCache<T> extends Map<string, T> {
@@ -52,9 +57,23 @@ class RowCache<T extends Indexable> {
   }
 }
 
-class CellCache {
+type CellCacheProps<T extends Indexable> = ColumnsProps<T> &
+  RowIndexGetterProps<T> & {
+    cellGen: GlideGridCellGenerator;
+    rows: number;
+  };
+
+class CellCache<T extends Indexable> {
   // column -> row -> value
   private cachedContent: Map<string, Map<number, GridCell>> = new Map();
+  constructor({ cellGen, columns, rows, getRowByIndex }: CellCacheProps<T>) {
+    for (let row = 0; row < rows; row++) {
+      const { rowUuid } = getRowByIndex(row);
+      for (let col = 0; col < columns.length; col++) {
+        this.set(rowUuid, col, cellGen([col, row]));
+      }
+    }
+  }
 
   get(rowUuid: string, col: number): GridCell {
     const rowCache = this.cachedContent.get(rowUuid);

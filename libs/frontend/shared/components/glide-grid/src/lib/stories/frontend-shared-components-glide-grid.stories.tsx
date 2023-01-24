@@ -5,8 +5,8 @@ import {
   GlideGridProps,
 } from '../frontend-shared-components-glide-grid';
 import type { Indexable, WrappedGridColumn } from '../types';
-import { genGetCellContent, genTextCell, genUriCell } from '../utils';
 import { randAddress, randCompanyName, randFloat } from '@ngneat/falso';
+import { genTextCell, genUriCell } from '../cells/generators';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -49,7 +49,7 @@ type Property = {
 const columns: WrappedGridColumn<Property>[] = [
   {
     title: 'Property',
-    id: 'property',
+    id: 'Property',
     grow: 2,
     cell: genUriCell({
       data: 'property',
@@ -63,7 +63,7 @@ const columns: WrappedGridColumn<Property>[] = [
   },
   {
     title: 'Address',
-    id: 'address',
+    id: 'Address',
     grow: 2,
     cell: genTextCell({ data: 'address' }),
   },

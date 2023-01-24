@@ -1,24 +1,20 @@
-import { Indexable } from '../types';
-import { CellCache, RowCache } from '../Cache';
+import { CellCache } from '../Cache';
 import { useCallback, useRef } from 'react';
-import { GridCell } from '@glideapps/glide-data-grid';
+import { genGetCellContent } from '../utils';
+import { ColumnsProps, Indexable, RowIndexGetterProps } from '../types';
 
-const useCellCache = () => {
-  const cache = useRef<CellCache>(new CellCache());
-
-  const cacheHas = useCallback((uuid: string, col: number) => {
-    return cache.current?.has(uuid, col);
-  }, []);
-
-  const cacheHasRow = useCallback((rowUuid: string) => {
-    return cache.current?.hasRow(rowUuid);
-  }, []);
-
-  const cacheSetRow = useCallback(
-    (uuid: string, col: number, value: GridCell) => {
-      return cache.current?.set(uuid, col, value);
-    },
-    []
+const useCellCache = <T extends Indexable>({
+  columns,
+  getRowByIndex,
+  rows,
+}: ColumnsProps<T> & RowIndexGetterProps<T> & { rows: number }) => {
+  const cache = useRef<CellCache<T>>(
+    new CellCache({
+      cellGen: genGetCellContent(columns, getRowByIndex),
+      columns,
+      rows,
+      getRowByIndex,
+    })
   );
 
   const cacheGetRow = useCallback((uuid: string, col: number) => {
@@ -26,9 +22,6 @@ const useCellCache = () => {
   }, []);
 
   return {
-    cacheHas,
-    cacheHasRow,
-    cacheSetRow,
     cacheGetRow,
   };
 };

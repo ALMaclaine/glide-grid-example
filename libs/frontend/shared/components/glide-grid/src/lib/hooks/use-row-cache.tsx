@@ -1,4 +1,4 @@
-import { Indexable } from '../types';
+import type { Indexable } from '../types';
 import { RowCache } from '../Cache';
 import { useCallback, useRef } from 'react';
 

@@ -41,6 +41,7 @@ specifiers:
   eslint-plugin-jsx-a11y: 6.6.1
   eslint-plugin-react: 7.31.11
   eslint-plugin-react-hooks: 4.6.0
+  fast-sort: ^3.2.1
   html-webpack-plugin: ^5.5.0
   jest: 28.1.1
   jest-environment-jsdom: 28.1.1
@@ -61,6 +62,7 @@ dependencies:
   '@glideapps/glide-data-grid': 5.2.1_hkxiktvnj65fwmoenr62ovejiy
   '@ngneat/falso': 6.4.0
   core-js: 3.27.2
+  fast-sort: 3.2.1
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   tslib: 2.4.1
@@ -10004,6 +10006,10 @@ packages:
   /fast-levenshtein/2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
+
+  /fast-sort/3.2.1:
+    resolution: {integrity: sha512-ECGwVH57yCv3C8v+4BQkQf65bNR4nFetxfGRRLYmzFEAK3oZBr7zCakBjOY/AptmmoU3ffMPJLLN1rdKdMHoUA==}
+    dev: false
 
   /fastq/1.15.0:
     resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
