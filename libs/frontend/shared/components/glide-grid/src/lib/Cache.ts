@@ -15,12 +15,11 @@ class RowCache<T extends Indexable> {
   private rowIdArray: string[] = [];
   private cache: BaseCache<T> = new BaseCache<IdRow<T>>();
   // column -> row -> value
-  constructor(data: T[] = []) {
+  constructor(data: IdRow<T>[] = []) {
     for (const row of data) {
-      const idRow = addIdToRow<T>(row);
-      const { rowUuid } = idRow;
+      const { rowUuid } = row;
       this.rowIdArray.push(rowUuid);
-      this.cache.set(rowUuid, idRow);
+      this.cache.set(rowUuid, row);
     }
   }
 

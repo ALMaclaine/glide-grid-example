@@ -11,6 +11,7 @@ import { noOp, noOpObj } from './utils';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { useSetupData } from './hooks/use-setup-data';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
+import { useAddIds } from './hooks/use-add-ids';
 
 function GlideGrid<T extends Indexable>({
   columns,
@@ -19,7 +20,8 @@ function GlideGrid<T extends Indexable>({
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
 }: GlideGridProps<T>) {
-  const { getRowByIndex } = useSetupData(data);
+  const { dataWithIds } = useAddIds(data);
+  const { getRowByIndex } = useSetupData(dataWithIds);
 
   const {
     onItemHovered: onItemHoveredHighlight,

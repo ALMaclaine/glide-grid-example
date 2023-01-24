@@ -68,8 +68,15 @@ const addIdToRow = <T extends Indexable>(row: T): IdRow<T> => {
   return changeType;
 };
 
+const addIdsToRows = <T extends Indexable>(rows: T[]): IdRow<T>[] => {
+  // mutate directly to avoid performance issues on large tables
+  rows.forEach(addIdToRow);
+  return rows as IdRow<T>[];
+};
+
 export {
   addIdToRow,
+  addIdsToRows,
   genTextCell,
   genGridCell,
   genGetCellContent,
