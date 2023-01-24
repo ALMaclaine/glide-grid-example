@@ -13,7 +13,7 @@ type Cell<T> = Omit<GridCell, 'data'> &
     displayData: keyof T;
   };
 
-type Indexable = Record<string, unknown>;
+type Indexable = { [key: string]: any };
 
 type WrappedGridColumn<T extends Indexable> = GridColumn & {
   cell: Cell<T>;
@@ -53,7 +53,7 @@ type GlideGridProps<T extends Indexable> = {
   getRowThemeOverride: GetRowThemeCallback;
 };
 
-type RowGetter<T extends Indexable> = (row: number) => IdRow<T>;
+type RowGetter<T extends Indexable> = (uuid: string) => IdRow<T>;
 
 export type {
   Cell,

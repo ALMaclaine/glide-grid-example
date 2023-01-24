@@ -19,7 +19,7 @@ function GlideGrid<T extends Indexable>({
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
 }: GlideGridProps<T>) {
-  const { getRow } = useSetupData(data);
+  const { getRowByIndex } = useSetupData(data);
 
   const {
     onItemHovered: onItemHoveredHighlight,
@@ -44,7 +44,7 @@ function GlideGrid<T extends Indexable>({
     [getRowHoveredThemeOverride, getRowThemeOverride]
   );
 
-  const { getCellContent } = useGenGetCellContent({ columns, getRow });
+  const { getCellContent } = useGenGetCellContent({ columns, getRowByIndex });
 
   return (
     <DataEditor

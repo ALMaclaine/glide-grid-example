@@ -1,13 +1,22 @@
 import { Indexable } from '../types';
-import { useCallback, useMemo } from 'react';
-import { addIdsToRows } from '../utils';
+import { RowCache } from '../Cache';
+import { useRowCache } from './use-row-cache';
 
 const useSetupData = <T extends Indexable>(data: T[]) => {
-  const dataWithIds = useMemo(() => addIdsToRows(data), [data]);
-  const getRow = useCallback(
-    (row: number) => dataWithIds[row] ?? {},
-    [dataWithIds]
-  );
-  return { getRow };
+  const {
+    cacheHasId,
+    cacheHasIndex,
+    cacheGetRowById,
+    cacheGetRowId,
+    cacheGetRowByIndex,
+  } = useRowCache<T, RowCache<T>>(new RowCache<T>(data));
+  return {
+    hasId: cacheHasId,
+    hasIndex: cacheHasIndex,
+    getRowById: cacheGetRowById,
+    getRowByIndex: cacheGetRowByIndex,
+    getRowId: cacheGetRowId,
+  };
 };
+
 export { useSetupData };
