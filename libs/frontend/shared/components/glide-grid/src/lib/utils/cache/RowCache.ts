@@ -1,5 +1,5 @@
-import type { Indexable } from '../types/general';
-import type { IdRow } from '../types/grid';
+import type { Indexable } from '../../types/general';
+import type { IdRow } from '../../types/grid';
 
 class RowCache<T extends Indexable> {
   private rowIdArray: string[] = [];

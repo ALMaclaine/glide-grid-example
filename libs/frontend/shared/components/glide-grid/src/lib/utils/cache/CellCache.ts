@@ -1,13 +1,13 @@
 import { GridCell, Item } from '@glideapps/glide-data-grid';
-import type { Indexable } from '../types/general';
+import type { Indexable } from '../../types/general';
 import { GlideGridCellGenerator } from '../cells/generators';
-import type { WrappedGridColumn } from '../types/grid';
+import type { WrappedGridColumn } from '../../types/grid';
 import type {
   ColumnsProps,
   RowIndexGetterProps,
   RowsProps,
-} from '../types/props';
-import type { RowIndexGetter } from '../types/func';
+} from '../../types/props';
+import type { RowIndexGetter } from '../../types/func';
 
 const genGetCellContent = <T extends Indexable>(
   columns: WrappedGridColumn<T>[],

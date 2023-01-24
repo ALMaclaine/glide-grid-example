@@ -12,8 +12,11 @@ import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { useSetupData } from './hooks/use-setup-data';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
 import { useAddIds } from './hooks/use-add-ids';
-import { useHeaderClicked } from './hooks/use-header-clicked';
-import type { Indexable } from './types/general';
+import {
+  useHeaderClicked,
+  UseHeaderClickedProps,
+} from './hooks/use-header-clicked';
+import type { Indexable, StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { useSort } from './hooks/use-sort';
@@ -39,7 +42,7 @@ function GlideGrid<T extends Indexable>({
   const { sorted, onHeaderClickSort } = useSort(dataWithIds);
 
   const onHeaderClickedIn = useCallback(
-    (headerVal: string) => {
+    (headerVal: StringKeys<T>) => {
       onHeaderClicked(headerVal);
       onHeaderClickSort(headerVal);
     },
@@ -49,7 +52,7 @@ function GlideGrid<T extends Indexable>({
   const { onHeaderClicked: _onHeaderClicked } = useHeaderClicked({
     columns,
     onHeaderClicked: onHeaderClickedIn,
-  });
+  } as UseHeaderClickedProps<T>);
 
   const {
     onItemHovered: onItemHoveredHighlight,

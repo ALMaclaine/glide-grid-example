@@ -1,17 +1,22 @@
-import { Indexable } from '../types/general';
+import { Indexable, StringKeys } from '../types/general';
 import { IdRow } from '../types/grid';
 import { useCallback, useRef, useState } from 'react';
-import { Sorter } from '../utils/sorter';
+import { TableSorter } from '../utils/sort/table-sorter';
 import { useSortStateMachine } from './use-sort-state-machine';
 
 const useSort = <T extends Indexable>(originalData: IdRow<T>[]) => {
-  const sorter = useRef(new Sorter(originalData));
-  const { sortMachineNextToken } = useSortStateMachine();
+  const sorter = useRef(new TableSorter(originalData));
+  const { sortMachineNextToken } = useSortStateMachine<T>();
   const [sorted, setSorted] = useState(originalData);
   const onHeaderClickSort = useCallback(
-    (headerVal: string) => {
-      const { nextState } = sortMachineNextToken(headerVal);
-      setSorted(sorter.current.stateSort(nextState, headerVal));
+    (headerVal: StringKeys<T>) => {
+      const { currentStateSet, previousStateSet } =
+        sortMachineNextToken(headerVal);
+      const nextSorted = sorter.current.stateSort(
+        currentStateSet,
+        previousStateSet
+      );
+      setSorted(nextSorted);
     },
     [sortMachineNextToken]
   );

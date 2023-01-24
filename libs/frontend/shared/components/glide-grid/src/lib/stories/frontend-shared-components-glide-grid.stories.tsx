@@ -4,9 +4,10 @@ import {
   GlideGrid,
   GlideGridProps,
 } from '../frontend-shared-components-glide-grid';
-import type { Indexable, WrappedGridColumn } from '../types';
-import { randAddress, randCompanyName, randFloat } from '@ngneat/falso';
-import { genTextCell, genUriCell } from '../cells/generators';
+import { randAddress, randCompanyName } from '@ngneat/falso';
+import { genTextCell, genUriCell } from '../utils/cells/generators';
+import type { Indexable } from '../types/general';
+import type { WrappedGridColumn } from '../types/grid';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -87,13 +88,15 @@ const columns: WrappedGridColumn<Property>[] = [
   },
 ];
 
+const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43, 4300.99, 543.53];
 function genProperty(): Property {
   return {
     property: randAddress().street,
     address: randAddress().street,
     investor: randCompanyName(),
     units: Math.round(Math.random() * 6 + 1).toString(),
-    rentOwed: randFloat({ fraction: 2 }).toString(),
+    rentOwed:
+      RENT_OWED_SET[Math.floor(Math.random() * RENT_OWED_SET.length)] + '',
   };
 }
 

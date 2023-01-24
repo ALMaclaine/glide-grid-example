@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { CellCache } from '../cache/CellCache';
+import { CellCache } from '../utils/cache/CellCache';
 import type { Indexable } from '../types/general';
 import type {
   ColumnsProps,

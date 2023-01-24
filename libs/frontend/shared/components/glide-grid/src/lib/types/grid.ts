@@ -1,10 +1,10 @@
 import { GridCell, GridColumn, UriCell } from '@glideapps/glide-data-grid';
-import type { Indexable } from './general';
+import type { Indexable, StringKeys } from './general';
 
-type Cell<T> = Omit<GridCell, 'data'> &
+type Cell<T extends Indexable> = Omit<GridCell, 'data'> &
   Pick<UriCell, 'readonly'> & {
-    data: Extract<keyof T, string>;
-    displayData: Extract<keyof T, string>;
+    data: StringKeys<T>;
+    displayData: StringKeys<T>;
   };
 
 type WrappedGridColumn<T extends Indexable> = GridColumn & {

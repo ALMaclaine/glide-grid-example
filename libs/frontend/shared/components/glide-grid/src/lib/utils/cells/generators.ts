@@ -1,6 +1,6 @@
 import { GridCell, GridCellKind, Item } from '@glideapps/glide-data-grid';
-import type { Indexable } from '../types/general';
-import type { Cell } from '../types/grid';
+import type { Indexable } from '../../types/general';
+import type { Cell } from '../../types/grid';
 
 type GenGridCellProps<T extends Indexable> = {
   kind: GridCell['kind'];

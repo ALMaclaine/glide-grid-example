@@ -1,11 +1,11 @@
 import { useCallback, useRef } from 'react';
-import { SortStateMachine } from '../utils/sort-state-machine';
+import { SortStateMachine } from '../utils/sort/sort-state-machine';
+import { Indexable, StringKeys } from '../types/general';
 
-const useSortStateMachine = () => {
-  const stateMachine = useRef(new SortStateMachine());
-  const sortMachineNextToken = useCallback((value: string) => {
-    const nextState = stateMachine.current.nextValue(value);
-    return { nextState };
+const useSortStateMachine = <T extends Indexable>() => {
+  const stateMachine = useRef(new SortStateMachine<T>());
+  const sortMachineNextToken = useCallback((value: StringKeys<T>) => {
+    return stateMachine.current.nextValue(value);
   }, []);
 
   return { sortMachineNextToken };
