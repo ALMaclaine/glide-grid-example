@@ -1,6 +1,6 @@
 import { useRowCache } from './use-row-cache';
 import type { Indexable } from '../types/general';
-import { RowCache } from '../utils/cache/RowCache';
+import { RowCache } from '../utils/cache/row-cache';
 import type { IdRow } from '../types/grid';
 
 const useSetupData = <T extends Indexable>(data: IdRow<T>[]) => {
