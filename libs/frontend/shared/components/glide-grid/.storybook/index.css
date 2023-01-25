@@ -1,0 +1,8 @@
+.sb-show-main.sb-main-padded {
+  padding: 0;
+}
+
+html, body, #root, .sb-show-main {
+  height: 100%;
+  padding: 0 !important;
+}

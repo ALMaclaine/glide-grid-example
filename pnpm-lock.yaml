@@ -25,6 +25,7 @@ specifiers:
   '@testing-library/react': 13.4.0
   '@types/jest': 28.1.1
   '@types/node': 18.11.9
+  '@types/offscreencanvas': ^2019.7.0
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
   '@types/uuid': ^9.0.0
@@ -89,6 +90,7 @@ devDependencies:
   '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
   '@types/jest': 28.1.1
   '@types/node': 18.11.9
+  '@types/offscreencanvas': 2019.7.0
   '@types/react': 18.0.25
   '@types/react-dom': 18.0.9
   '@types/uuid': 9.0.0
@@ -5821,6 +5823,10 @@ packages:
 
   /@types/npmlog/4.1.4:
     resolution: {integrity: sha512-WKG4gTr8przEZBiJ5r3s8ZIAoMXNbOgQ+j/d5O4X3x6kZJRLNvyUJuUK/KoG3+8BaOHPhp2m7WC6JKKeovDSzQ==}
+    dev: true
+
+  /@types/offscreencanvas/2019.7.0:
+    resolution: {integrity: sha512-PGcyveRIpL1XIqK8eBsmRBt76eFgtzuPiSTyKHZxnGemp2yzGzWpjYKAfK3wIMiU7eH+851yEpiuP8JZerTmWg==}
     dev: true
 
   /@types/parse-json/4.0.0:

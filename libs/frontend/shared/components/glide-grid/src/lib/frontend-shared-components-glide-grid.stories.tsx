@@ -3,15 +3,15 @@ import { ComponentStory, Meta } from '@storybook/react';
 import {
   GlideGrid,
   GlideGridProps,
-} from '../frontend-shared-components-glide-grid';
+} from './frontend-shared-components-glide-grid';
 import { randAddress, randCompanyName } from '@ngneat/falso';
 import {
   genNumericCell,
   genTextCell,
   genUriCell,
-} from '../utils/cells/generators';
-import type { Indexable } from '../types/general';
-import type { WrappedGridColumn } from '../types/grid';
+} from './utils/cells/generators';
+import type { Indexable } from './types/general';
+import type { WrappedGridColumn } from './types/grid';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
