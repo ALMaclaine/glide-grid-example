@@ -39,7 +39,10 @@ function GlideGrid<T extends Indexable>({
 }: GlideGridProps<T>) {
   const { dataWithIds } = useAddIds(data);
   const { getRowByIndex } = useSetupData(dataWithIds);
-  const { sorted, onHeaderClickSort } = useSort(dataWithIds);
+  const { sorted, onHeaderClickSort } = useSort({
+    originalData: dataWithIds,
+    columns,
+  });
 
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
@@ -104,6 +107,11 @@ function GlideGrid<T extends Indexable>({
       onHeaderClicked={_onHeaderClicked}
       smoothScrollX={true}
       smoothScrollY={true}
+      theme={{
+        accentColor: '#e1dbfc',
+        accentLight: '#f8f7fe',
+        textHeaderSelected: '#3d3c5a',
+      }}
       onItemHovered={_onItemHovered}
       getRowThemeOverride={_getRowThemeOverride}
       rows={rows}

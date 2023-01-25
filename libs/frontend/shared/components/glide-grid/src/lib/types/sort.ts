@@ -2,8 +2,8 @@ import type { ObjectValues } from './general';
 
 const SORT_STATES = {
   initial: 'initial',
-  ascending: 'ascending',
-  descending: 'descending',
+  ascending: 'asc',
+  descending: 'desc',
 } as const;
 
 type SortStates = ObjectValues<typeof SORT_STATES>;

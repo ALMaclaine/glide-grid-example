@@ -5,7 +5,11 @@ import {
   GlideGridProps,
 } from '../frontend-shared-components-glide-grid';
 import { randAddress, randCompanyName } from '@ngneat/falso';
-import { genTextCell, genUriCell } from '../utils/cells/generators';
+import {
+  genNumericCell,
+  genTextCell,
+  genUriCell,
+} from '../utils/cells/generators';
 import type { Indexable } from '../types/general';
 import type { WrappedGridColumn } from '../types/grid';
 
@@ -31,7 +35,6 @@ export const Primary: ComponentStory<typeof GlideGrid> = <T extends Indexable>(
         width: '80vw',
         height: '60vh',
         margin: '0 auto',
-        boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
       }}
     >
       <GlideGrid {...args} />
@@ -78,13 +81,13 @@ const columns: WrappedGridColumn<Property>[] = [
     title: 'Units',
     id: 'units',
     grow: 1,
-    cell: genTextCell({ data: 'units' }),
+    cell: genNumericCell({ data: 'units' }),
   },
   {
     title: 'Rent Owed',
     id: 'rent-owed',
     grow: 1,
-    cell: genTextCell({ data: 'rentOwed', contentAlign: 'right' }),
+    cell: genNumericCell({ data: 'rentOwed', contentAlign: 'right' }),
   },
 ];
 

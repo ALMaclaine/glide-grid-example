@@ -1,5 +1,6 @@
-import type { Indexable, IdRow } from '../types';
 import { v4 as uuid } from 'uuid';
+import type { Indexable } from '../types/general';
+import type { IdRow } from '../types/grid';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
