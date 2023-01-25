@@ -1,13 +1,6 @@
 import { GridCell, GridColumn, UriCell } from '@glideapps/glide-data-grid';
-import type { Indexable, ObjectValues, StringKeys } from './general';
-
-const SORT_TYPES = {
-  natural: 'natural',
-  date: 'date',
-  numeric: 'numeric',
-} as const;
-
-type SortTypes = ObjectValues<typeof SORT_TYPES>;
+import type { Indexable, StringKeys } from './general';
+import type { SortTypes } from '../utils/sort/object-sort';
 
 type Cell<T extends Indexable> = Omit<GridCell, 'data'> &
   Pick<UriCell, 'readonly'> & {
@@ -24,5 +17,4 @@ type IdRow<T extends Indexable> = T & {
   rowUuid: string;
 };
 
-export type { Cell, IdRow, WrappedGridColumn, SortTypes };
-export { SORT_TYPES };
+export type { Cell, IdRow, WrappedGridColumn };

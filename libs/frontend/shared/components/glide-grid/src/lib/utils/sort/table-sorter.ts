@@ -1,11 +1,9 @@
 import type { Indexable, StringKeys } from '../../types/general';
-import type { IdRow, SortTypes } from '../../types/grid';
-import { SORT_STATES, SortStates } from '../../types/sort';
+import type { IdRow } from '../../types/grid';
 import { StateSet } from './sort-state-machine';
 import { ColumnsProps } from '../../types/props';
-import { SORT_TYPES } from '../../types/grid';
-import { naturalSort, sortDates, sortNumeric } from './sorters';
-import { firstBy } from 'thenby';
+import { objectSort, SORT_STATES, SORT_TYPES } from './object-sort';
+import type { SortTypes } from './object-sort';
 const { initial } = SORT_STATES;
 
 type TableSorterProps<T extends Indexable> = ColumnsProps<T> & {
@@ -33,64 +31,11 @@ class TableSorter<T extends Indexable> {
     return [...this.originalData];
   }
 
-  private getSorterType(type: SortTypes) {
-    switch (type) {
-      case SORT_TYPES.natural:
-        return naturalSort;
-      case SORT_TYPES.date:
-        return sortDates;
-      case SORT_TYPES.numeric:
-        return sortNumeric;
-      default: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const _default: never = type;
-        return naturalSort;
-      }
+  private getType(key: StringKeys<T> | '') {
+    if (key === '') {
+      return SORT_TYPES.natural;
     }
-  }
-
-  private getFirstBySorter(key: StringKeys<T>, state: SortStates) {
-    const type = this.sortMap.get(key) as SortTypes;
-
-    switch (type) {
-      case SORT_TYPES.natural:
-        return firstBy(key as string, state);
-      case SORT_TYPES.date:
-        return firstBy((val1: T, val2: T) => {
-          return sortDates(val1[key] as string, val2[key] as string);
-        }, state);
-      case SORT_TYPES.numeric:
-        return firstBy((val1: T, val2: T) => {
-          return sortNumeric(val1[key] as string, val2[key] as string);
-        }, state);
-      default: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const _default: never = type;
-        return firstBy(key as string, state);
-      }
-    }
-  }
-
-  private getThenBySorter(sorter, key: StringKeys<T>, state: SortStates) {
-    const type = this.sortMap.get(key) as SortTypes;
-
-    switch (type) {
-      case SORT_TYPES.natural:
-        return sorter.thenBy(key as string, state);
-      case SORT_TYPES.date:
-        return sorter.thenBy((val1: T, val2: T) => {
-          return sortDates(val1[key] as string, val2[key] as string);
-        }, state);
-      case SORT_TYPES.numeric:
-        return sorter.thenBy((val1: T, val2: T) => {
-          return sortNumeric(val1[key] as string, val2[key] as string);
-        }, state);
-      default: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const _default: never = type;
-        return sorter.thenBy(key as string, state);
-      }
-    }
+    return this.sortMap.get(key) || SORT_TYPES.natural;
   }
 
   stateSort(currentStateSet: StateSet<T>, previousStateSet: StateSet<T>) {
@@ -102,13 +47,18 @@ class TableSorter<T extends Indexable> {
       return this.cloneOriginal();
     }
 
-    let sorter = this.getFirstBySorter(currentValue, currentState);
-
-    if (previousValue !== '') {
-      sorter = this.getThenBySorter(sorter, previousValue, previousState);
-    }
-
-    return this.cloneOriginal().sort(sorter);
+    return objectSort(this.cloneOriginal(), [
+      {
+        state: currentState,
+        type: this.getType(currentValue),
+        key: currentValue,
+      },
+      {
+        state: previousState,
+        type: this.getType(previousValue),
+        key: previousValue,
+      },
+    ]);
   }
 }
 

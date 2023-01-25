@@ -1,6 +1,6 @@
-import type { SortStates } from '../../types/sort';
-import { SORT_STATES } from '../../types/sort';
 import type { Indexable, StringKeys } from '../../types/general';
+import type { SortStates } from './object-sort';
+import { SORT_STATES } from './object-sort';
 
 const sortStatesArray: SortStates[] = [
   SORT_STATES.initial,
