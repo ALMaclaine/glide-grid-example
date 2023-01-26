@@ -1,3 +1,12 @@
+.sb-show-main.sb-main-padded {
+  padding: 0;
+}
+
+html, body, #root, .sb-show-main {
+  height: 100%;
+  padding: 0 !important;
+}
+
 /* linaria:data-grid-overlay-editor-style_115vs9w.linaria.css */
 .d1t1th9s {
   position: absolute;
