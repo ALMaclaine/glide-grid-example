@@ -8,7 +8,7 @@ const useSort = <T extends Indexable>({
   columns,
 }: TableSorterProps<T>) => {
   const sorter = useRef(new TableSorter({ originalData, columns }));
-  const { sortMachineNextToken } = useSortStateMachine<T>();
+  const { sortMachineNextToken, getSortState } = useSortStateMachine<T>();
   const [sorted, setSorted] = useState(originalData);
   const onHeaderClickSort = useCallback(
     (headerVal: StringKeys<T>) => {
@@ -24,7 +24,7 @@ const useSort = <T extends Indexable>({
     [sortMachineNextToken]
   );
 
-  return { sorted, onHeaderClickSort };
+  return { sorted, onHeaderClickSort, getSortState };
 };
 
 export { useSort };

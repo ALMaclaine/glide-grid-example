@@ -34,8 +34,13 @@ class Triangle implements Imageable {
     this.fillColor = color;
   }
 
+  background(color: string) {
+    this.easel.background(color);
+  }
+
   private drawUp() {
     this.easel.draw((ctx) => {
+      this.easel.drawBackground();
       const _midPoint = midPoint(0, this._width);
       ctx.fillStyle = this.fillColor;
       ctx.beginPath();
@@ -48,6 +53,7 @@ class Triangle implements Imageable {
 
   private drawDown() {
     this.easel.draw((ctx) => {
+      this.easel.drawBackground();
       const _midPoint = midPoint(0, this._width);
       ctx.fillStyle = this.fillColor;
       ctx.beginPath();
@@ -60,6 +66,7 @@ class Triangle implements Imageable {
 
   private drawRight() {
     this.easel.draw((ctx) => {
+      this.easel.drawBackground();
       const _midPoint = midPoint(0, this._height);
       ctx.fillStyle = this.fillColor;
       ctx.beginPath();
@@ -72,6 +79,7 @@ class Triangle implements Imageable {
 
   private drawLeft() {
     this.easel.draw((ctx) => {
+      this.easel.drawBackground();
       const _midPoint = midPoint(0, this._height);
       ctx.fillStyle = this.fillColor;
       ctx.beginPath();

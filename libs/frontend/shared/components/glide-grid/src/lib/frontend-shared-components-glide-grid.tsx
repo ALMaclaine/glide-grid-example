@@ -1,5 +1,6 @@
 import {
   DataEditor,
+  DrawHeaderCallback,
   GridMouseEventArgs,
   Item,
 } from '@glideapps/glide-data-grid';
@@ -20,8 +21,12 @@ import type { Indexable, StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { useSort } from './hooks/use-sort';
-import { StackedTriangles } from './utils/canvas/stacked-triangles';
 import { positioner } from './utils/canvas/utils';
+import {
+  drawHeaderSort,
+  getHeaderSortImage,
+  headerThemePriority,
+} from './utils/canvas/draw-helpers';
 
 type GlideGridProps<T extends Indexable> = {
   onItemHovered: HoverHandler;
@@ -41,7 +46,7 @@ function GlideGrid<T extends Indexable>({
 }: GlideGridProps<T>) {
   const { dataWithIds } = useAddIds(data);
   const { getRowByIndex } = useSetupData(dataWithIds);
-  const { sorted, onHeaderClickSort } = useSort({
+  const { sorted, onHeaderClickSort, getSortState } = useSort({
     originalData: dataWithIds,
     columns,
   });
@@ -109,26 +114,8 @@ function GlideGrid<T extends Indexable>({
       onHeaderClicked={_onHeaderClicked}
       smoothScrollX={true}
       smoothScrollY={true}
-      drawHeader={({ ctx, rect }) => {
-        const { x, y, width, height } = rect;
-        const stackedTriangles = new StackedTriangles({
-          width: 8,
-          height: 8,
-          gap: 4,
-        });
-        stackedTriangles.draw();
-        const pos = positioner({
-          containerWidth: width,
-          containerHeight: height,
-          itemWidth: stackedTriangles.width,
-          itemHeight: stackedTriangles.height,
-          position: 'midRight',
-          padding: 8,
-        });
-
-        ctx.putImageData(stackedTriangles.image(), pos.x + x, pos.y + y);
-
-        console.log(rect);
+      drawHeader={(args) => {
+        drawHeaderSort(args, getSortState());
         return false;
       }}
       theme={{

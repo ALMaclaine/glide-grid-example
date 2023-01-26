@@ -45,7 +45,14 @@ class StackedTriangles implements Imageable {
     this.clear();
   }
 
+  background(color: string) {
+    this.triangle.background(color);
+    this.easel.background(color);
+    this.clear();
+  }
+
   clear() {
+    this.triangle.clear();
     this.easel.clear();
     this.dirty = true;
   }
@@ -62,6 +69,8 @@ class StackedTriangles implements Imageable {
     this.triangle.draw(TRIANGLE_DIRECTIONS.down);
     const triangleDownImage = this.triangle.image();
     this.triangle.clear();
+
+    this.easel.drawBackground();
 
     const baseOptions = {
       containerWidth: this._width,
@@ -87,3 +96,4 @@ class StackedTriangles implements Imageable {
 }
 
 export { StackedTriangles };
+export type { StackedTriangleProps };

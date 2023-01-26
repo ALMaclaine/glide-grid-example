@@ -53,7 +53,7 @@ type Property = {
 const columns: WrappedGridColumn<Property>[] = [
   {
     title: 'Property',
-    id: 'Property',
+    id: 'property',
     grow: 2,
     cell: genUriCell({
       data: 'property',
@@ -67,7 +67,7 @@ const columns: WrappedGridColumn<Property>[] = [
   },
   {
     title: 'Address',
-    id: 'Address',
+    id: 'address',
     grow: 2,
     cell: genTextCell({ data: 'address' }),
   },
@@ -85,7 +85,7 @@ const columns: WrappedGridColumn<Property>[] = [
   },
   {
     title: 'Rent Owed',
-    id: 'rent-owed',
+    id: 'rentOwed',
     grow: 1,
     cell: genNumericCell({ data: 'rentOwed', contentAlign: 'right' }),
   },

@@ -29,6 +29,11 @@ type StateSet<T extends Indexable> = {
   value: StringKeys<T> | '';
 };
 
+type StateSetHistory<T extends Indexable> = {
+  currentStateSet: StateSet<T>;
+  previousStateSet: StateSet<T>;
+};
+
 const initialStateSet = {
   state: SORT_STATES.initial,
   value: '',
@@ -48,6 +53,10 @@ class SortStateMachine<T extends Indexable> {
     if (stateSet.value) {
       this.currentStateSet.value = stateSet.value;
     }
+  }
+
+  get previousState() {
+    return { ...this.previousStateSet };
   }
 
   get state() {
@@ -71,7 +80,7 @@ class SortStateMachine<T extends Indexable> {
     this.currentStateSet.state = this.stateCycler();
   }
 
-  nextValue(val: StringKeys<T>) {
+  nextValue(val: StringKeys<T>): StateSetHistory<T> {
     if (this.currentStateSet.value === '') {
       this.currentStateSet.value = val;
       this.nextState();
@@ -88,5 +97,5 @@ class SortStateMachine<T extends Indexable> {
   }
 }
 
-export type { StateSet };
+export type { StateSet, StateSetHistory };
 export { SortStateMachine };

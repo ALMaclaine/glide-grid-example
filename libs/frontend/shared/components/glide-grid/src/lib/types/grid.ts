@@ -9,7 +9,9 @@ type Cell<T extends Indexable> = Omit<GridCell, 'data'> &
     sortType: SortTypes;
   };
 
-type WrappedGridColumn<T extends Indexable> = GridColumn & {
+type WrappedGridColumn<T extends Indexable> = Omit<GridColumn, 'id'> & {
+  id: StringKeys<T>;
+} & {
   cell: Cell<T>;
 };
 

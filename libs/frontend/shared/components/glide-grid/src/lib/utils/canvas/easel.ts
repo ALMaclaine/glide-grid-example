@@ -19,6 +19,7 @@ class Easel implements Imageable {
   private readonly context: OffscreenCanvasRenderingContext2D;
   private readonly _width: number;
   private readonly _height: number;
+  private _background = 'white';
 
   constructor(props?: EaselProps) {
     this._width = props?.width ? props.width : DEFAULT_WIDTH;
@@ -33,6 +34,17 @@ class Easel implements Imageable {
       throw new Error('Context could not be created');
     }
     this.context = context;
+  }
+
+  drawBackground() {
+    this.context.fillStyle = this._background;
+    this.context.beginPath();
+    this.context.rect(0, 0, this._width, this._height);
+    this.context.fill();
+  }
+
+  background(color: string) {
+    this._background = color;
   }
 
   private clearCache() {
