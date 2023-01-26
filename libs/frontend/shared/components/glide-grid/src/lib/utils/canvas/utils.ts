@@ -1,4 +1,4 @@
-import { ObjectValues } from '../types/general';
+import { ObjectValues } from '../../types/general';
 
 const midPoint = (start: number, end: number) => (end + start) / 2;
 
