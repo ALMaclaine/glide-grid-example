@@ -1,29 +1,39 @@
-import type { EaselProps, Imageable } from './easel';
+import type { Imageable } from './easel';
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, Easel } from './easel';
-import { ObjectValues } from '../types/general';
-import { midPoint } from './utils';
+import { positioner, ALIGNMENTS } from './utils';
+import { Triangle, TRIANGLE_DIRECTIONS, TriangleProps } from './triangle';
 
-const TRIANGLE_DIRECTIONS = {
-  up: 'up',
-  down: 'down',
-  left: 'left',
-  right: 'right',
-} as const;
+type StackedTriangleProps = TriangleProps & {
+  gap?: number;
+};
 
-type TriangleDirection = ObjectValues<typeof TRIANGLE_DIRECTIONS>;
-
-type TriangleProps = EaselProps;
-
-class Triangle implements Imageable {
+class StackedTriangles implements Imageable {
   private readonly _width;
+  get width() {
+    return this._width;
+  }
+  private readonly itemHeight;
+
   private readonly _height;
-  private readonly easel;
-  private fillColor = 'black';
+  get height() {
+    return this._height;
+  }
+  private readonly triangle;
+
+  private readonly easel: Easel;
+  private dirty = true;
   // private
-  constructor(props?: TriangleProps) {
+  constructor(props?: StackedTriangleProps) {
+    const gap = props?.gap ? props.gap : 0;
     this._width = props?.width ? props.width : DEFAULT_WIDTH;
-    this._height = props?.height ? props.height : DEFAULT_HEIGHT;
-    this.easel = new Easel(props);
+    const height = props?.height ? props.height : DEFAULT_HEIGHT;
+    this.itemHeight = height;
+    this._height = 2 * height + gap;
+    this.triangle = new Triangle({ width: this._width, height });
+    this.easel = new Easel({
+      width: this._width,
+      height: this._height,
+    });
   }
 
   image(): ImageData {
@@ -31,77 +41,49 @@ class Triangle implements Imageable {
   }
 
   fill(color: string) {
-    this.fillColor = color;
-  }
-
-  private drawUp() {
-    this.easel.draw((ctx) => {
-      const _midPoint = midPoint(0, this._width);
-      ctx.beginPath();
-      ctx.moveTo(_midPoint, 0);
-      ctx.lineTo(0, this._height);
-      ctx.lineTo(this._width, this._height);
-      ctx.fill();
-    });
-  }
-
-  private drawDown() {
-    this.easel.draw((ctx) => {
-      const _midPoint = midPoint(0, this._width);
-      ctx.beginPath();
-      ctx.moveTo(_midPoint, this._height);
-      ctx.lineTo(0, 0);
-      ctx.lineTo(this._width, 0);
-      ctx.fill();
-    });
-  }
-
-  private drawRight() {
-    this.easel.draw((ctx) => {
-      const _midPoint = midPoint(0, this._height);
-      ctx.beginPath();
-      ctx.moveTo(this._width, _midPoint);
-      ctx.lineTo(0, 0);
-      ctx.lineTo(0, this._height);
-      ctx.fill();
-    });
-  }
-
-  private drawLeft() {
-    this.easel.draw((ctx) => {
-      const _midPoint = midPoint(0, this._height);
-      ctx.beginPath();
-      ctx.moveTo(0, _midPoint);
-      ctx.lineTo(this._width, this._height);
-      ctx.lineTo(this._width, 0);
-      ctx.fill();
-    });
+    this.triangle.fill(color);
+    this.clear();
   }
 
   clear() {
     this.easel.clear();
+    this.dirty = true;
   }
 
-  draw(direction: TriangleDirection = TRIANGLE_DIRECTIONS.up) {
-    switch (direction) {
-      case TRIANGLE_DIRECTIONS.up: {
-        this.drawUp();
-        return;
-      }
-      case TRIANGLE_DIRECTIONS.right: {
-        this.drawRight();
-        return;
-      }
-      case TRIANGLE_DIRECTIONS.left: {
-        this.drawLeft();
-        return;
-      }
-      case TRIANGLE_DIRECTIONS.down: {
-        this.drawDown();
-        return;
-      }
+  draw() {
+    if (!this.dirty) {
+      return;
     }
+
+    this.triangle.draw(TRIANGLE_DIRECTIONS.up);
+    const triangleUpImage = this.triangle.image();
+    this.triangle.clear();
+
+    this.triangle.draw(TRIANGLE_DIRECTIONS.down);
+    const triangleDownImage = this.triangle.image();
+    this.triangle.clear();
+
+    const baseOptions = {
+      containerWidth: this._width,
+      containerHeight: this._height,
+      itemWidth: this._width,
+      itemHeight: this.itemHeight,
+    };
+
+    const pos1 = positioner({
+      ...baseOptions,
+      position: ALIGNMENTS.topMid,
+    });
+
+    const pos2 = positioner({
+      ...baseOptions,
+      position: ALIGNMENTS.botMid,
+    });
+
+    this.easel.putImageData(triangleUpImage, pos1);
+    this.easel.putImageData(triangleDownImage, pos2);
+    this.dirty = false;
   }
 }
 
-export { Triangle };
+export { StackedTriangles };

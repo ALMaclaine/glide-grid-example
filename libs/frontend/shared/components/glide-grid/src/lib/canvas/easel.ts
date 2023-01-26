@@ -1,3 +1,5 @@
+import { Position } from './utils';
+
 type Context2dProcessor = (ctx: OffscreenCanvasRenderingContext2D) => void;
 
 type EaselProps = {
@@ -33,17 +35,21 @@ class Easel implements Imageable {
     this.context = context;
   }
 
-  clearCache() {
+  private clearCache() {
     this.imageCache = undefined;
   }
 
-  clearScreen() {
+  private clearScreen() {
     this.context.clearRect(0, 0, this._width, this._height);
   }
 
   clear() {
     this.clearCache();
     this.clearScreen();
+  }
+
+  putImageData(image: ImageData, { x, y }: Position) {
+    this.context.putImageData(image, x, y);
   }
 
   private imageCache?: ImageData;

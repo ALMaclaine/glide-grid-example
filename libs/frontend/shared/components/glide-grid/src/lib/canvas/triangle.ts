@@ -37,6 +37,7 @@ class Triangle implements Imageable {
   private drawUp() {
     this.easel.draw((ctx) => {
       const _midPoint = midPoint(0, this._width);
+      ctx.fillStyle = this.fillColor;
       ctx.beginPath();
       ctx.moveTo(_midPoint, 0);
       ctx.lineTo(0, this._height);
@@ -48,6 +49,7 @@ class Triangle implements Imageable {
   private drawDown() {
     this.easel.draw((ctx) => {
       const _midPoint = midPoint(0, this._width);
+      ctx.fillStyle = this.fillColor;
       ctx.beginPath();
       ctx.moveTo(_midPoint, this._height);
       ctx.lineTo(0, 0);
@@ -59,6 +61,7 @@ class Triangle implements Imageable {
   private drawRight() {
     this.easel.draw((ctx) => {
       const _midPoint = midPoint(0, this._height);
+      ctx.fillStyle = this.fillColor;
       ctx.beginPath();
       ctx.moveTo(this._width, _midPoint);
       ctx.lineTo(0, 0);
@@ -70,6 +73,7 @@ class Triangle implements Imageable {
   private drawLeft() {
     this.easel.draw((ctx) => {
       const _midPoint = midPoint(0, this._height);
+      ctx.fillStyle = this.fillColor;
       ctx.beginPath();
       ctx.moveTo(0, _midPoint);
       ctx.lineTo(this._width, this._height);
@@ -80,9 +84,17 @@ class Triangle implements Imageable {
 
   clear() {
     this.easel.clear();
+    this.lastDirection = undefined;
   }
 
+  private lastDirection?: TriangleDirection;
   draw(direction: TriangleDirection = TRIANGLE_DIRECTIONS.up) {
+    if (this.lastDirection === direction) {
+      return;
+    } else {
+      this.lastDirection = direction;
+    }
+
     switch (direction) {
       case TRIANGLE_DIRECTIONS.up: {
         this.drawUp();
@@ -104,4 +116,5 @@ class Triangle implements Imageable {
   }
 }
 
-export { Triangle };
+export { Triangle, TRIANGLE_DIRECTIONS };
+export type { TriangleDirection, TriangleProps };
