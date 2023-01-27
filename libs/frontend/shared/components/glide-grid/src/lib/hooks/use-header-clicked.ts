@@ -11,7 +11,7 @@ const useHeaderClicked = <T extends Indexable>({
 }: UseHeaderClickedProps<T>) => {
   const _onHeaderClicked = useCallback(
     (col: number) => {
-      const selectedHeader = columns[col].cell.displayData;
+      const selectedHeader = columns.getDisplayData(col);
       onHeaderClicked(selectedHeader, col);
     },
     [columns, onHeaderClicked]

@@ -1,18 +1,20 @@
 import { RowCache } from '../utils/cache/row-cache';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { Indexable } from '../types/general';
+import { IdRow } from '../types/grid';
 
-const useRowCache = <T extends Indexable, U extends RowCache<T>>(
-  cacheStore: U
-) => {
-  const cache = useRef<U>(cacheStore);
+const useRowCache = <T extends Indexable>(data: IdRow<T>[]) => {
+  const cache = useMemo(() => new RowCache(data), [data]);
 
-  const cacheGetRowByIndex = useCallback((row: number) => {
-    return cache.current?.getRowByIndex(row);
-  }, []);
+  const cacheGetRowByIndex = useCallback(
+    (row: number) => {
+      return cache.getRowByIndex(row);
+    },
+    [cache]
+  );
 
   return {
-    cacheGetRowByIndex,
+    getRowByIndex: cacheGetRowByIndex,
   };
 };
 

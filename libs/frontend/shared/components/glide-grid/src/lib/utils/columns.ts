@@ -34,9 +34,6 @@ class Columns<T extends Indexable> {
   }
 
   getType(key: StringKeys<T>) {
-    if (key === '') {
-      return SORT_TYPES.natural;
-    }
     return this.sortMap.get(key) || SORT_TYPES.natural;
   }
 
@@ -52,7 +49,7 @@ class Columns<T extends Indexable> {
   }
 
   getCell(colPos: number) {
-    if (colPos > this.uuidOrder.length) {
+    if (colPos > this.uuidOrder.length || colPos < 0) {
       throw new Error('Out of bounds access');
     }
     const id = this.uuidOrder[colPos];
@@ -61,6 +58,20 @@ class Columns<T extends Indexable> {
       return column.cell;
     }
     throw new Error('Column does not exist');
+  }
+
+  swap(col1: number, col2: number) {
+    if (col1 > this.uuidOrder.length || col1 < 0) {
+      throw new Error('col1 Out of bounds access');
+    }
+
+    if (col2 > this.uuidOrder.length || col2 < 0) {
+      throw new Error('col2 Out of bounds access');
+    }
+    [this.uuidOrder[col1], this.uuidOrder[col2]] = [
+      this.uuidOrder[col2],
+      this.uuidOrder[col1],
+    ];
   }
 
   private addColumnsToMap() {

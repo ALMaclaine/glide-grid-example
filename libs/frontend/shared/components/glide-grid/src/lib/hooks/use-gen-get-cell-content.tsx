@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Item } from '@glideapps/glide-data-grid';
 import { useCellCache } from './use-cell-cache';
 import type { Indexable } from '../types/general';

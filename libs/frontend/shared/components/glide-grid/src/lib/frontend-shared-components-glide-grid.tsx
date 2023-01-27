@@ -5,11 +5,10 @@ import {
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
-import { useSetupData } from './hooks/use-setup-data';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
 import { useAddIds } from './hooks/use-add-ids';
 import {
@@ -21,6 +20,8 @@ import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { useSort } from './hooks/use-sort';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
+import { Columns } from './utils/columns';
+import { useRowCache } from './hooks/use-row-cache';
 
 type GlideGridProps<T extends Indexable> = {
   onItemHovered: HoverHandler;
@@ -39,8 +40,9 @@ function GlideGrid<T extends Indexable>({
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
   const { dataWithIds } = useAddIds(data);
-  const { getRowByIndex } = useSetupData(dataWithIds);
-  const { sorted, onHeaderClickSort, getSortState } = useSort({
+  const { getRowByIndex } = useRowCache(dataWithIds);
+  const columnsRef = useRef<Columns<T>>(columns);
+  const { sorted, onHeaderClickSort, getSortState, refreshSort } = useSort({
     originalData: dataWithIds,
     columns,
   });
@@ -104,6 +106,10 @@ function GlideGrid<T extends Indexable>({
         //   const { data } = rest as UriCell;
         //   window.alert('Navigating to: ' + data);
         // }
+      }}
+      onColumnMoved={(col1, col2) => {
+        columnsRef.current.swap(col1, col2);
+        refreshSort();
       }}
       onHeaderClicked={_onHeaderClicked}
       smoothScrollX={true}

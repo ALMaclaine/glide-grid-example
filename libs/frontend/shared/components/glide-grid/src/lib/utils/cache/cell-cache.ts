@@ -8,22 +8,20 @@ import type {
   RowsProps,
 } from '../../types/props';
 import type { RowIndexGetter } from '../../types/func';
+import type { Columns } from '../columns';
 
 const genGetCellContent = <T extends Indexable>(
-  columns: WrappedGridColumn<T>[],
+  columns: Columns<T>,
   getDataByIndex: RowIndexGetter<T>
 ): GlideGridCellGenerator => {
   return ([col, row]: Item): GridCell => {
     const item = getDataByIndex(row);
     if (col < columns.length) {
-      const {
-        cell: { data, displayData, ...rest },
-      } = columns[col];
-
+      const { data, displayData, ...rest } = columns.getCell(col);
       return {
         ...rest,
         data: item[data],
-        displayData: item[data],
+        displayData: item[displayData],
       } as GridCell;
     } else {
       throw new Error("Attempting to access a column that doesn't exist");

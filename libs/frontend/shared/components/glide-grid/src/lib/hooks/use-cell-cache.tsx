@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { CellCache } from '../utils/cache/cell-cache';
 import type { Indexable } from '../types/general';
 import type {
@@ -16,17 +16,20 @@ const useCellCache = <T extends Indexable>({
   getRowByIndex,
   rows,
 }: UseCellCacheProps<T>) => {
-  const cache = useRef<CellCache<T>>(
-    new CellCache({
+  const cache = useMemo(() => {
+    return new CellCache({
       columns,
       rows,
       getRowByIndex,
-    })
-  );
+    });
+  }, [columns, getRowByIndex, rows]);
 
-  const cacheGetRow = useCallback((uuid: string, col: number) => {
-    return cache.current?.get(uuid, col);
-  }, []);
+  const cacheGetRow = useCallback(
+    (uuid: string, col: number) => {
+      return cache.get(uuid, col);
+    },
+    [cache]
+  );
 
   return {
     cacheGetRow,

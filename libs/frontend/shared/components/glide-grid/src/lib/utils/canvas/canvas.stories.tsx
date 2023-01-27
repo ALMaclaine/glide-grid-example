@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ComponentStory, Meta } from '@storybook/react';
 import { Easel } from './easel';
-import { Triangle } from './triangle';
 import { positioner } from './utils';
 import { StackedTriangles } from './stacked-triangles';
 
@@ -10,9 +9,10 @@ const HEIGHT = 512;
 const SIZE = 100;
 const CanvasDemo = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const easel = useRef(new Easel({ width: WIDTH, height: HEIGHT }));
-  const triangle = useRef<StackedTriangles>(
-    new StackedTriangles({ width: SIZE, height: SIZE / 2, gap: 24 })
+  const easel = useMemo(() => new Easel({ width: WIDTH, height: HEIGHT }), []);
+  const triangle = useMemo<StackedTriangles>(
+    () => new StackedTriangles({ width: SIZE, height: SIZE / 2, gap: 24 }),
+    []
   );
 
   const innerDraw = useCallback(() => {
@@ -20,22 +20,22 @@ const CanvasDemo = () => {
     if (!context) {
       throw new Error('Could not obtain context');
     }
-    triangle.current.fill('red');
-    triangle.current.draw();
-    const image = triangle.current.image();
+    triangle.fill('red');
+    triangle.draw();
+    const image = triangle.image();
 
     const pos = positioner({
       containerWidth: WIDTH,
       containerHeight: HEIGHT,
-      itemWidth: triangle.current.width,
-      itemHeight: triangle.current.height,
+      itemWidth: triangle.width,
+      itemHeight: triangle.height,
       position: 'midRight',
       padding: 32,
     });
 
-    easel.current.putImageData(image, pos);
-    context.putImageData(easel.current.image(), 0, 0);
-    easel.current.clear();
+    easel.putImageData(image, pos);
+    context.putImageData(easel.image(), 0, 0);
+    easel.clear();
   }, []);
 
   useEffect(() => {
