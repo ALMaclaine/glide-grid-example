@@ -12,6 +12,7 @@ import {
 } from './utils/cells/generators';
 import type { Indexable } from './types/general';
 import type { WrappedGridColumn } from './types/grid';
+import { Columns } from './utils/columns';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -42,15 +43,15 @@ export const Primary: ComponentStory<typeof GlideGrid> = <T extends Indexable>(
   );
 };
 
-type Property = {
+interface Property extends Indexable {
   property: string;
   address: string;
   investor: string;
   units: string;
   rentOwed: string;
-};
+}
 
-const columns: WrappedGridColumn<Property>[] = [
+const columnsDetails: WrappedGridColumn<Property>[] = [
   {
     title: 'Property',
     id: 'property',
@@ -90,6 +91,8 @@ const columns: WrappedGridColumn<Property>[] = [
     cell: genNumericCell({ data: 'rentOwed', contentAlign: 'right' }),
   },
 ];
+
+const columns = new Columns<Property>(columnsDetails);
 
 const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43, 4300.99, 543.53];
 function genProperty(): Property {

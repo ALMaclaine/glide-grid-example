@@ -1,6 +1,5 @@
 import {
   DataEditor,
-  DrawHeaderCallback,
   GridMouseEventArgs,
   Item,
 } from '@glideapps/glide-data-grid';
@@ -21,12 +20,7 @@ import type { Indexable, StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { useSort } from './hooks/use-sort';
-import { positioner } from './utils/canvas/utils';
-import {
-  drawHeaderSort,
-  getHeaderSortImage,
-  headerThemePriority,
-} from './utils/canvas/draw-helpers';
+import { drawHeaderSort } from './utils/canvas/draw-helpers';
 
 type GlideGridProps<T extends Indexable> = {
   onItemHovered: HoverHandler;
@@ -99,7 +93,7 @@ function GlideGrid<T extends Indexable>({
       // width 100% needed otherwise grow/resizing animates slowly to fill extra width
       width="100%"
       verticalBorder={false}
-      columns={columns}
+      columns={columns.getColumns()}
       // turns on copy support
       getCellsForSelection={true}
       getCellContent={getCellContent}

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import type { Indexable } from '../types/general';
 import type { ColumnsProps, HeaderClickProps } from '../types/props';
 
