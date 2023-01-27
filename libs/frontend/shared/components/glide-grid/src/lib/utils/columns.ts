@@ -1,4 +1,3 @@
-import type { ColumnsProps } from '../types/props';
 import type { Indexable, StringKeys } from '../types/general';
 import type { WrappedGridColumn } from '../types/grid';
 import { uuid } from './general';
@@ -55,15 +54,23 @@ class Columns<T extends Indexable> {
     return this.sortMap.get(key) || SORT_TYPES.natural;
   }
 
+  private dirty = true;
+  private columnsCache: WrappedGridColumn<T>[] = [];
   getColumns() {
+    if (!this.dirty) {
+      return this.columnsCache;
+    }
+
     const out = [];
     for (const colPos of this.translate) {
-      const uuid = this.getTranslatedId(colPos);
-      const val = this.columnMap.get(this.uuidOrder[colPos]);
+      const uuid = this.uuidOrder[colPos];
+      const val = this.columnMap.get(uuid);
       if (val) {
         out.push(val);
       }
     }
+    this.dirty = false;
+    this.columnsCache = out;
     return out;
   }
 
@@ -71,17 +78,13 @@ class Columns<T extends Indexable> {
     if (colPos > this.uuidOrder.length || colPos < 0) {
       throw new Error('Out of bounds access');
     }
-    const id = this.getTranslatedId(colPos);
+    const pos = this.translate[colPos];
+    const id = this.uuidOrder[pos];
     const column = this.columnMap.get(id);
     if (column) {
       return column.cell;
     }
     throw new Error('Column does not exist');
-  }
-
-  private getTranslatedId(colPos: number) {
-    const pos = this.translate[colPos];
-    return this.uuidOrder[pos];
   }
 
   swap(col1: number, col2: number) {
@@ -101,6 +104,7 @@ class Columns<T extends Indexable> {
         this.translate[i],
       ];
     }
+    this.dirty = true;
   }
 }
 
