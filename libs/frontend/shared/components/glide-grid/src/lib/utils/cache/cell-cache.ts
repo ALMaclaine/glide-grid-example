@@ -1,7 +1,6 @@
 import { GridCell, Item } from '@glideapps/glide-data-grid';
 import type { Indexable } from '../../types/general';
 import { GlideGridCellGenerator } from '../cells/generators';
-import type { WrappedGridColumn } from '../../types/grid';
 import type {
   ColumnsProps,
   RowIndexGetterProps,
@@ -36,7 +35,9 @@ type CellCacheProps<T extends Indexable> = ColumnsProps<T> &
 class CellCache<T extends Indexable> {
   // column -> row -> value
   private cachedContent: Map<string, Map<number, GridCell>> = new Map();
+  private columns: Columns<T>;
   constructor({ columns, rows, getRowByIndex }: CellCacheProps<T>) {
+    this.columns = columns;
     const cellGen = genGetCellContent(columns, getRowByIndex);
     for (let row = 0; row < rows; row++) {
       const { rowUuid } = getRowByIndex(row);
@@ -53,7 +54,9 @@ class CellCache<T extends Indexable> {
       throw new Error('Cache should be set before accessing');
     }
 
-    return rowCache.get(col) as GridCell;
+    const translatedCol = this.columns.getTranslation(col);
+
+    return rowCache.get(translatedCol) as GridCell;
   }
 
   hasRow(rowUuid: string) {

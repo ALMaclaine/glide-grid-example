@@ -8,12 +8,30 @@ class Columns<T extends Indexable> {
   private readonly columns: WrappedGridColumn<T>[];
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private readonly uuidOrder: string[] = [];
+  private readonly translate: number[] = [];
   private readonly sortMap: Map<StringKeys<T>, SortTypes>;
 
   constructor(columns: WrappedGridColumn<T>[]) {
     this.columns = columns;
     this.addColumnsToMap();
     this.sortMap = this.processColumns(columns);
+  }
+
+  private addColumnsToMap() {
+    let i = 0;
+    for (const column of this.columns) {
+      const id = uuid();
+      this.uuidOrder.push(id);
+      this.columnMap.set(id, column);
+      this.translate.push(i++);
+    }
+  }
+
+  getTranslation(pos: number) {
+    if (pos > this.translate.length || pos < 0) {
+      throw new Error('Out of bounds access');
+    }
+    return this.translate[pos];
   }
 
   private processColumns(columns: WrappedGridColumn<T>[]) {
@@ -39,8 +57,9 @@ class Columns<T extends Indexable> {
 
   getColumns() {
     const out = [];
-    for (const uuid of this.uuidOrder) {
-      const val = this.columnMap.get(uuid);
+    for (const colPos of this.translate) {
+      const uuid = this.getTranslatedId(colPos);
+      const val = this.columnMap.get(this.uuidOrder[colPos]);
       if (val) {
         out.push(val);
       }
@@ -52,12 +71,17 @@ class Columns<T extends Indexable> {
     if (colPos > this.uuidOrder.length || colPos < 0) {
       throw new Error('Out of bounds access');
     }
-    const id = this.uuidOrder[colPos];
+    const id = this.getTranslatedId(colPos);
     const column = this.columnMap.get(id);
     if (column) {
       return column.cell;
     }
     throw new Error('Column does not exist');
+  }
+
+  private getTranslatedId(colPos: number) {
+    const pos = this.translate[colPos];
+    return this.uuidOrder[pos];
   }
 
   swap(col1: number, col2: number) {
@@ -68,17 +92,14 @@ class Columns<T extends Indexable> {
     if (col2 > this.uuidOrder.length || col2 < 0) {
       throw new Error('col2 Out of bounds access');
     }
-    [this.uuidOrder[col1], this.uuidOrder[col2]] = [
-      this.uuidOrder[col2],
-      this.uuidOrder[col1],
-    ];
-  }
+    const max = Math.max(col1, col2);
+    const min = Math.min(col1, col2);
 
-  private addColumnsToMap() {
-    for (const column of this.columns) {
-      const id = uuid();
-      this.uuidOrder.push(id);
-      this.columnMap.set(id, column);
+    for (let i = max - 1; i >= min; i--) {
+      [this.translate[i], this.translate[i + 1]] = [
+        this.translate[i + 1],
+        this.translate[i],
+      ];
     }
   }
 }
