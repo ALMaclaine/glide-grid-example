@@ -1,9 +1,5 @@
-import type { HeaderClickHandler, RowIndexGetter } from './func';
+import type { HeaderClickHandler } from './func';
 import { Columns } from '../utils/columns';
-
-type RowIndexGetterProps<T> = {
-  getRowByIndex: RowIndexGetter<T>;
-};
 
 type HeaderClickProps = {
   onHeaderClicked: HeaderClickHandler;
@@ -15,4 +11,4 @@ type RowsProps = {
 
 type ColumnsProps<T> = { columns: Columns<T> };
 
-export type { RowsProps, HeaderClickProps, RowIndexGetterProps, ColumnsProps };
+export type { RowsProps, HeaderClickProps, ColumnsProps };

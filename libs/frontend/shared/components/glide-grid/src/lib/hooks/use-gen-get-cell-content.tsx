@@ -1,31 +1,37 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Item } from '@glideapps/glide-data-grid';
-import { useCellCache } from './use-cell-cache';
-import type {
-  ColumnsProps,
-  RowIndexGetterProps,
-  RowsProps,
-} from '../types/props';
+import type { ColumnsProps, RowsProps } from '../types/props';
 import type { IdRow } from '../types/grid';
 import type { ItemToGridCell } from '../types/func';
+import { RowsManager } from '../rows-manager';
+import { CellCache } from '../utils/caches/cell-cache';
 
 type UseGenGetCellContentProps<T> = ColumnsProps<T> &
-  RowIndexGetterProps<T> &
   RowsProps & {
     sorted: IdRow<T>[];
+    rowManager: RowsManager<T>;
   };
 
 const useGenGetCellContent = <T,>({
   columns,
-  getRowByIndex,
+  rowManager,
   sorted,
   rows,
 }: UseGenGetCellContentProps<T>) => {
-  const { cacheGetRow } = useCellCache({
-    columns,
-    getRowByIndex,
-    rows,
-  });
+  const cache = useMemo(() => {
+    return new CellCache({
+      columns,
+      rows,
+      getRowByIndex: (row: number) => rowManager.getRowByIndex(row),
+    });
+  }, [columns, rowManager, rows]);
+
+  const cacheGetRow = useCallback(
+    (uuid: string, col: number) => {
+      return cache.get(uuid, col);
+    },
+    [cache]
+  );
 
   const getCellContent = useCallback<ItemToGridCell>(
     ([col, row]: Item) => {
