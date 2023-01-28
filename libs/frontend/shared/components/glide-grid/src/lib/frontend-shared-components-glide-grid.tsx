@@ -19,7 +19,6 @@ import type { ColumnsProps, RowsProps } from './types/props';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
 import { RowsManager } from './rows-manager';
-import { CellCache } from './utils/caches/cell-cache';
 import { ItemToGridCell } from './types/func';
 
 const divStyles = {
@@ -76,31 +75,14 @@ function GlideGrid<T>({
     [columns, data]
   );
 
-  const [sorted, setSorted] = useState(rowClass.rows);
+  const [, setSorted] = useState(rowClass.rows);
   const onHeaderClickSort = useCallback(
     (headerVal: StringKeys<T>) => {
       setSorted(rowClass.nextSortKey(headerVal));
     },
     [rowClass]
   );
-
   const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
-
-  const cache = useMemo(() => {
-    return new CellCache({
-      columns: rowClass.columns,
-      rows: rowClass.length,
-      getRowByIndex: (row: number) => rowClass.getRowByIndex(row),
-    });
-  }, [rowClass]);
-
-  const getCellContent = useCallback<ItemToGridCell>(
-    ([col, row]: Item) => {
-      const { rowUuid } = sorted[row];
-      return cache.get(rowUuid, col);
-    },
-    [cache, sorted]
-  );
 
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
@@ -146,7 +128,7 @@ function GlideGrid<T>({
         columns={columns.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
-        getCellContent={getCellContent}
+        getCellContent={(item: Item) => rowClass.itemToCell(item)}
         onCellClicked={(item: Item) => {
           // const { kind, ...rest } = getCellContent(item);
           // if (kind === 'uri') {

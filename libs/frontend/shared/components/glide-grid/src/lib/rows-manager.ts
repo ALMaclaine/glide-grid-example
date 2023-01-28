@@ -6,6 +6,9 @@ import { TableSorter } from './utils/sort/table-sorter';
 import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
+import { useMemo } from 'react';
+import { CellCache } from './utils/caches/cell-cache';
+import { Item } from '@glideapps/glide-data-grid';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
@@ -13,6 +16,8 @@ class RowsManager<T> {
   readonly stateMachine: SortStateMachine<T>;
   readonly sorter: TableSorter<T>;
   readonly columns: Columns<T>;
+  readonly cellCache: CellCache<T>;
+  private sorted: IdRow<T>[];
 
   get rows() {
     return this._rows;
@@ -20,11 +25,22 @@ class RowsManager<T> {
   constructor(data: T[], columns: Columns<T>) {
     this.columns = columns;
     this._rows = addIdsToRows(data);
+    this.sorted = this._rows;
     this.cache = new RowCache<T>(this.rows);
     this.stateMachine = new SortStateMachine<T>();
     this.sorter = new TableSorter({ originalData: this._rows, columns });
+
+    this.cellCache = new CellCache({
+      columns: this.columns,
+      rows: this.length,
+      getRowByIndex: (row: number) => this.getRowByIndex(row),
+    });
   }
 
+  itemToCell([col, row]: Item) {
+    const { rowUuid } = this.sorted[row];
+    return this.cellCache.get(rowUuid, col);
+  }
   get length() {
     return this._rows.length;
   }
@@ -39,7 +55,9 @@ class RowsManager<T> {
 
   nextSortKey(key: StringKeys<T>) {
     const stateHistory = this.stateMachine.nextValue(key, STATE_HISTORY_STEPS);
-    return this.sorter.stateSort(stateHistory);
+    const sorted = this.sorter.stateSort(stateHistory);
+    this.sorted = sorted;
+    return sorted;
   }
 }
 export { RowsManager };
