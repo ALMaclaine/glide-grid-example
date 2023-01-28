@@ -70,26 +70,21 @@ function GlideGrid<T>({
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
+  const [, _refresh] = useState([]);
+  const refresh = useCallback(() => _refresh([]), []);
+
   const rowClass = useMemo(
     () => new RowsManager(data, columns),
     [columns, data]
   );
 
-  const [, setSorted] = useState(rowClass.rows);
-  const onHeaderClickSort = useCallback(
-    (headerVal: StringKeys<T>) => {
-      setSorted(rowClass.nextSortKey(headerVal));
-    },
-    [rowClass]
-  );
-  const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
-
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
       onHeaderClicked(headerVal);
-      onHeaderClickSort(headerVal);
+      rowClass.nextSortKey(headerVal);
+      refresh();
     },
-    [onHeaderClickSort, onHeaderClicked]
+    [onHeaderClicked, refresh, rowClass]
   );
 
   const { onHeaderClicked: _onHeaderClicked } = useHeaderClicked({
@@ -139,7 +134,7 @@ function GlideGrid<T>({
         }}
         onColumnMoved={(col1, col2) => {
           columns.swap(col1, col2);
-          refreshSort();
+          refresh();
         }}
         onHeaderClicked={_onHeaderClicked}
         smoothScrollX={true}
