@@ -89,8 +89,7 @@ class Columns<T> {
     }
 
     const out = [];
-    for (const colPos of this.translate) {
-      const uuid = this.uuidOrder[colPos];
+    for (const uuid of this.uuidOrder) {
       const val = this.columnMap.get(uuid);
       if (val && !this.hiddenColumnsSet.has(val.id)) {
         out.push(val);
@@ -103,8 +102,7 @@ class Columns<T> {
 
   getCell(colPos: number) {
     this.validateBounds(colPos);
-    const pos = this.translate[colPos];
-    const id = this.uuidOrder[pos];
+    const id = this.uuidOrder[colPos];
     const column = this.columnMap.get(id);
     if (column) {
       return column.cell;
@@ -113,19 +111,25 @@ class Columns<T> {
   }
 
   private shiftRight(pos1: number, pos2: number) {
-    const tmp = this.translate[pos2];
+    const translateTmp = this.translate[pos2];
+    const uuidTmp = this.uuidOrder[pos2];
     for (let i = pos2; i >= pos1; i--) {
       this.translate[i] = this.translate[i - 1];
+      this.uuidOrder[i] = this.uuidOrder[i - 1];
     }
-    this.translate[pos1] = tmp;
+    this.translate[pos1] = translateTmp;
+    this.uuidOrder[pos1] = uuidTmp;
   }
 
   private shiftLeft(pos1: number, pos2: number) {
-    const tmp = this.translate[pos1];
+    const translateTmp = this.translate[pos1];
+    const uuidTmp = this.uuidOrder[pos1];
     for (let i = pos1; i < pos2; i++) {
       this.translate[i] = this.translate[i + 1];
+      this.uuidOrder[i] = this.uuidOrder[i + 1];
     }
-    this.translate[pos2] = tmp;
+    this.translate[pos2] = translateTmp;
+    this.uuidOrder[pos2] = uuidTmp;
   }
 
   private validateBounds(col: number) {
