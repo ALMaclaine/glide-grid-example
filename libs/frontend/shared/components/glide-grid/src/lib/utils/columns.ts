@@ -14,7 +14,48 @@ class ColumnsTranslation {
 
   addUuid(uuid: string) {
     this.uuidOrder.push(uuid);
-    this.translate.push(this.translate.length + 1);
+    this.translate.push(this.translate.length);
+  }
+
+  getTranslation(pos: number) {
+    if (pos > this.translate.length || pos < 0) {
+      throw new Error('Out of bounds access');
+    }
+    return this.translate[pos];
+  }
+
+  get length() {
+    return this.uuidOrder.length;
+  }
+
+  private shiftRight(pos1: number, pos2: number) {
+    const translateTmp = this.translate[pos2];
+    const uuidTmp = this.uuidOrder[pos2];
+    for (let i = pos2; i >= pos1; i--) {
+      this.translate[i] = this.translate[i - 1];
+      this.uuidOrder[i] = this.uuidOrder[i - 1];
+    }
+    this.translate[pos1] = translateTmp;
+    this.uuidOrder[pos1] = uuidTmp;
+  }
+
+  private shiftLeft(pos1: number, pos2: number) {
+    const translateTmp = this.translate[pos1];
+    const uuidTmp = this.uuidOrder[pos1];
+    for (let i = pos1; i < pos2; i++) {
+      this.translate[i] = this.translate[i + 1];
+      this.uuidOrder[i] = this.uuidOrder[i + 1];
+    }
+    this.translate[pos2] = translateTmp;
+    this.uuidOrder[pos2] = uuidTmp;
+  }
+
+  swap(col1: number, col2: number) {
+    if (col1 > col2) {
+      this.shiftRight(col2, col1);
+    } else {
+      this.shiftLeft(col1, col2);
+    }
   }
 }
 
@@ -40,12 +81,12 @@ class Columns<T> {
   }
 
   private addColumnsToMap() {
-    let i = 0;
     for (const column of this.columns) {
       const id = uuid();
       this.columnMap.set(id, column);
+      this.columnTranslation.addUuid(id);
       this.uuidOrder.push(id);
-      this.translate.push(i++);
+      this.translate.push(this.translate.length);
     }
   }
 
@@ -54,10 +95,7 @@ class Columns<T> {
   }
 
   getTranslation(pos: number) {
-    if (pos > this.translate.length || pos < 0) {
-      throw new Error('Out of bounds access');
-    }
-    return this.translate[pos];
+    return this.columnTranslation.getTranslation(pos);
   }
 
   private processColumns(columns: WrappedGridColumn<T>[]) {
@@ -70,7 +108,7 @@ class Columns<T> {
   }
 
   get length() {
-    return this.uuidOrder.length;
+    return this.columnTranslation.length;
   }
 
   getDisplayData(colPos: number) {
@@ -144,7 +182,7 @@ class Columns<T> {
     this.validateBounds(col2);
     const columns = this.getColumns();
     console.log(columns);
-
+    this.columnTranslation.swap(col1, col2);
     if (col1 > col2) {
       this.shiftRight(col2, col1);
     } else {
