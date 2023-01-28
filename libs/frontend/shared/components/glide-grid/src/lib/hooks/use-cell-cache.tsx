@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { CellCache } from '../utils/cache/cell-cache';
+import { CellCache } from '../utils/caches/cell-cache';
 import type {
   ColumnsProps,
   RowIndexGetterProps,

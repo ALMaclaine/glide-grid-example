@@ -29,26 +29,13 @@ class TableSorter<T> {
     return this.columns.getType(key);
   }
 
-  stateSort(currentStateSet: StateSet<T>, previousStateSet: StateSet<T>) {
-    const { state: currentState, value: currentValue } = currentStateSet;
-    const { state: previousState, value: previousValue } = previousStateSet;
-    const bothStateInitial =
-      currentState === initial && previousState === initial;
-    if (bothStateInitial || currentValue === '') {
-      return this.cloneOriginal();
-    }
-
+  stateSort(stateHistory: StateSet<T>[]) {
     return objectSort(this.cloneOriginal(), [
-      {
-        state: currentState,
-        type: this.getType(currentValue),
-        key: currentValue,
-      },
-      {
-        state: previousState,
-        type: this.getType(previousValue),
-        key: previousValue,
-      },
+      ...stateHistory.map(({ state, key }) => ({
+        state,
+        type: this.getType(key),
+        key,
+      })),
     ]);
   }
 }

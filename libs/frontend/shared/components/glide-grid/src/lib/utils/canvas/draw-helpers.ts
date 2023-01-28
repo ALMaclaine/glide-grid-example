@@ -1,7 +1,7 @@
 import { Triangle, TRIANGLE_DIRECTIONS } from './triangle';
 import { StackedTriangles } from './stacked-triangles';
 import type { DrawHeaderCallback } from '@glideapps/glide-data-grid';
-import type { StateSetHistory } from '../sort/sort-state-machine';
+import type { StateSet, StateSetHistory } from '../sort/sort-state-machine';
 import { SORT_STATES, SortStates } from '../sort/object-sort';
 import { positioner } from './utils';
 
@@ -128,7 +128,7 @@ type DrawHeaderCallbackProps = Parameters<DrawHeaderCallback>[0];
 
 const drawHeaderSort = <T>(
   headerProps: DrawHeaderCallbackProps,
-  stateHistory: StateSetHistory<T>
+  stateHistory: StateSet<T>[]
 ) => {
   const {
     ctx,
@@ -136,17 +136,14 @@ const drawHeaderSort = <T>(
     theme,
     column: { id },
   } = headerProps;
-  const {
-    currentStateSet: { value: curValue, state: curState },
-    previousStateSet: { value: prevValue, state: prevState },
-  } = stateHistory;
 
   const { x, y, width, height } = rect;
   const zoomed = window.devicePixelRatio > 1;
   const zoomFactor = zoomed ? 2 : 1;
 
-  const isSorted = curValue === id || prevValue === id;
-  const sortState = curValue === id ? curState : prevState;
+  const stateSet = stateHistory.find((state) => state.key === id);
+  const isSorted = stateSet !== undefined;
+  const sortState = stateSet?.state || SORT_STATES.initial;
 
   const image = getHeaderSortImage({
     isSorted,

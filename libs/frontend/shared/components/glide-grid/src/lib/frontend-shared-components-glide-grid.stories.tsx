@@ -101,19 +101,20 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
 
 const columns = new Columns<Property>(columnsDetails);
 
-const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43, 4300.99, 543.53];
+const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43];
+const INVESTORS = [randCompanyName(), randCompanyName(), randCompanyName()];
 function genProperty(): Property {
   return {
     property: randAddress().street,
     address: randAddress().street,
-    investor: randCompanyName(),
-    units: Math.round(Math.random() * 6 + 1).toString(),
+    investor: INVESTORS[Math.floor(Math.random() * INVESTORS.length)] + '',
+    units: Math.round(Math.random() * 2 + 1).toString(),
     rentOwed:
       RENT_OWED_SET[Math.floor(Math.random() * RENT_OWED_SET.length)] + '',
   };
 }
 
-const data: Property[] = [...Array(50).fill(0).map(genProperty)];
+const data: Property[] = [...Array(100).fill(0).map(genProperty)];
 
 Primary.args = {
   columns,

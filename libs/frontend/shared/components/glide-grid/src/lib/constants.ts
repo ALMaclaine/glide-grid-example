@@ -1,0 +1,2 @@
+const STATE_HISTORY_STEPS = 2;
+export { STATE_HISTORY_STEPS };

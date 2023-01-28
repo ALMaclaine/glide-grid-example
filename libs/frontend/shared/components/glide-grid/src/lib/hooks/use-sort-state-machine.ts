@@ -1,22 +1,22 @@
-import { useCallback, useMemo, useRef } from 'react';
-import { SortStateMachine } from '../utils/sort/sort-state-machine';
-import type { StateSetHistory } from '../utils/sort/sort-state-machine';
+import { useCallback, useMemo } from 'react';
+import { SortStateMachine, StateSet } from '../utils/sort/sort-state-machine';
 import { StringKeys } from '../types/general';
 
 const useSortStateMachine = <T>() => {
   const stateMachine = useMemo(() => new SortStateMachine<T>(), []);
   const sortMachineNextToken = useCallback(
-    (value: StringKeys<T>) => {
-      return stateMachine.nextValue(value);
+    (value: StringKeys<T>, steps: number) => {
+      return stateMachine.nextValue(value, steps);
     },
     [stateMachine]
   );
 
-  const getSortState: () => StateSetHistory<T> = useCallback(() => {
-    const currentStateSet = stateMachine.state;
-    const previousStateSet = stateMachine.previousState;
-    return { currentStateSet, previousStateSet };
-  }, [stateMachine.previousState, stateMachine.state]);
+  const getSortState: (steps: number) => StateSet<T>[] = useCallback(
+    (steps: number) => {
+      return stateMachine.getHistory(steps);
+    },
+    [stateMachine]
+  );
 
   return { sortMachineNextToken, getSortState };
 };

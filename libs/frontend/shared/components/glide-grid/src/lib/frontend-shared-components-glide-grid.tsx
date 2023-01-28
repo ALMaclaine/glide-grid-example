@@ -22,6 +22,7 @@ import { useSort } from './hooks/use-sort';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { Columns } from './utils/columns';
 import { useRowCache } from './hooks/use-row-cache';
+import { STATE_HISTORY_STEPS } from './constants';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -148,7 +149,7 @@ function GlideGrid<T>({
         smoothScrollX={true}
         smoothScrollY={true}
         drawHeader={(args) => {
-          drawHeaderSort(args, getSortState());
+          drawHeaderSort(args, getSortState(STATE_HISTORY_STEPS));
           return false;
         }}
         theme={theme}

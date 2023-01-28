@@ -1,4 +1,4 @@
-import { RowCache } from '../utils/cache/row-cache';
+import { RowCache } from '../utils/caches/row-cache';
 import { useCallback, useMemo } from 'react';
 import { IdRow } from '../types/grid';
 

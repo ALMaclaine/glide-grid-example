@@ -1,6 +1,7 @@
 import type { StringKeys } from '../../types/general';
 import type { SortStates } from './object-sort';
 import { SORT_STATES } from './object-sort';
+import { STATE_HISTORY_STEPS } from '../../constants';
 
 const sortStatesArray: SortStates[] = [
   SORT_STATES.initial,
@@ -26,7 +27,7 @@ const genCycleStates = (initial: SortStates = SORT_STATES.initial) => {
 
 type StateSet<T> = {
   state: SortStates;
-  value: StringKeys<T> | '';
+  key: StringKeys<T> | '';
 };
 
 type StateSetHistory<T> = {
@@ -36,33 +37,35 @@ type StateSetHistory<T> = {
 
 const initialStateSet = {
   state: SORT_STATES.initial,
-  value: '',
+  key: '',
 } as const;
 
 class SortStateMachine<T> {
-  private currentStateSet: StateSet<T> = { ...initialStateSet };
-  private previousStateSet: StateSet<T> = { ...initialStateSet };
+  private keySet = new Set<StringKeys<T>>();
+
+  private stateHistory: StateSet<T>[] = [];
 
   // value passed to genCycleStates is the starting value of the NEXT state update
   // start at first state after initial
   private stateCycler = genCycleStates(sortStatesArray[1]);
 
   constructor(stateSet: Partial<StateSet<T>> = {}) {
-    if (stateSet.state) {
-      this.currentStateSet.state = stateSet.state;
-    }
-
-    if (stateSet.value) {
-      this.currentStateSet.value = stateSet.value;
-    }
+    this.stateHistory.push({
+      state: stateSet.state || initialStateSet.state,
+      key: stateSet.key || initialStateSet.key,
+    });
   }
 
-  get previousState() {
-    return { ...this.previousStateSet };
+  get previousState(): StateSet<T> {
+    if (this.stateHistory[1]) {
+      return { ...this.stateHistory[1] };
+    } else {
+      return { ...initialStateSet };
+    }
   }
 
   get state() {
-    return { ...this.currentStateSet };
+    return { ...this.stateHistory[0] };
   }
 
   resetCycler() {
@@ -71,31 +74,65 @@ class SortStateMachine<T> {
     this.stateCycler = genCycleStates(sortStatesArray[1]);
   }
 
+  private get currentKey() {
+    return this.stateHistory[0].key as StringKeys<T>;
+  }
+
+  private set currentKey(newKey: StringKeys<T>) {
+    this.stateHistory[0].key = newKey;
+  }
+
   reset() {
-    this.previousStateSet = this.currentStateSet;
-    this.currentStateSet = { ...initialStateSet };
+    this.stateHistory.unshift({
+      state: SORT_STATES.initial,
+      key: '',
+    });
     this.resetCycler();
     this.nextState();
   }
 
   nextState() {
-    this.currentStateSet.state = this.stateCycler();
+    this.stateHistory[0].state = this.stateCycler();
   }
 
-  nextValue(val: StringKeys<T>): StateSetHistory<T> {
-    if (this.currentStateSet.value === '') {
-      this.currentStateSet.value = val;
+  getHistory(steps: number): StateSet<T>[] {
+    if (steps < 2) {
+      return [];
+    }
+
+    if (this.stateHistory.length < 2) {
+      this.stateHistory.push({ ...initialStateSet });
+    }
+
+    return this.stateHistory.slice(0, steps);
+  }
+
+  private removeKeyFromHistory(key: StringKeys<T>) {
+    const index = this.stateHistory.findIndex(
+      (e: StateSet<T>) => e.key === key
+    );
+    this.stateHistory = this.stateHistory.filter((_, i) => i !== index);
+  }
+
+  nextValue(key: StringKeys<T>, steps = STATE_HISTORY_STEPS): StateSet<T>[] {
+    const isSameKey = this.currentKey === key;
+    if (this.keySet.has(key) && !isSameKey) {
+      this.removeKeyFromHistory(key);
+    } else {
+      this.keySet.add(key);
+    }
+
+    if (this.currentKey === '') {
+      this.currentKey = key;
       this.nextState();
-    } else if (this.currentStateSet.value === val) {
+    } else if (isSameKey) {
       this.nextState();
     } else {
       this.reset();
-      this.currentStateSet.value = val;
+      this.currentKey = key;
     }
-    return {
-      currentStateSet: this.currentStateSet,
-      previousStateSet: this.previousStateSet,
-    };
+
+    return this.getHistory(steps);
   }
 }
 
