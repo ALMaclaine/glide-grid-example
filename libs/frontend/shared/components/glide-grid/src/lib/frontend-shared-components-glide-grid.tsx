@@ -7,9 +7,8 @@ import '@glideapps/glide-data-grid/dist/index.css';
 
 import { useCallback, useMemo, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
-import { addIdsToRows, noOp, noOpObj } from './utils/general';
+import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
-import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
 import {
   useHeaderClicked,
   UseHeaderClickedProps,
@@ -19,8 +18,9 @@ import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { TableSorter } from './utils/sort/table-sorter';
 import { RowsManager } from './rows-manager';
+import { CellCache } from './utils/caches/cell-cache';
+import { ItemToGridCell } from './types/func';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -86,10 +86,21 @@ function GlideGrid<T>({
 
   const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
 
-  const { getCellContent } = useGenGetCellContent({
-    rowManager: rowClass,
-    sorted,
-  });
+  const cache = useMemo(() => {
+    return new CellCache({
+      columns: rowClass.columns,
+      rows: rowClass.length,
+      getRowByIndex: (row: number) => rowClass.getRowByIndex(row),
+    });
+  }, [rowClass]);
+
+  const getCellContent = useCallback<ItemToGridCell>(
+    ([col, row]: Item) => {
+      const { rowUuid } = sorted[row];
+      return cache.get(rowUuid, col);
+    },
+    [cache, sorted]
+  );
 
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
