@@ -19,10 +19,7 @@ import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { RowCache } from './utils/caches/row-cache';
-import { IdRow } from './types/grid';
 import { TableSorter } from './utils/sort/table-sorter';
-import { SortStateMachine, StateSet } from './utils/sort/sort-state-machine';
 import { RowsManager } from './rows-manager';
 
 const divStyles = {
@@ -81,13 +78,6 @@ function GlideGrid<T>({
     [columns, rowClass.rows]
   );
 
-  const getSortState: (steps: number) => StateSet<T>[] = useCallback(
-    (steps: number) => {
-      return rowClass.stateMachine.getHistory(steps);
-    },
-    [rowClass.stateMachine]
-  );
-
   const [sorted, setSorted] = useState(rowClass.rows);
   const onHeaderClickSort = useCallback(
     (headerVal: StringKeys<T>) => {
@@ -103,6 +93,13 @@ function GlideGrid<T>({
   );
 
   const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
+
+  const { getCellContent } = useGenGetCellContent({
+    columns,
+    rowManager: rowClass,
+    sorted,
+    rows,
+  });
 
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
@@ -140,13 +137,6 @@ function GlideGrid<T>({
     [getRowHoveredThemeOverride, getRowThemeOverride]
   );
 
-  const { getCellContent } = useGenGetCellContent({
-    columns,
-    rowManager: rowClass,
-    sorted,
-    rows,
-  });
-
   return (
     <div style={divStyles}>
       <DataEditor
@@ -172,7 +162,10 @@ function GlideGrid<T>({
         smoothScrollX={true}
         smoothScrollY={true}
         drawHeader={(args) => {
-          drawHeaderSort(args, getSortState(STATE_HISTORY_STEPS));
+          drawHeaderSort(
+            args,
+            rowClass.stateMachine.getHistory(STATE_HISTORY_STEPS)
+          );
           return false;
         }}
         theme={theme}
