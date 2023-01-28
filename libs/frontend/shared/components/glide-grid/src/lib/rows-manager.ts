@@ -4,6 +4,8 @@ import { addIdsToRows } from './utils/general';
 import { SortStateMachine } from './utils/sort/sort-state-machine';
 import { TableSorter } from './utils/sort/table-sorter';
 import { Columns } from './utils/columns';
+import { STATE_HISTORY_STEPS } from './constants';
+import { StringKeys } from './types/general';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
@@ -21,12 +23,21 @@ class RowsManager<T> {
     this.sorter = new TableSorter({ originalData: this._rows, columns });
   }
 
+  get length() {
+    return this._rows.length;
+  }
+
   getRowById(id: string) {
     return this.cache.getRowById(id);
   }
 
   getRowByIndex(index: number) {
     return this.cache.getRowByIndex(index);
+  }
+
+  nextSortKey(key: StringKeys<T>) {
+    const stateHistory = this.stateMachine.nextValue(key, STATE_HISTORY_STEPS);
+    return this.sorter.stateSort(stateHistory);
   }
 }
 export { RowsManager };
