@@ -1,9 +1,9 @@
-import type { Indexable, StringKeys } from '../types/general';
+import type { StringKeys } from '../types/general';
 import type { WrappedGridColumn } from '../types/grid';
 import { uuid } from './general';
 import { SORT_TYPES, SortTypes } from './sort/object-sort';
 
-class Columns<T extends Indexable> {
+class Columns<T> {
   private readonly columns: WrappedGridColumn<T>[];
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private readonly uuidOrder: string[] = [];

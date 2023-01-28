@@ -2,7 +2,6 @@ import { Triangle, TRIANGLE_DIRECTIONS } from './triangle';
 import { StackedTriangles } from './stacked-triangles';
 import type { DrawHeaderCallback } from '@glideapps/glide-data-grid';
 import type { StateSetHistory } from '../sort/sort-state-machine';
-import type { Indexable } from '../../types/general';
 import { SORT_STATES, SortStates } from '../sort/object-sort';
 import { positioner } from './utils';
 
@@ -127,7 +126,7 @@ const getHeaderSortImage = (props: GetHeaderImageProps) => {
 
 type DrawHeaderCallbackProps = Parameters<DrawHeaderCallback>[0];
 
-const drawHeaderSort = <T extends Indexable>(
+const drawHeaderSort = <T>(
   headerProps: DrawHeaderCallbackProps,
   stateHistory: StateSetHistory<T>
 ) => {

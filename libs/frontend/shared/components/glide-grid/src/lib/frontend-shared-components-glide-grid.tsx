@@ -15,7 +15,7 @@ import {
   useHeaderClicked,
   UseHeaderClickedProps,
 } from './hooks/use-header-clicked';
-import type { Indexable, StringKeys } from './types/general';
+import type { StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { useSort } from './hooks/use-sort';
@@ -56,7 +56,7 @@ const theme = {
   cellVerticalPadding: 10,
 };
 
-type GlideGridProps<T extends Indexable> = {
+type GlideGridProps<T> = {
   onItemHovered: HoverHandler;
   data: T[];
   getRowThemeOverride: GetRowThemeCallback;
@@ -64,7 +64,7 @@ type GlideGridProps<T extends Indexable> = {
 } & ColumnsProps<T> &
   RowsProps;
 
-function GlideGrid<T extends Indexable>({
+function GlideGrid<T>({
   columns,
   data,
   rows,

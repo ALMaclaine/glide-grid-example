@@ -1,4 +1,4 @@
-import type { Indexable, StringKeys } from '../../types/general';
+import type { StringKeys } from '../../types/general';
 import type { IdRow } from '../../types/grid';
 import { StateSet } from './sort-state-machine';
 import type { ColumnsProps } from '../../types/props';
@@ -6,11 +6,11 @@ import { objectSort, SORT_STATES, SORT_TYPES } from './object-sort';
 import { Columns } from '../columns';
 const { initial } = SORT_STATES;
 
-type TableSorterProps<T extends Indexable> = ColumnsProps<T> & {
+type TableSorterProps<T> = ColumnsProps<T> & {
   originalData: IdRow<T>[];
 };
 
-class TableSorter<T extends Indexable> {
+class TableSorter<T> {
   private readonly originalData: IdRow<T>[];
   private readonly columns: Columns<T>;
   constructor({ originalData, columns }: TableSorterProps<T>) {

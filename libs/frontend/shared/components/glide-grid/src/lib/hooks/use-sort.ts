@@ -1,12 +1,9 @@
-import { Indexable, StringKeys } from '../types/general';
+import { StringKeys } from '../types/general';
 import { useCallback, useMemo, useState } from 'react';
 import { TableSorter, TableSorterProps } from '../utils/sort/table-sorter';
 import { useSortStateMachine } from './use-sort-state-machine';
 
-const useSort = <T extends Indexable>({
-  originalData,
-  columns,
-}: TableSorterProps<T>) => {
+const useSort = <T>({ originalData, columns }: TableSorterProps<T>) => {
   const sorter = useMemo(
     () => new TableSorter({ originalData, columns }),
     [columns, originalData]

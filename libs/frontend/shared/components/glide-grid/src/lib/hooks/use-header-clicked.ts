@@ -1,11 +1,9 @@
 import { useCallback } from 'react';
-import type { Indexable } from '../types/general';
 import type { ColumnsProps, HeaderClickProps } from '../types/props';
 
-type UseHeaderClickedProps<T extends Indexable> = ColumnsProps<T> &
-  HeaderClickProps;
+type UseHeaderClickedProps<T> = ColumnsProps<T> & HeaderClickProps;
 
-const useHeaderClicked = <T extends Indexable>({
+const useHeaderClicked = <T>({
   columns,
   onHeaderClicked,
 }: UseHeaderClickedProps<T>) => {

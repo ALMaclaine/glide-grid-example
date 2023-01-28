@@ -1,5 +1,4 @@
 import { GridCell, Item } from '@glideapps/glide-data-grid';
-import type { Indexable } from '../../types/general';
 import { GlideGridCellGenerator } from '../cells/generators';
 import type {
   ColumnsProps,
@@ -9,7 +8,7 @@ import type {
 import type { RowIndexGetter } from '../../types/func';
 import type { Columns } from '../columns';
 
-const genGetCellContent = <T extends Indexable>(
+const genGetCellContent = <T>(
   columns: Columns<T>,
   getDataByIndex: RowIndexGetter<T>
 ): GlideGridCellGenerator => {
@@ -28,11 +27,9 @@ const genGetCellContent = <T extends Indexable>(
   };
 };
 
-type CellCacheProps<T extends Indexable> = ColumnsProps<T> &
-  RowIndexGetterProps<T> &
-  RowsProps;
+type CellCacheProps<T> = ColumnsProps<T> & RowIndexGetterProps<T> & RowsProps;
 
-class CellCache<T extends Indexable> {
+class CellCache<T> {
   // column -> row -> value
   private cachedContent: Map<string, Map<number, GridCell>> = new Map();
   private columns: Columns<T>;

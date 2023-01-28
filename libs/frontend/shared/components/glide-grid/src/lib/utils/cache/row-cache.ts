@@ -1,7 +1,6 @@
-import type { Indexable } from '../../types/general';
 import type { IdRow } from '../../types/grid';
 
-class RowCache<T extends Indexable> {
+class RowCache<T> {
   private rowIdArray: string[] = [];
   private cache = new Map<string, IdRow<T>>();
   // column -> row -> value

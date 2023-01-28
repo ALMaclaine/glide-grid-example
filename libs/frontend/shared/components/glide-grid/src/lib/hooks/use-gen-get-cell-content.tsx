@@ -1,7 +1,6 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { Item } from '@glideapps/glide-data-grid';
 import { useCellCache } from './use-cell-cache';
-import type { Indexable } from '../types/general';
 import type {
   ColumnsProps,
   RowIndexGetterProps,
@@ -10,13 +9,13 @@ import type {
 import type { IdRow } from '../types/grid';
 import type { ItemToGridCell } from '../types/func';
 
-type UseGenGetCellContentProps<T extends Indexable> = ColumnsProps<T> &
+type UseGenGetCellContentProps<T> = ColumnsProps<T> &
   RowIndexGetterProps<T> &
   RowsProps & {
     sorted: IdRow<T>[];
   };
 
-const useGenGetCellContent = <T extends Indexable>({
+const useGenGetCellContent = <T,>({
   columns,
   getRowByIndex,
   sorted,

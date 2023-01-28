@@ -1,4 +1,4 @@
-import type { Indexable, StringKeys } from '../../types/general';
+import type { StringKeys } from '../../types/general';
 import type { SortStates } from './object-sort';
 import { SORT_STATES } from './object-sort';
 
@@ -24,12 +24,12 @@ const genCycleStates = (initial: SortStates = SORT_STATES.initial) => {
   return () => generator.next().value as SortStates;
 };
 
-type StateSet<T extends Indexable> = {
+type StateSet<T> = {
   state: SortStates;
   value: StringKeys<T> | '';
 };
 
-type StateSetHistory<T extends Indexable> = {
+type StateSetHistory<T> = {
   currentStateSet: StateSet<T>;
   previousStateSet: StateSet<T>;
 };
@@ -39,7 +39,7 @@ const initialStateSet = {
   value: '',
 } as const;
 
-class SortStateMachine<T extends Indexable> {
+class SortStateMachine<T> {
   private currentStateSet: StateSet<T> = { ...initialStateSet };
   private previousStateSet: StateSet<T> = { ...initialStateSet };
 

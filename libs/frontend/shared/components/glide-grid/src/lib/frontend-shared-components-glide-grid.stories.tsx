@@ -10,7 +10,6 @@ import {
   genTextCell,
   genUriCell,
 } from './utils/cells/generators';
-import type { Indexable } from './types/general';
 import type { WrappedGridColumn } from './types/grid';
 import { Columns } from './utils/columns';
 
@@ -27,7 +26,7 @@ export default {
   ],
 } as Meta;
 
-export const Primary: ComponentStory<typeof GlideGrid> = <T extends Indexable>(
+export const Primary: ComponentStory<typeof GlideGrid<Property>> = <T,>(
   args: GlideGridProps<T>
 ) => {
   return (
@@ -51,7 +50,7 @@ export const Primary: ComponentStory<typeof GlideGrid> = <T extends Indexable>(
   );
 };
 
-interface Property extends Indexable {
+interface Property {
   property: string;
   address: string;
   investor: string;

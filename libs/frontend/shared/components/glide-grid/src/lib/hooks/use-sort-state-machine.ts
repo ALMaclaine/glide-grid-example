@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { SortStateMachine } from '../utils/sort/sort-state-machine';
 import type { StateSetHistory } from '../utils/sort/sort-state-machine';
-import { Indexable, StringKeys } from '../types/general';
+import { StringKeys } from '../types/general';
 
-const useSortStateMachine = <T extends Indexable>() => {
+const useSortStateMachine = <T>() => {
   const stateMachine = useMemo(() => new SortStateMachine<T>(), []);
   const sortMachineNextToken = useCallback(
     (value: StringKeys<T>) => {

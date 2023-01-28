@@ -1,4 +1,4 @@
-import { Indexable, ObjectValues, StringKeys } from '../../types/general';
+import { ObjectValues, StringKeys } from '../../types/general';
 
 const SORT_TYPES = {
   natural: 'natural',
@@ -25,7 +25,7 @@ const defaultSort = (a: string, b: string) => {
   return a < b ? -1 : a > b ? 1 : 0;
 };
 
-type Sorter<T extends Indexable> = {
+type Sorter<T> = {
   type: SortTypes;
   state: SortStates;
   key: StringKeys<T> | '';
@@ -37,7 +37,7 @@ const COMPARE_MAP: Record<SortTypes, (str1: string, str2: string) => number> = {
   [SORT_TYPES.numeric]: sortNumeric,
 } as const;
 
-const objectSort = <T extends Indexable>(data: T[], sorters: Sorter<T>[]) => {
+const objectSort = <T>(data: T[], sorters: Sorter<T>[]) => {
   return data.sort((a, b) => {
     for (const sorter of sorters) {
       const { type, state, key } = sorter;

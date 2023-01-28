@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { CellCache } from '../utils/cache/cell-cache';
-import type { Indexable } from '../types/general';
 import type {
   ColumnsProps,
   RowIndexGetterProps,
   RowsProps,
 } from '../types/props';
 
-type UseCellCacheProps<T extends Indexable> = ColumnsProps<T> &
+type UseCellCacheProps<T> = ColumnsProps<T> &
   RowIndexGetterProps<T> &
   RowsProps;
 
-const useCellCache = <T extends Indexable>({
+const useCellCache = <T,>({
   columns,
   getRowByIndex,
   rows,
