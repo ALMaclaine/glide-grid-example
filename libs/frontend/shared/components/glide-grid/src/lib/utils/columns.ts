@@ -9,45 +9,45 @@ type ColumnsProps<T> = {
 };
 
 class ColumnsTranslation {
-  private readonly uuidOrder: string[] = [];
-  private readonly translate: number[] = [];
+  private readonly _uuidOrder: string[] = [];
+  private readonly _translate: number[] = [];
 
   addUuid(uuid: string) {
-    this.uuidOrder.push(uuid);
-    this.translate.push(this.translate.length);
+    this._uuidOrder.push(uuid);
+    this._translate.push(this._translate.length);
   }
 
   getTranslation(pos: number) {
-    if (pos > this.translate.length || pos < 0) {
+    if (pos > this._translate.length || pos < 0) {
       throw new Error('Out of bounds access');
     }
-    return this.translate[pos];
+    return this._translate[pos];
   }
 
   get length() {
-    return this.uuidOrder.length;
+    return this._uuidOrder.length;
   }
 
   private shiftRight(pos1: number, pos2: number) {
-    const translateTmp = this.translate[pos2];
-    const uuidTmp = this.uuidOrder[pos2];
+    const translateTmp = this._translate[pos2];
+    const uuidTmp = this._uuidOrder[pos2];
     for (let i = pos2; i >= pos1; i--) {
-      this.translate[i] = this.translate[i - 1];
-      this.uuidOrder[i] = this.uuidOrder[i - 1];
+      this._translate[i] = this._translate[i - 1];
+      this._uuidOrder[i] = this._uuidOrder[i - 1];
     }
-    this.translate[pos1] = translateTmp;
-    this.uuidOrder[pos1] = uuidTmp;
+    this._translate[pos1] = translateTmp;
+    this._uuidOrder[pos1] = uuidTmp;
   }
 
   private shiftLeft(pos1: number, pos2: number) {
-    const translateTmp = this.translate[pos1];
-    const uuidTmp = this.uuidOrder[pos1];
+    const translateTmp = this._translate[pos1];
+    const uuidTmp = this._uuidOrder[pos1];
     for (let i = pos1; i < pos2; i++) {
-      this.translate[i] = this.translate[i + 1];
-      this.uuidOrder[i] = this.uuidOrder[i + 1];
+      this._translate[i] = this._translate[i + 1];
+      this._uuidOrder[i] = this._uuidOrder[i + 1];
     }
-    this.translate[pos2] = translateTmp;
-    this.uuidOrder[pos2] = uuidTmp;
+    this._translate[pos2] = translateTmp;
+    this._uuidOrder[pos2] = uuidTmp;
   }
 
   swap(col1: number, col2: number) {
@@ -57,17 +57,18 @@ class ColumnsTranslation {
       this.shiftLeft(col1, col2);
     }
   }
+
+  get uuidOrder() {
+    return this._uuidOrder;
+  }
 }
 
 class Columns<T> {
   private readonly columns: WrappedGridColumn<T>[];
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
-  private readonly uuidOrder: string[] = [];
-  private readonly translate: number[] = [];
   private hiddenColumnsSet: Set<StringKeys<T>> = new Set();
   private readonly sortMap: Map<StringKeys<T>, SortTypes>;
-  private readonly columnTranslation: ColumnsTranslation =
-    new ColumnsTranslation();
+  private readonly translator: ColumnsTranslation = new ColumnsTranslation();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.columns = columns;
@@ -84,9 +85,7 @@ class Columns<T> {
     for (const column of this.columns) {
       const id = uuid();
       this.columnMap.set(id, column);
-      this.columnTranslation.addUuid(id);
-      this.uuidOrder.push(id);
-      this.translate.push(this.translate.length);
+      this.translator.addUuid(id);
     }
   }
 
@@ -95,7 +94,7 @@ class Columns<T> {
   }
 
   getTranslation(pos: number) {
-    return this.columnTranslation.getTranslation(pos);
+    return this.translator.getTranslation(pos);
   }
 
   private processColumns(columns: WrappedGridColumn<T>[]) {
@@ -108,7 +107,7 @@ class Columns<T> {
   }
 
   get length() {
-    return this.columnTranslation.length;
+    return this.translator.length;
   }
 
   getDisplayData(colPos: number) {
@@ -127,7 +126,7 @@ class Columns<T> {
     }
 
     const out = [];
-    for (const uuid of this.uuidOrder) {
+    for (const uuid of this.translator.uuidOrder) {
       const val = this.columnMap.get(uuid);
       if (val && !this.hiddenColumnsSet.has(val.id)) {
         out.push(val);
@@ -140,34 +139,12 @@ class Columns<T> {
 
   getCell(colPos: number) {
     this.validateBounds(colPos);
-    const id = this.uuidOrder[colPos];
+    const id = this.translator.uuidOrder[colPos];
     const column = this.columnMap.get(id);
     if (column) {
       return column.cell;
     }
     throw new Error('Column does not exist');
-  }
-
-  private shiftRight(pos1: number, pos2: number) {
-    const translateTmp = this.translate[pos2];
-    const uuidTmp = this.uuidOrder[pos2];
-    for (let i = pos2; i >= pos1; i--) {
-      this.translate[i] = this.translate[i - 1];
-      this.uuidOrder[i] = this.uuidOrder[i - 1];
-    }
-    this.translate[pos1] = translateTmp;
-    this.uuidOrder[pos1] = uuidTmp;
-  }
-
-  private shiftLeft(pos1: number, pos2: number) {
-    const translateTmp = this.translate[pos1];
-    const uuidTmp = this.uuidOrder[pos1];
-    for (let i = pos1; i < pos2; i++) {
-      this.translate[i] = this.translate[i + 1];
-      this.uuidOrder[i] = this.uuidOrder[i + 1];
-    }
-    this.translate[pos2] = translateTmp;
-    this.uuidOrder[pos2] = uuidTmp;
   }
 
   private validateBounds(col: number) {
@@ -181,13 +158,7 @@ class Columns<T> {
     this.validateBounds(col1);
     this.validateBounds(col2);
     const columns = this.getColumns();
-    console.log(columns);
-    this.columnTranslation.swap(col1, col2);
-    if (col1 > col2) {
-      this.shiftRight(col2, col1);
-    } else {
-      this.shiftLeft(col1, col2);
-    }
+    this.translator.swap(col1, col2);
     this.dirty = true;
   }
 }
