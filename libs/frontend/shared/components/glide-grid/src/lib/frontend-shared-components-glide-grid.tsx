@@ -71,7 +71,10 @@ function GlideGrid<T>({
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
-  const rowClass = useMemo(() => new RowsManager(data, columns), [data]);
+  const rowClass = useMemo(
+    () => new RowsManager(data, columns),
+    [columns, data]
+  );
 
   const [sorted, setSorted] = useState(rowClass.rows);
   const onHeaderClickSort = useCallback(
@@ -84,7 +87,6 @@ function GlideGrid<T>({
   const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
 
   const { getCellContent } = useGenGetCellContent({
-    columns,
     rowManager: rowClass,
     sorted,
   });

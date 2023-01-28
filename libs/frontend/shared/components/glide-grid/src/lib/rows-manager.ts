@@ -12,11 +12,13 @@ class RowsManager<T> {
   private readonly cache: RowCache<T>;
   readonly stateMachine: SortStateMachine<T>;
   readonly sorter: TableSorter<T>;
+  readonly columns: Columns<T>;
 
   get rows() {
     return this._rows;
   }
   constructor(data: T[], columns: Columns<T>) {
+    this.columns = columns;
     this._rows = addIdsToRows(data);
     this.cache = new RowCache<T>(this.rows);
     this.stateMachine = new SortStateMachine<T>();

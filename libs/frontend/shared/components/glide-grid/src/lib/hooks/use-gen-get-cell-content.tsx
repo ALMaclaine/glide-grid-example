@@ -6,23 +6,22 @@ import type { ItemToGridCell } from '../types/func';
 import { RowsManager } from '../rows-manager';
 import { CellCache } from '../utils/caches/cell-cache';
 
-type UseGenGetCellContentProps<T> = ColumnsProps<T> & {
+type UseGenGetCellContentProps<T> = {
   sorted: IdRow<T>[];
   rowManager: RowsManager<T>;
 };
 
 const useGenGetCellContent = <T,>({
-  columns,
   rowManager,
   sorted,
 }: UseGenGetCellContentProps<T>) => {
   const cache = useMemo(() => {
     return new CellCache({
-      columns,
+      columns: rowManager.columns,
       rows: rowManager.length,
       getRowByIndex: (row: number) => rowManager.getRowByIndex(row),
     });
-  }, [columns, rowManager]);
+  }, [rowManager]);
 
   const getCellContent = useCallback<ItemToGridCell>(
     ([col, row]: Item) => {
