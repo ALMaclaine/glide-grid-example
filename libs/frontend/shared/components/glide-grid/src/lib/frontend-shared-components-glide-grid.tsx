@@ -5,7 +5,7 @@ import {
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { addIdsToRows, noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
@@ -22,7 +22,7 @@ import { STATE_HISTORY_STEPS } from './constants';
 import { RowCache } from './utils/caches/row-cache';
 import { IdRow } from './types/grid';
 import { TableSorter } from './utils/sort/table-sorter';
-import { useSortStateMachine } from './hooks/use-sort-state-machine';
+import { SortStateMachine, StateSet } from './utils/sort/sort-state-machine';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -108,7 +108,21 @@ function GlideGrid<T>({
     [columns, rowClass.rows]
   );
 
-  const { sortMachineNextToken, getSortState } = useSortStateMachine<T>();
+  const stateMachine = useMemo(() => new SortStateMachine<T>(), []);
+  const sortMachineNextToken = useCallback(
+    (value: StringKeys<T>, steps: number) => {
+      return stateMachine.nextValue(value, steps);
+    },
+    [stateMachine]
+  );
+
+  const getSortState: (steps: number) => StateSet<T>[] = useCallback(
+    (steps: number) => {
+      return stateMachine.getHistory(steps);
+    },
+    [stateMachine]
+  );
+
   const [sorted, setSorted] = useState(rowClass.rows);
   const onHeaderClickSort = useCallback(
     (headerVal: StringKeys<T>) => {
