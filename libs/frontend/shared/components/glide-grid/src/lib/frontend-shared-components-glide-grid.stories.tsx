@@ -99,7 +99,10 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
   },
 ];
 
-const columns = new Columns<Property>(columnsDetails);
+const columns = new Columns<Property>({
+  columns: columnsDetails,
+  // hiddenColumns: ['rentOwed'],
+});
 
 const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43];
 const INVESTORS = [randCompanyName(), randCompanyName(), randCompanyName()];

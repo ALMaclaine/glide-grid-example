@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import type { IdRow } from '../types/grid';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
@@ -6,4 +7,13 @@ const noOp = () => {};
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOpObj = () => ({});
 
-export { noOp, noOpObj, uuid };
+const addIdsToRows = <T>(rows: T[]): IdRow<T>[] => {
+  // mutate directly to avoid performance issues on large tables
+  for (const row of rows) {
+    const changeType = row as IdRow<T>;
+    changeType.rowUuid = uuid();
+  }
+  return rows as IdRow<T>[];
+};
+
+export { noOp, noOpObj, uuid, addIdsToRows };

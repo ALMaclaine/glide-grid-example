@@ -5,12 +5,11 @@ import {
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
-import { noOp, noOpObj } from './utils/general';
+import { addIdsToRows, noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { useGenGetCellContent } from './hooks/use-gen-get-cell-content';
-import { useAddIds } from './hooks/use-add-ids';
 import {
   useHeaderClicked,
   UseHeaderClickedProps,
@@ -21,8 +20,8 @@ import type { ColumnsProps, RowsProps } from './types/props';
 import { useSort } from './hooks/use-sort';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { Columns } from './utils/columns';
-import { useRowCache } from './hooks/use-row-cache';
 import { STATE_HISTORY_STEPS } from './constants';
+import { RowCache } from './utils/caches/row-cache';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -73,8 +72,16 @@ function GlideGrid<T>({
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
-  const { dataWithIds } = useAddIds(data);
-  const { getRowByIndex } = useRowCache(dataWithIds);
+  const dataWithIds = useMemo(() => addIdsToRows(data), [data]);
+  const cache = useMemo(() => new RowCache(dataWithIds), [data]);
+
+  const getRowByIndex = useCallback(
+    (row: number) => {
+      return cache.getRowByIndex(row);
+    },
+    [cache]
+  );
+
   const columnsRef = useRef<Columns<T>>(columns);
   const { sorted, onHeaderClickSort, getSortState, refreshSort } = useSort({
     originalData: dataWithIds,

@@ -3,27 +3,54 @@ import type { WrappedGridColumn } from '../types/grid';
 import { uuid } from './general';
 import { SORT_TYPES, SortTypes } from './sort/object-sort';
 
+type ColumnsProps<T> = {
+  columns: WrappedGridColumn<T>[];
+  hiddenColumns?: StringKeys<T>[];
+};
+
+class ColumnsTranslation {
+  private readonly uuidOrder: string[] = [];
+  private readonly translate: number[] = [];
+
+  addUuid(uuid: string) {
+    this.uuidOrder.push(uuid);
+    this.translate.push(this.translate.length + 1);
+  }
+}
+
 class Columns<T> {
   private readonly columns: WrappedGridColumn<T>[];
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private readonly uuidOrder: string[] = [];
   private readonly translate: number[] = [];
+  private hiddenColumnsSet: Set<StringKeys<T>> = new Set();
   private readonly sortMap: Map<StringKeys<T>, SortTypes>;
+  private readonly columnTranslation: ColumnsTranslation =
+    new ColumnsTranslation();
 
-  constructor(columns: WrappedGridColumn<T>[]) {
+  constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.columns = columns;
     this.addColumnsToMap();
     this.sortMap = this.processColumns(columns);
+    this.fillSet(hiddenColumns);
+  }
+
+  private fillSet(hiddenColumns: StringKeys<T>[]) {
+    this.hiddenColumnsSet = new Set(hiddenColumns);
   }
 
   private addColumnsToMap() {
     let i = 0;
     for (const column of this.columns) {
       const id = uuid();
-      this.uuidOrder.push(id);
       this.columnMap.set(id, column);
+      this.uuidOrder.push(id);
       this.translate.push(i++);
     }
+  }
+
+  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
+    this.fillSet(hiddenColumns);
   }
 
   getTranslation(pos: number) {
@@ -65,7 +92,7 @@ class Columns<T> {
     for (const colPos of this.translate) {
       const uuid = this.uuidOrder[colPos];
       const val = this.columnMap.get(uuid);
-      if (val) {
+      if (val && !this.hiddenColumnsSet.has(val.id)) {
         out.push(val);
       }
     }
@@ -75,9 +102,7 @@ class Columns<T> {
   }
 
   getCell(colPos: number) {
-    if (colPos > this.uuidOrder.length || colPos < 0) {
-      throw new Error('Out of bounds access');
-    }
+    this.validateBounds(colPos);
     const pos = this.translate[colPos];
     const id = this.uuidOrder[pos];
     const column = this.columnMap.get(id);
@@ -87,34 +112,39 @@ class Columns<T> {
     throw new Error('Column does not exist');
   }
 
+  private shiftRight(pos1: number, pos2: number) {
+    const tmp = this.translate[pos2];
+    for (let i = pos2; i >= pos1; i--) {
+      this.translate[i] = this.translate[i - 1];
+    }
+    this.translate[pos1] = tmp;
+  }
+
+  private shiftLeft(pos1: number, pos2: number) {
+    const tmp = this.translate[pos1];
+    for (let i = pos1; i < pos2; i++) {
+      this.translate[i] = this.translate[i + 1];
+    }
+    this.translate[pos2] = tmp;
+  }
+
+  private validateBounds(col: number) {
+    const columns = this.getColumns();
+    if (col > columns.length || col < 0) {
+      throw new Error('Out of bounds access');
+    }
+  }
+
   swap(col1: number, col2: number) {
-    if (col1 > this.uuidOrder.length || col1 < 0) {
-      throw new Error('col1 Out of bounds access');
-    }
+    this.validateBounds(col1);
+    this.validateBounds(col2);
+    const columns = this.getColumns();
+    console.log(columns);
 
-    if (col2 > this.uuidOrder.length || col2 < 0) {
-      throw new Error('col2 Out of bounds access');
-    }
     if (col1 > col2) {
-      const max = col1;
-      const min = col2;
-
-      for (let i = max - 1; i >= min; i--) {
-        [this.translate[i], this.translate[i + 1]] = [
-          this.translate[i + 1],
-          this.translate[i],
-        ];
-      }
+      this.shiftRight(col2, col1);
     } else {
-      const max = col2;
-      const min = col1;
-
-      for (let i = min; i < max; i++) {
-        [this.translate[i], this.translate[i + 1]] = [
-          this.translate[i + 1],
-          this.translate[i],
-        ];
-      }
+      this.shiftLeft(col1, col2);
     }
     this.dirty = true;
   }
