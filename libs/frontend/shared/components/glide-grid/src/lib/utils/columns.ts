@@ -98,6 +98,12 @@ class Columns<T> {
   }
 
   private processColumns(columns: WrappedGridColumn<T>[]) {
+    return new Map(
+      columns.map(({ cell: { displayData, sortType } }) => [
+        displayData,
+        sortType,
+      ])
+    );
     const sortMap = new Map<StringKeys<T>, SortTypes>();
     for (const column of columns) {
       const { sortType, displayData } = column.cell;
