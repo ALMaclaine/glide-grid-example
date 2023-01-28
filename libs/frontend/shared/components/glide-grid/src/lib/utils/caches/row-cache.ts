@@ -3,10 +3,12 @@ import type { IdRow } from '../../types/grid';
 class RowCache<T> {
   private rowIdArray: string[] = [];
   private cache = new Map<string, IdRow<T>>();
+  private idRowMap = new Map<string, number>();
   // column -> row -> value
   constructor(data: IdRow<T>[] = []) {
     for (const row of data) {
       const { rowUuid } = row;
+      this.idRowMap.set(rowUuid, this.rowIdArray.length);
       this.rowIdArray.push(rowUuid);
       this.cache.set(rowUuid, row);
     }
@@ -22,6 +24,14 @@ class RowCache<T> {
   getRowByIndex(n: number) {
     const uuid = this.getRowId(n);
     const row = this.cache.get(uuid);
+    if (!row) {
+      throw new Error('Cache should be set before accessing');
+    }
+    return row;
+  }
+
+  getRowById(id: string) {
+    const row = this.cache.get(id);
     if (!row) {
       throw new Error('Cache should be set before accessing');
     }

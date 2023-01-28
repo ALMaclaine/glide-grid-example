@@ -22,6 +22,7 @@ import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { RowCache } from './utils/caches/row-cache';
+import { IdRow } from './types/grid';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -56,6 +57,27 @@ const theme = {
   cellVerticalPadding: 10,
 };
 
+class Rows<T> {
+  private readonly _rows: IdRow<T>[];
+  private readonly cache: RowCache<T>;
+
+  get rows() {
+    return this._rows;
+  }
+  constructor(data: T[]) {
+    this._rows = addIdsToRows(data);
+    this.cache = new RowCache<T>(this.rows);
+  }
+
+  getRowById(id: string) {
+    return this.cache.getRowById(id);
+  }
+
+  getRowByIndex(index: number) {
+    return this.cache.getRowByIndex(index);
+  }
+}
+
 type GlideGridProps<T> = {
   onItemHovered: HoverHandler;
   data: T[];
@@ -72,19 +94,18 @@ function GlideGrid<T>({
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
-  const dataWithIds = useMemo(() => addIdsToRows(data), [data]);
-  const cache = useMemo(() => new RowCache(dataWithIds), [data]);
+  const rowClass = useMemo(() => new Rows(data), [data]);
 
   const getRowByIndex = useCallback(
     (row: number) => {
-      return cache.getRowByIndex(row);
+      return rowClass.getRowByIndex(row);
     },
-    [cache]
+    [rowClass]
   );
 
   const columnsRef = useRef<Columns<T>>(columns);
   const { sorted, onHeaderClickSort, getSortState, refreshSort } = useSort({
-    originalData: dataWithIds,
+    originalData: rowClass.rows,
     columns,
   });
 

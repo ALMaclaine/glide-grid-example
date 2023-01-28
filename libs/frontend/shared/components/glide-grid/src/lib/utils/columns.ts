@@ -163,7 +163,6 @@ class Columns<T> {
   swap(col1: number, col2: number) {
     this.validateBounds(col1);
     this.validateBounds(col2);
-    const columns = this.getColumns();
     this.translator.swap(col1, col2);
     this.dirty = true;
   }
