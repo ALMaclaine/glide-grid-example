@@ -81,19 +81,17 @@ function GlideGrid<T>({
     [columns, rowClass.rows]
   );
 
-  const stateMachine = useMemo(() => new SortStateMachine<T>(), []);
-
   const getSortState: (steps: number) => StateSet<T>[] = useCallback(
     (steps: number) => {
-      return stateMachine.getHistory(steps);
+      return rowClass.stateMachine.getHistory(steps);
     },
-    [stateMachine]
+    [rowClass.stateMachine]
   );
 
   const [sorted, setSorted] = useState(rowClass.rows);
   const onHeaderClickSort = useCallback(
     (headerVal: StringKeys<T>) => {
-      const stateHistory = stateMachine.nextValue(
+      const stateHistory = rowClass.stateMachine.nextValue(
         headerVal,
         STATE_HISTORY_STEPS
       );
@@ -101,7 +99,7 @@ function GlideGrid<T>({
       const nextSorted = sorter.stateSort(stateHistory);
       setSorted(nextSorted);
     },
-    [sorter, stateMachine]
+    [rowClass.stateMachine, sorter]
   );
 
   const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);

@@ -26,19 +26,12 @@ const useGenGetCellContent = <T,>({
     });
   }, [columns, rowManager, rows]);
 
-  const cacheGetRow = useCallback(
-    (uuid: string, col: number) => {
-      return cache.get(uuid, col);
-    },
-    [cache]
-  );
-
   const getCellContent = useCallback<ItemToGridCell>(
     ([col, row]: Item) => {
       const { rowUuid } = sorted[row];
-      return cacheGetRow(rowUuid, col);
+      return cache.get(rowUuid, col);
     },
-    [cacheGetRow, sorted]
+    [cache, sorted]
   );
 
   return { getCellContent };
