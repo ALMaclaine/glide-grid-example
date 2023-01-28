@@ -122,5 +122,4 @@ const data: Property[] = [...Array(100).fill(0).map(genProperty)];
 Primary.args = {
   columns,
   data,
-  rows: data.length,
 };

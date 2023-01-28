@@ -22,7 +22,8 @@ import { STATE_HISTORY_STEPS } from './constants';
 import { RowCache } from './utils/caches/row-cache';
 import { IdRow } from './types/grid';
 import { TableSorter } from './utils/sort/table-sorter';
-import { useSortStateMachine } from './hooks/use-sort-state-machine';
+import { SortStateMachine, StateSet } from './utils/sort/sort-state-machine';
+import { Columns } from './utils/columns';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -57,16 +58,24 @@ const theme = {
   cellVerticalPadding: 10,
 };
 
-class Rows<T> {
+type RowManagerProps<T> = ColumnsProps<T> & {
+  rows: T[];
+};
+
+class RowManager<T> {
   private readonly _rows: IdRow<T>[];
   private readonly cache: RowCache<T>;
+  private readonly columns: Columns<T>;
+  readonly sorter: TableSorter<T>;
 
   get rows() {
     return this._rows;
   }
-  constructor(data: T[]) {
-    this._rows = addIdsToRows(data);
+  constructor({ rows, columns }: RowManagerProps<T>) {
+    this._rows = addIdsToRows(rows);
+    this.columns = columns;
     this.cache = new RowCache<T>(this.rows);
+    this.sorter = new TableSorter({ originalData: this._rows, columns });
   }
 
   getRowById(id: string) {
@@ -83,41 +92,34 @@ type GlideGridProps<T> = {
   data: T[];
   getRowThemeOverride: GetRowThemeCallback;
   onHeaderClicked: HeaderClickHandler;
-} & ColumnsProps<T> &
-  RowsProps;
+} & ColumnsProps<T>;
 
 function GlideGrid<T>({
   columns,
   data,
-  rows,
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
-  const rowClass = useMemo(() => new Rows(data), [data]);
-
-  const getRowByIndex = useCallback(
-    (row: number) => {
-      return rowClass.getRowByIndex(row);
-    },
-    [rowClass]
+  const rowClass = useMemo(
+    () => new RowManager({ columns, rows: data }),
+    [columns, data]
   );
 
-  const sorter = useMemo(
-    () => new TableSorter({ originalData: rowClass.rows, columns }),
-    [columns, rowClass.rows]
-  );
+  const stateMachine = useMemo(() => new SortStateMachine<T>(), []);
 
-  const { sortMachineNextToken, getSortState } = useSortStateMachine<T>();
   const [sorted, setSorted] = useState(rowClass.rows);
   const onHeaderClickSort = useCallback(
     (headerVal: StringKeys<T>) => {
-      const stateHistory = sortMachineNextToken(headerVal, STATE_HISTORY_STEPS);
+      const stateHistory = stateMachine.nextValue(
+        headerVal,
+        STATE_HISTORY_STEPS
+      );
 
-      const nextSorted = sorter.stateSort(stateHistory);
+      const nextSorted = rowClass.sorter.stateSort(stateHistory);
       setSorted(nextSorted);
     },
-    [sortMachineNextToken, sorter]
+    [rowClass.sorter, stateMachine]
   );
 
   const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
@@ -160,9 +162,9 @@ function GlideGrid<T>({
 
   const { getCellContent } = useGenGetCellContent({
     columns,
-    getRowByIndex,
+    getRowByIndex: (row) => rowClass.getRowByIndex(row),
     sorted,
-    rows,
+    rows: data.length,
   });
 
   return (
@@ -190,13 +192,13 @@ function GlideGrid<T>({
         smoothScrollX={true}
         smoothScrollY={true}
         drawHeader={(args) => {
-          drawHeaderSort(args, getSortState(STATE_HISTORY_STEPS));
+          drawHeaderSort(args, stateMachine.getHistory(STATE_HISTORY_STEPS));
           return false;
         }}
         theme={theme}
         onItemHovered={_onItemHovered}
         getRowThemeOverride={_getRowThemeOverride}
-        rows={rows}
+        rows={data.length}
       />
     </div>
   );
