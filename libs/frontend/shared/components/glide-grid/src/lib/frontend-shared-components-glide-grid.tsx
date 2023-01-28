@@ -5,7 +5,7 @@ import {
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { addIdsToRows, noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
@@ -17,12 +17,12 @@ import {
 import type { StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
-import { useSort } from './hooks/use-sort';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
-import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { RowCache } from './utils/caches/row-cache';
 import { IdRow } from './types/grid';
+import { TableSorter } from './utils/sort/table-sorter';
+import { useSortStateMachine } from './hooks/use-sort-state-machine';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -103,11 +103,24 @@ function GlideGrid<T>({
     [rowClass]
   );
 
-  const columnsRef = useRef<Columns<T>>(columns);
-  const { sorted, onHeaderClickSort, getSortState, refreshSort } = useSort({
-    originalData: rowClass.rows,
-    columns,
-  });
+  const sorter = useMemo(
+    () => new TableSorter({ originalData: rowClass.rows, columns }),
+    [columns, rowClass.rows]
+  );
+
+  const { sortMachineNextToken, getSortState } = useSortStateMachine<T>();
+  const [sorted, setSorted] = useState(rowClass.rows);
+  const onHeaderClickSort = useCallback(
+    (headerVal: StringKeys<T>) => {
+      const stateHistory = sortMachineNextToken(headerVal, STATE_HISTORY_STEPS);
+
+      const nextSorted = sorter.stateSort(stateHistory);
+      setSorted(nextSorted);
+    },
+    [sortMachineNextToken, sorter]
+  );
+
+  const refreshSort = useCallback(() => setSorted((sorted) => [...sorted]), []);
 
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
@@ -170,7 +183,7 @@ function GlideGrid<T>({
           // }
         }}
         onColumnMoved={(col1, col2) => {
-          columnsRef.current.swap(col1, col2);
+          columns.swap(col1, col2);
           refreshSort();
         }}
         onHeaderClicked={_onHeaderClicked}
