@@ -178,6 +178,12 @@ class Columns<T> {
   swap(col1: number, col2: number) {
     this.validateBounds(col1);
     this.validateBounds(col2);
+    const { id: id1 } = this.getColumns()[col1];
+    const { id: id2 } = this.getColumns()[col2];
+    const translatedCol1 = this.translator.getTranslationById(id1);
+    const translatedCol2 = this.translator.getTranslationById(id2);
+    console.log(col1, translatedCol1);
+    console.log(col2, translatedCol2);
     this.translator.swap(col1, col2);
     this.dirty = true;
   }
