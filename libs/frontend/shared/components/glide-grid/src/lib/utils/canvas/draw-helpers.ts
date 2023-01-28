@@ -163,7 +163,7 @@ const drawHeaderSort = <T extends Indexable>(
     itemWidth: image.width,
     itemHeight: image.height,
     position: 'midRight',
-    padding: 8,
+    padding: theme.cellHorizontalPadding,
   });
 
   ctx.putImageData(image, zoomFactor * (pos.x + x), pos.y + y);

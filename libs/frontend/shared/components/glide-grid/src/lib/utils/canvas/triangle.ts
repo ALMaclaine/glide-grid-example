@@ -32,10 +32,12 @@ class Triangle implements Imageable {
 
   fill(color: string) {
     this.fillColor = color;
+    this.clear();
   }
 
   background(color: string) {
     this.easel.background(color);
+    this.clear();
   }
 
   private drawUp() {
@@ -93,16 +95,20 @@ class Triangle implements Imageable {
   clear() {
     this.easel.clear();
     this.lastDirection = undefined;
+    this.dirty = true;
   }
+
+  private dirty = true;
 
   private lastDirection?: TriangleDirection;
   draw(direction: TriangleDirection = TRIANGLE_DIRECTIONS.up) {
-    if (this.lastDirection === direction) {
+    if (this.lastDirection === direction || !this.dirty) {
       return;
     } else {
       this.lastDirection = direction;
     }
 
+    this.dirty = false;
     switch (direction) {
       case TRIANGLE_DIRECTIONS.up: {
         this.drawUp();
@@ -118,6 +124,9 @@ class Triangle implements Imageable {
       }
       case TRIANGLE_DIRECTIONS.down: {
         this.drawDown();
+        return;
+      }
+      default: {
         return;
       }
     }

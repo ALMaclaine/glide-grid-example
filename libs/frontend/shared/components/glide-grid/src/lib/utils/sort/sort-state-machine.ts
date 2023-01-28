@@ -43,6 +43,8 @@ class SortStateMachine<T extends Indexable> {
   private currentStateSet: StateSet<T> = { ...initialStateSet };
   private previousStateSet: StateSet<T> = { ...initialStateSet };
 
+  // value passed to genCycleStates is the starting value of the NEXT state update
+  // start at first state after initial
   private stateCycler = genCycleStates(sortStatesArray[1]);
 
   constructor(stateSet: Partial<StateSet<T>> = {}) {

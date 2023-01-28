@@ -23,6 +23,39 @@ import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { Columns } from './utils/columns';
 import { useRowCache } from './hooks/use-row-cache';
 
+const divStyles = {
+  border: '1px solid #e9e9e9',
+  borderRadius: '4px',
+  height: '100%',
+  overflow: 'hidden',
+};
+
+const theme = {
+  accentColor: '#e2dbff',
+  accentLight: '#f8f6ff',
+  textDark: '#0e0e2c',
+  textMedium: '#7e7f9b',
+  textLight: '#adaec8',
+  textBubble: '#03032c',
+  bgIconHeader: '#f9f8f8',
+  fgIconHeader: '#cccccc',
+  textHeader: '#0e0e2c',
+  textGroupHeader: '#0e0e2c',
+  textHeaderSelected: '#0e0e2c',
+  bgCell: '#ffffff',
+  bgCellMedium: '#ffffff',
+  bgHeader: '#f9f8f8',
+  bgHeaderHasFocus: '#e2dbff',
+  bgHeaderHovered: '#f3f0ff',
+  bgBubble: '#f3f0ff',
+  bgBubbleSelected: '#e2dbff',
+  bgSearchResult: '#f3f0ff',
+  borderColor: '#e9e9e9',
+  linkColor: '#5843be',
+  cellHorizontalPadding: 12,
+  cellVerticalPadding: 10,
+};
+
 type GlideGridProps<T extends Indexable> = {
   onItemHovered: HoverHandler;
   data: T[];
@@ -91,42 +124,39 @@ function GlideGrid<T extends Indexable>({
   });
 
   return (
-    <DataEditor
-      // width 100% needed otherwise grow/resizing animates slowly to fill extra width
-      width="100%"
-      verticalBorder={false}
-      columns={columns.getColumns()}
-      // turns on copy support
-      getCellsForSelection={true}
-      getCellContent={getCellContent}
-      onCellClicked={(item: Item) => {
-        // const { kind, ...rest } = getCellContent(item);
-        // if (kind === 'uri') {
-        //   // TODO: use type guard
-        //   const { data } = rest as UriCell;
-        //   window.alert('Navigating to: ' + data);
-        // }
-      }}
-      onColumnMoved={(col1, col2) => {
-        columnsRef.current.swap(col1, col2);
-        refreshSort();
-      }}
-      onHeaderClicked={_onHeaderClicked}
-      smoothScrollX={true}
-      smoothScrollY={true}
-      drawHeader={(args) => {
-        drawHeaderSort(args, getSortState());
-        return false;
-      }}
-      theme={{
-        accentColor: '#e1dbfc',
-        accentLight: '#f8f7fe',
-        textHeaderSelected: '#3d3c5a',
-      }}
-      onItemHovered={_onItemHovered}
-      getRowThemeOverride={_getRowThemeOverride}
-      rows={rows}
-    />
+    <div style={divStyles}>
+      <DataEditor
+        // width 100% needed otherwise grow/resizing animates slowly to fill extra width
+        width="100%"
+        columns={columns.getColumns()}
+        // turns on copy support
+        getCellsForSelection={true}
+        getCellContent={getCellContent}
+        onCellClicked={(item: Item) => {
+          // const { kind, ...rest } = getCellContent(item);
+          // if (kind === 'uri') {
+          //   // TODO: use type guard
+          //   const { data } = rest as UriCell;
+          //   window.alert('Navigating to: ' + data);
+          // }
+        }}
+        onColumnMoved={(col1, col2) => {
+          columnsRef.current.swap(col1, col2);
+          refreshSort();
+        }}
+        onHeaderClicked={_onHeaderClicked}
+        smoothScrollX={true}
+        smoothScrollY={true}
+        drawHeader={(args) => {
+          drawHeaderSort(args, getSortState());
+          return false;
+        }}
+        theme={theme}
+        onItemHovered={_onItemHovered}
+        getRowThemeOverride={_getRowThemeOverride}
+        rows={rows}
+      />
+    </div>
   );
 }
 

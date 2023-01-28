@@ -95,14 +95,26 @@ class Columns<T extends Indexable> {
     if (col2 > this.uuidOrder.length || col2 < 0) {
       throw new Error('col2 Out of bounds access');
     }
-    const max = Math.max(col1, col2);
-    const min = Math.min(col1, col2);
+    if (col1 > col2) {
+      const max = col1;
+      const min = col2;
 
-    for (let i = max - 1; i >= min; i--) {
-      [this.translate[i], this.translate[i + 1]] = [
-        this.translate[i + 1],
-        this.translate[i],
-      ];
+      for (let i = max - 1; i >= min; i--) {
+        [this.translate[i], this.translate[i + 1]] = [
+          this.translate[i + 1],
+          this.translate[i],
+        ];
+      }
+    } else {
+      const max = col2;
+      const min = col1;
+
+      for (let i = min; i < max; i++) {
+        [this.translate[i], this.translate[i + 1]] = [
+          this.translate[i + 1],
+          this.translate[i],
+        ];
+      }
     }
     this.dirty = true;
   }

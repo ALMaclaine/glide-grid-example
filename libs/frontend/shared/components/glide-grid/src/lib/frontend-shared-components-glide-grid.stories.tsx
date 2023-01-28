@@ -19,7 +19,7 @@ export default {
   component: GlideGrid,
   decorators: [
     (Story) => (
-      <div>
+      <div style={{ height: '100%' }}>
         <Story />
         <div id="portal" />
       </div>
@@ -33,12 +33,20 @@ export const Primary: ComponentStory<typeof GlideGrid> = <T extends Indexable>(
   return (
     <div
       style={{
-        width: '80vw',
-        height: '60vh',
-        margin: '0 auto',
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      <GlideGrid {...args} />
+      <div
+        style={{
+          width: '80vw',
+          height: '60vh',
+        }}
+      >
+        <GlideGrid {...args} />
+      </div>
     </div>
   );
 };
