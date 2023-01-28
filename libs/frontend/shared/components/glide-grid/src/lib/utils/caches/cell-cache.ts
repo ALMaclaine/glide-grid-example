@@ -1,12 +1,9 @@
 import { GridCell, Item } from '@glideapps/glide-data-grid';
 import { GlideGridCellGenerator } from '../cells/generators';
-import type {
-  ColumnsProps,
-  RowIndexGetterProps,
-  RowsProps,
-} from '../../types/props';
+import type { ColumnsProps, RowsProps } from '../../types/props';
 import type { RowIndexGetter } from '../../types/func';
 import type { Columns } from '../columns';
+import { IdRow } from '../../types/grid';
 
 const genGetCellContent = <T>(
   columns: Columns<T>,
@@ -27,7 +24,8 @@ const genGetCellContent = <T>(
   };
 };
 
-type CellCacheProps<T> = ColumnsProps<T> & RowIndexGetterProps<T> & RowsProps;
+type CellCacheProps<T> = ColumnsProps<T> &
+  RowsProps & { getRowByIndex: (index: number) => IdRow<T> };
 
 class CellCache<T> {
   // column -> row -> value

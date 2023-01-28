@@ -73,7 +73,7 @@ function GlideGrid<T>({
   const [, _refresh] = useState([]);
   const refresh = useCallback(() => _refresh([]), []);
 
-  const rowClass = useMemo(
+  const rowManager = useMemo(
     () => new RowsManager(data, columns),
     [columns, data]
   );
@@ -81,10 +81,10 @@ function GlideGrid<T>({
   const onHeaderClickedIn = useCallback(
     (headerVal: StringKeys<T>) => {
       onHeaderClicked(headerVal);
-      rowClass.nextSortKey(headerVal);
+      rowManager.nextSortKey(headerVal);
       refresh();
     },
-    [onHeaderClicked, refresh, rowClass]
+    [onHeaderClicked, refresh, rowManager]
   );
 
   const { onHeaderClicked: _onHeaderClicked } = useHeaderClicked({
@@ -123,7 +123,7 @@ function GlideGrid<T>({
         columns={columns.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
-        getCellContent={(item: Item) => rowClass.itemToCell(item)}
+        getCellContent={(item: Item) => rowManager.itemToCell(item)}
         onCellClicked={(item: Item) => {
           // const { kind, ...rest } = getCellContent(item);
           // if (kind === 'uri') {
@@ -142,7 +142,7 @@ function GlideGrid<T>({
         drawHeader={(args) => {
           drawHeaderSort(
             args,
-            rowClass.stateMachine.getHistory(STATE_HISTORY_STEPS)
+            rowManager.stateMachine.getHistory(STATE_HISTORY_STEPS)
           );
           return false;
         }}
