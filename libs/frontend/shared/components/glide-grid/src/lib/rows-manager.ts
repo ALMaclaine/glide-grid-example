@@ -7,66 +7,45 @@ import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
 import { CellCache } from './utils/caches/cell-cache';
-import { GridCell, Item } from '@glideapps/glide-data-grid';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
-  private readonly cache: RowCache<T>;
+  private readonly rowCache: RowCache<T>;
   readonly stateMachine: SortStateMachine<T> = new SortStateMachine<T>();
   readonly sorter: TableSorter<T>;
   readonly columns: Columns<T>;
-  readonly cellCache: CellCache<T>;
-  private sorted: IdRow<T>[];
+  private _sorted: IdRow<T>[];
 
   get rows() {
     return this._rows;
   }
+
+  get sorted() {
+    return this._sorted;
+  }
   constructor(data: T[], columns: Columns<T>) {
     this.columns = columns;
     this._rows = addIdsToRows(data);
-    this.sorted = this._rows;
-    this.cache = new RowCache<T>(this.rows);
+    this._sorted = this._rows;
+    this.rowCache = new RowCache<T>(this.rows);
     this.sorter = new TableSorter({
       originalData: this._rows,
       sortMap: columns.sortMap,
     });
-
-    this.cellCache = new CellCache();
-
-    const originalColumns = columns.originalColumns();
-    for (let row = 0; row < this.length; row++) {
-      const item = this.getRowByIndex(row);
-      const { rowUuid } = item;
-      for (let col = 0; col < originalColumns.length; col++) {
-        const { columnUuid } = originalColumns[col];
-        const cell = this.columns.genCell(item, columnUuid);
-        this.cellCache.set(rowUuid, columnUuid, cell);
-      }
-    }
-  }
-
-  itemToCell([col, row]: Item): GridCell {
-    const { rowUuid } = this.sorted[row];
-    const translatedCol = this.columns.getTranslation(col);
-    return this.cellCache.get(rowUuid, translatedCol) as GridCell;
   }
 
   get length() {
     return this._rows.length;
   }
 
-  getRowById(id: string) {
-    return this.cache.getRowById(id);
-  }
-
   getRowByIndex(index: number) {
-    return this.cache.getRowByIndex(index);
+    return this.rowCache.getRowByIndex(index);
   }
 
   nextSortKey(key: StringKeys<T>) {
     const stateHistory = this.stateMachine.nextValue(key, STATE_HISTORY_STEPS);
     const sorted = this.sorter.stateSort(stateHistory);
-    this.sorted = sorted;
+    this._sorted = sorted;
     return sorted;
   }
 }

@@ -104,7 +104,7 @@ function GlideGrid<T>({
         columns={gridManager.columns.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
-        getCellContent={(item: Item) => gridManager.rowManager.itemToCell(item)}
+        getCellContent={(item: Item) => gridManager.itemToCell(item)}
         onCellClicked={(item: Item) => {
           // const { kind, ...rest } = getCellContent(item);
           // if (kind === 'uri') {

@@ -30,14 +30,6 @@ class RowCache<T> {
     return row;
   }
 
-  getRowById(id: string) {
-    const row = this.cache.get(id);
-    if (!row) {
-      throw new Error('Cache should be set before accessing');
-    }
-    return row;
-  }
-
   hasIndex(n: number) {
     return n >= 0 || n < this.rowIdArray.length;
   }
