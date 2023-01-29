@@ -1,7 +1,6 @@
 import type { StringKeys } from '../types/general';
 import type { IdColumn, WrappedGridColumn } from '../types/grid';
-import { addIdsToColumns, uuid } from './general';
-import { SORT_TYPES, SortTypes } from './sort/object-sort';
+import { addIdsToColumns } from './general';
 import { IdRow } from '../types/grid';
 import { GridCell } from '@glideapps/glide-data-grid';
 import { SortMap } from './sort/sort-map';
@@ -46,16 +45,19 @@ class ColumnsTranslation<T> {
     return this._translate.length;
   }
 
+  private updateIdMap(translation: Translation<T>, pos: number) {
+    const { id } = translation;
+    this.idMap.set(id, pos);
+  }
+
   private shiftRight(pos1: number, pos2: number): void {
     const translateTmp = this._translate[pos2];
     for (let i = pos2; i > pos1; i--) {
       const translation = this._translate[i - 1];
-      const { id } = translation;
-      this.idMap.set(id, i);
+      this.updateIdMap(translation, i);
       this._translate[i] = translation;
     }
-    const { id } = translateTmp;
-    this.idMap.set(id, pos1);
+    this.updateIdMap(translateTmp, pos1);
     this._translate[pos1] = translateTmp;
   }
 
@@ -63,12 +65,11 @@ class ColumnsTranslation<T> {
     const translateTmp = this._translate[pos1];
     for (let i = pos1; i < pos2; i++) {
       const translation = this._translate[i + 1];
-      const { id } = translation;
-      this.idMap.set(id, i);
+      this.updateIdMap(translation, i);
       this._translate[i] = translation;
     }
-    const { id } = translateTmp;
-    this.idMap.set(id, pos2);
+    this.updateIdMap(translateTmp, pos2);
+
     this._translate[pos2] = translateTmp;
   }
 
