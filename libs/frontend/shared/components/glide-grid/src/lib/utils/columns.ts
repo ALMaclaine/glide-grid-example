@@ -1,7 +1,5 @@
 import type { StringKeys } from '../types/general';
-import type { Cell, IdColumn, WrappedGridColumn } from '../types/grid';
-import { IdRow } from '../types/grid';
-import { SortMap } from './sort/sort-map';
+import type { WrappedGridColumn } from '../types/grid';
 import { MiniCache } from './mini-cache';
 
 type ColumnsProps<T> = {
@@ -178,6 +176,7 @@ class Columns<T> {
   }
 
   private getTranslatedPosition(colPos: number) {
+    this.validateBounds(colPos);
     return this.hiddenTranslator.getHiddenTranslation(colPos);
   }
 
@@ -192,16 +191,7 @@ class Columns<T> {
     return this.hiddenTranslator.getColumns(translations);
   }
 
-  genCell(item: IdRow<T>, colUuid: string): Cell<T> {
-    const { data, displayData, ...rest } = this.getCell(colUuid);
-    return {
-      ...rest,
-      data: item[data],
-      displayData: item[displayData],
-    } as Cell<T>;
-  }
-
-  private getCell(colUuid: string) {
+  getCell(colUuid: string) {
     const column = this.hiddenTranslator.getColumn(colUuid);
     if (column) {
       return column.cell;
@@ -217,8 +207,6 @@ class Columns<T> {
   }
 
   swap(col1: number, col2: number) {
-    this.validateBounds(col1);
-    this.validateBounds(col2);
     const translatedPosition1 = this.getTranslatedPosition(col1);
     const translatedPosition2 = this.getTranslatedPosition(col2);
     this.sortTranslator.swap(translatedPosition1, translatedPosition2);

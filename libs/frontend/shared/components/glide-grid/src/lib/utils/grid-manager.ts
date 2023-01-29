@@ -1,6 +1,6 @@
 import { Columns } from './columns';
 import { RowsManager } from '../rows-manager';
-import { WrappedGridColumn } from '../types/grid';
+import { Cell, IdRow, WrappedGridColumn } from '../types/grid';
 import { StringKeys } from '../types/general';
 import { CellCache } from './caches/cell-cache';
 import { RowCache } from './caches/row-cache';
@@ -27,6 +27,15 @@ class GridManager<T> {
     this.cellCache = this.setupCellCache(columns);
   }
 
+  private genCell(item: IdRow<T>, colUuid: string): Cell<T> {
+    const { data, displayData, ...rest } = this._columns.getCell(colUuid);
+    return {
+      ...rest,
+      data: item[data],
+      displayData: item[displayData],
+    } as Cell<T>;
+  }
+
   private setupCellCache(columns: WrappedGridColumn<T>[]) {
     const cellCache = new CellCache<T>();
     for (let row = 0; row < this.length; row++) {
@@ -34,7 +43,7 @@ class GridManager<T> {
       const { rowUuid } = item;
       for (let col = 0; col < columns.length; col++) {
         const { columnUuid } = columns[col];
-        const cell = this._columns.genCell(item, columnUuid);
+        const cell = this.genCell(item, columnUuid);
         cellCache.set(rowUuid, columnUuid, cell);
       }
     }
