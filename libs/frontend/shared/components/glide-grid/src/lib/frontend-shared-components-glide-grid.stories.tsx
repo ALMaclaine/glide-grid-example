@@ -13,6 +13,7 @@ import {
 import type { WrappedGridColumn } from './types/grid';
 import { Columns } from './utils/columns';
 import { uuid } from './utils/general';
+import { GridManager } from './utils/grid-manager';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -131,5 +132,6 @@ const data: Property[] = [...Array(100).fill(0).map(genProperty)];
 Primary.args = {
   columns,
   data,
+  gridManager: new GridManager({ columns }),
   rows: data.length,
 };

@@ -9,12 +9,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
-import type { StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
 import { RowsManager } from './rows-manager';
+import { GridManager } from './utils/grid-manager';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -51,6 +51,7 @@ const theme = {
 
 type GlideGridProps<T> = {
   onItemHovered: HoverHandler;
+  gridManager: GridManager<T>;
   data: T[];
   getRowThemeOverride: GetRowThemeCallback;
   onHeaderClicked: HeaderClickHandler;
@@ -60,6 +61,7 @@ type GlideGridProps<T> = {
 function GlideGrid<T>({
   columns,
   data,
+  gridManager,
   rows,
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
@@ -69,18 +71,18 @@ function GlideGrid<T>({
   const refresh = useCallback(() => _refresh([]), []);
 
   const rowManager = useMemo(
-    () => new RowsManager(data, columns),
-    [columns, data]
+    () => new RowsManager(data, gridManager.columns),
+    [data, gridManager.columns]
   );
 
   const _onHeaderClicked = useCallback(
     (col: number) => {
-      const selectedHeader = columns.getHeaderKey(col);
+      const selectedHeader = gridManager.columns.getHeaderKey(col);
       onHeaderClicked(selectedHeader);
       rowManager.nextSortKey(selectedHeader);
       refresh();
     },
-    [columns, onHeaderClicked, refresh, rowManager]
+    [gridManager.columns, onHeaderClicked, refresh, rowManager]
   );
 
   const {
@@ -111,7 +113,7 @@ function GlideGrid<T>({
       <DataEditor
         // width 100% needed otherwise grow/resizing animates slowly to fill extra width
         width="100%"
-        columns={columns.getColumns()}
+        columns={gridManager.columns.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
         getCellContent={(item: Item) => rowManager.itemToCell(item)}
@@ -124,7 +126,7 @@ function GlideGrid<T>({
           // }
         }}
         onColumnMoved={(col1, col2) => {
-          columns.swap(col1, col2);
+          gridManager.columns.swap(col1, col2);
           refresh();
         }}
         onHeaderClicked={_onHeaderClicked}

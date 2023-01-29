@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import type { IdColumn, IdRow, WrappedGridColumn } from '../types/grid';
+import type { IdRow } from '../types/grid';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
@@ -16,15 +16,4 @@ const addIdsToRows = <T>(rows: T[]): IdRow<T>[] => {
   return rows as IdRow<T>[];
 };
 
-const addIdsToColumns = <T>(
-  columns: WrappedGridColumn<T>[]
-): IdColumn<WrappedGridColumn<T>>[] => {
-  // mutate directly to avoid performance issues on large tables
-  for (const column of columns) {
-    const changeType = column as IdColumn<WrappedGridColumn<T>>;
-    changeType.columnUuid = uuid();
-  }
-  return columns as IdColumn<WrappedGridColumn<T>>[];
-};
-
-export { noOp, noOpObj, uuid, addIdsToRows, addIdsToColumns };
+export { noOp, noOpObj, uuid, addIdsToRows };

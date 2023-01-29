@@ -1,6 +1,5 @@
 import type { StringKeys } from '../types/general';
 import type { Cell, IdColumn, WrappedGridColumn } from '../types/grid';
-import { addIdsToColumns } from './general';
 import { IdRow } from '../types/grid';
 import { SortMap } from './sort/sort-map';
 import { MiniCache } from './mini-cache';
