@@ -31,8 +31,6 @@ class RowsManager<T> {
 
     this.cellCache = new CellCache({
       columns: this.columns,
-      rows: this.length,
-      getRowByIndex: (row: number) => this.getRowByIndex(row),
     });
 
     for (let row = 0; row < this.length; row++) {

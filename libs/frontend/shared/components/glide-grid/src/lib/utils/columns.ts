@@ -157,6 +157,10 @@ class Columns<T> {
     return out;
   }
 
+  originalColumns() {
+    return [...this.columns];
+  }
+
   getCell(colPos: number) {
     this.validateBounds(colPos);
     const { id } = this.getColumns()[colPos];

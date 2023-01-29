@@ -3,8 +3,7 @@ import type { ColumnsProps, RowsProps } from '../../types/props';
 import type { Columns } from '../columns';
 import { IdRow } from '../../types/grid';
 
-type CellCacheProps<T> = ColumnsProps<T> &
-  RowsProps & { getRowByIndex: (index: number) => IdRow<T> };
+type CellCacheProps<T> = ColumnsProps<T>;
 
 class CellCache<T> {
   // column -> row -> value
