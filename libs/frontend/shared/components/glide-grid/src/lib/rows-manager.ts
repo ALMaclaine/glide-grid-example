@@ -8,12 +8,11 @@ import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
 import { CellCache } from './utils/caches/cell-cache';
 import { Item } from '@glideapps/glide-data-grid';
-import { SortMap } from './utils/sort/sort-map';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
   private readonly cache: RowCache<T>;
-  readonly stateMachine: SortStateMachine<T>;
+  readonly stateMachine: SortStateMachine<T> = new SortStateMachine<T>();
   readonly sorter: TableSorter<T>;
   readonly columns: Columns<T>;
   readonly cellCache: CellCache;
@@ -27,9 +26,10 @@ class RowsManager<T> {
     this._rows = addIdsToRows(data);
     this.sorted = this._rows;
     this.cache = new RowCache<T>(this.rows);
-    this.stateMachine = new SortStateMachine<T>();
-    const sortMap = columns.sortMap;
-    this.sorter = new TableSorter({ originalData: this._rows, sortMap });
+    this.sorter = new TableSorter({
+      originalData: this._rows,
+      sortMap: columns.sortMap,
+    });
 
     this.cellCache = new CellCache();
 

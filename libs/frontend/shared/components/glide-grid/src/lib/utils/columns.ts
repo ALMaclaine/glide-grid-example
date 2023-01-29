@@ -48,7 +48,7 @@ class ColumnsTranslation<T> {
 
   private shiftRight(pos1: number, pos2: number): void {
     const translateTmp = this._translate[pos2];
-    for (let i = pos2; i >= pos1; i--) {
+    for (let i = pos2; i > pos1; i--) {
       const translation = this._translate[i - 1];
       const { id } = translation;
       this.idMap.set(id, i);
