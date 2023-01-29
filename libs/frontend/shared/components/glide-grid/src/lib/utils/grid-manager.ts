@@ -43,7 +43,7 @@ class GridManager<T> {
 
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this._rowManager.sorted[row];
-    const translatedCol = this.columns.getTranslation(col);
+    const translatedCol = this._columns.getTranslation(col);
     return this.cellCache.get(rowUuid, translatedCol) as GridCell;
   }
 
@@ -51,12 +51,16 @@ class GridManager<T> {
     return this._columns.getColumns();
   }
 
-  get length() {
-    return this._rowManager.length;
+  swap(col1: number, col2: number) {
+    this._columns.swap(col1, col2);
   }
 
-  get columns() {
-    return this._columns;
+  getHeaderKey(col: number) {
+    return this._columns.getHeaderKey(col);
+  }
+
+  get length() {
+    return this._rowManager.length;
   }
 
   getHistory(steps: number) {

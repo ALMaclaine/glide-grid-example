@@ -65,10 +65,10 @@ function GlideGrid<T>({
 
   const _onHeaderClicked = useCallback(
     (col: number) => {
-      const selectedHeader = gridManager.columns.getHeaderKey(col);
-      onHeaderClicked(selectedHeader);
+      const selectedHeader = gridManager.getHeaderKey(col);
       gridManager.nextSortKey(selectedHeader);
       refresh();
+      onHeaderClicked(selectedHeader);
     },
     [gridManager, onHeaderClicked, refresh]
   );
@@ -101,7 +101,7 @@ function GlideGrid<T>({
       <DataEditor
         // width 100% needed otherwise grow/resizing animates slowly to fill extra width
         width="100%"
-        columns={gridManager.columns.getColumns()}
+        columns={gridManager.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
         getCellContent={(item: Item) => gridManager.itemToCell(item)}
@@ -114,7 +114,7 @@ function GlideGrid<T>({
           // }
         }}
         onColumnMoved={(col1, col2) => {
-          gridManager.columns.swap(col1, col2);
+          gridManager.swap(col1, col2);
           refresh();
         }}
         onHeaderClicked={_onHeaderClicked}
