@@ -9,10 +9,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
-import {
-  useHeaderClicked,
-  UseHeaderClickedProps,
-} from './hooks/use-header-clicked';
 import type { StringKeys } from './types/general';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import type { ColumnsProps, RowsProps } from './types/props';
@@ -77,19 +73,15 @@ function GlideGrid<T>({
     [columns, data]
   );
 
-  const onHeaderClickedIn = useCallback(
-    (headerVal: StringKeys<T>) => {
-      onHeaderClicked(headerVal);
-      rowManager.nextSortKey(headerVal);
+  const _onHeaderClicked = useCallback(
+    (col: number) => {
+      const selectedHeader = columns.getHeaderKey(col);
+      onHeaderClicked(selectedHeader);
+      rowManager.nextSortKey(selectedHeader);
       refresh();
     },
-    [onHeaderClicked, refresh, rowManager]
+    [columns, onHeaderClicked, refresh, rowManager]
   );
-
-  const { onHeaderClicked: _onHeaderClicked } = useHeaderClicked({
-    columns,
-    onHeaderClicked: onHeaderClickedIn,
-  } as UseHeaderClickedProps<T>);
 
   const {
     onItemHovered: onItemHoveredHighlight,

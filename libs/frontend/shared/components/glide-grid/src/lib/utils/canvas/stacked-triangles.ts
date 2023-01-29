@@ -1,4 +1,3 @@
-import type { Imageable } from './easel';
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, Easel } from './easel';
 import { positioner, ALIGNMENTS } from './utils';
 import { Triangle, TRIANGLE_DIRECTIONS, TriangleProps } from './triangle';
@@ -7,7 +6,7 @@ type StackedTriangleProps = TriangleProps & {
   gap?: number;
 };
 
-class StackedTriangles implements Imageable {
+class StackedTriangles {
   private readonly _width;
   get width() {
     return this._width;

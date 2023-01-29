@@ -1,4 +1,4 @@
-import type { EaselProps, Imageable } from './easel';
+import type { EaselProps } from './easel';
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, Easel } from './easel';
 import { ObjectValues } from '../../types/general';
 import { midPoint } from './utils';
@@ -14,7 +14,7 @@ type TriangleDirection = ObjectValues<typeof TRIANGLE_DIRECTIONS>;
 
 type TriangleProps = EaselProps;
 
-class Triangle implements Imageable {
+class Triangle {
   private readonly _width;
   private readonly _height;
   private readonly easel;

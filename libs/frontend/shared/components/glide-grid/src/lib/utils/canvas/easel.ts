@@ -1,4 +1,5 @@
 import { Position } from './utils';
+import { MiniCache } from '../mini-cache';
 
 type Context2dProcessor = (ctx: OffscreenCanvasRenderingContext2D) => void;
 
@@ -7,14 +8,10 @@ type EaselProps = {
   height: number;
 };
 
-interface Imageable {
-  image(): ImageData;
-}
-
 const DEFAULT_WIDTH = 512;
 const DEFAULT_HEIGHT = 512;
 
-class Easel implements Imageable {
+class Easel {
   private canvasRef: OffscreenCanvas;
   private readonly context: OffscreenCanvasRenderingContext2D;
   private readonly _width: number;
@@ -47,16 +44,14 @@ class Easel implements Imageable {
     this._background = color;
   }
 
-  private clearCache() {
-    this.imageCache = undefined;
-  }
+  private imageCache = new MiniCache<ImageData>();
 
   private clearScreen() {
     this.context.clearRect(0, 0, this._width, this._height);
   }
 
   clear() {
-    this.clearCache();
+    this.imageCache.dirty();
     this.clearScreen();
   }
 
@@ -64,10 +59,9 @@ class Easel implements Imageable {
     this.context.putImageData(image, x, y);
   }
 
-  private imageCache?: ImageData;
   image() {
-    if (this.imageCache) {
-      return this.imageCache;
+    if (this.imageCache.isClean) {
+      return this.imageCache.getCache();
     }
     const imageData = this.context.getImageData(
       0,
@@ -75,17 +69,15 @@ class Easel implements Imageable {
       this._width,
       this._height
     );
-    this.imageCache = imageData;
-    return this.imageCache;
+    this.imageCache.cache(imageData);
+    return this.imageCache.getCache();
   }
 
   draw(processor: Context2dProcessor) {
-    if (this.imageCache) {
-      this.clearCache();
-    }
+    this.imageCache.dirty();
     processor(this.context);
   }
 }
 
 export { Easel, DEFAULT_WIDTH, DEFAULT_HEIGHT };
-export type { EaselProps, Context2dProcessor, Imageable };
+export type { EaselProps, Context2dProcessor };

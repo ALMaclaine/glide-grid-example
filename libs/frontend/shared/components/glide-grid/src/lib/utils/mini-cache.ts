@@ -13,8 +13,9 @@ class MiniCache<T> {
     this._cache = undefined;
   }
 
-  cache(val: T) {
+  cache(val: T): T {
     this._cache = val;
+    return this._cache;
   }
 
   getCache(): T {

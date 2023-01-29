@@ -2,7 +2,6 @@ import type { StringKeys } from '../types/general';
 import type { Cell, IdColumn, WrappedGridColumn } from '../types/grid';
 import { addIdsToColumns } from './general';
 import { IdRow } from '../types/grid';
-import { GridCell } from '@glideapps/glide-data-grid';
 import { SortMap } from './sort/sort-map';
 import { MiniCache } from './mini-cache';
 
@@ -87,34 +86,95 @@ class SortTranslator<T> {
   }
 }
 
+class HiddenColumnTranslator<T> {
+  private readonly hiddenTranslatorMap = new Map<number, number>();
+  private readonly hiddenColumnsSet = new Set<StringKeys<T>>();
+  private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
+  private columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
+
+  getColumns(sortTranslations: Translation<T>[]) {
+    if (this.columnsCache.isClean) {
+      return this.columnsCache.getCache();
+    }
+    this.clear();
+
+    const out = [];
+    let i = 0;
+    let j = 0;
+    for (const { uuid } of sortTranslations) {
+      const val = this.getColumn(uuid);
+      if (val && !this.isHidden(val.id)) {
+        this.hiddenTranslatorMap.set(i++, j);
+        out.push(val);
+      }
+      j++;
+    }
+    return this.columnsCache.cache(out);
+  }
+
+  clear() {
+    this.hiddenTranslatorMap.clear();
+  }
+
+  dirty() {
+    this.columnsCache.dirty();
+  }
+
+  setHiddenColumns<T>(hiddenColumns: StringKeys<T>[]) {
+    this.hiddenColumnsSet.clear();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    hiddenColumns.forEach((key) => this.hiddenColumnsSet.add(key));
+  }
+
+  isHidden(key: StringKeys<T>) {
+    return this.hiddenColumnsSet.has(key);
+  }
+
+  setColumn(columnUuid: string, column: WrappedGridColumn<T>) {
+    this.columnMap.set(columnUuid, column);
+  }
+
+  getColumn(columnUuid: string) {
+    const column = this.columnMap.get(columnUuid);
+    if (column) {
+      return column;
+    }
+    throw new Error('Column does not exist');
+  }
+
+  getHiddenTranslation(colPos: number) {
+    const translatedPosition = this.hiddenTranslatorMap.get(colPos);
+    if (translatedPosition === undefined) {
+      throw new Error('Should not occur');
+    }
+    return translatedPosition;
+  }
+}
+
 class Columns<T> {
   private readonly columns: IdColumn<WrappedGridColumn<T>>[];
-  private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
-  private hiddenColumnsSet: Set<StringKeys<T>> = new Set();
   private readonly _sortMap: SortMap<T>;
-  private readonly sortTranslator: SortTranslator<T> = new SortTranslator<T>();
+  private readonly sortTranslator = new SortTranslator<T>();
+  private readonly hiddenTranslator = new HiddenColumnTranslator<T>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.columns = addIdsToColumns(columns);
     for (const column of this.columns) {
-      const { columnUuid } = column;
-      this.columnMap.set(columnUuid, column);
-      this.sortTranslator.addUuid(columnUuid, column.id);
+      const { columnUuid, id } = column;
+      this.hiddenTranslator.setColumn(columnUuid, column);
+      this.sortTranslator.addUuid(columnUuid, id);
     }
     this._sortMap = new SortMap<T>({ columns });
-    this.fillSet(hiddenColumns);
+    this.hiddenTranslator.setHiddenColumns(hiddenColumns);
   }
 
   originalColumns() {
     return [...this.columns];
   }
 
-  private fillSet(hiddenColumns: StringKeys<T>[]) {
-    this.hiddenColumnsSet = new Set(hiddenColumns);
-  }
-
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
-    this.fillSet(hiddenColumns);
+    this.hiddenTranslator.setHiddenColumns(hiddenColumns);
   }
 
   getTranslation(colPos: number): string {
@@ -127,16 +187,11 @@ class Columns<T> {
   }
 
   private getTranslatedPosition(colPos: number) {
-    const translatedPosition = this.hiddenTranslatorMap.get(colPos);
-    if (translatedPosition === undefined) {
-      throw new Error('Should not occur');
-    }
-    return translatedPosition;
+    return this.hiddenTranslator.getHiddenTranslation(colPos);
   }
 
   getHeaderKey(colPos: number) {
-    const translatedPosition = this.getTranslatedPosition(colPos);
-    const { id } = this.columns[translatedPosition];
+    const { id } = this.getColumns()[colPos];
     const { uuid } = this.sortTranslator.getTranslationById(id);
     return this.getCell(uuid).displayData;
   }
@@ -145,26 +200,9 @@ class Columns<T> {
     return this._sortMap;
   }
 
-  private hiddenTranslatorMap = new Map<number, number>();
-  private columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
   getColumns() {
-    if (this.columnsCache.isClean) {
-      return this.columnsCache.getCache();
-    }
-
-    const out = [];
-    let i = 0;
-    let j = 0;
-    for (const { uuid } of this.sortTranslator.translate) {
-      const val = this.columnMap.get(uuid);
-      if (val && !this.hiddenColumnsSet.has(val.id)) {
-        this.hiddenTranslatorMap.set(i++, j);
-        out.push(val);
-      }
-      j++;
-    }
-    this.columnsCache.cache(out);
-    return this.columnsCache.getCache();
+    const translations = this.sortTranslator.translate;
+    return this.hiddenTranslator.getColumns(translations);
   }
 
   genCell(item: IdRow<T>, colUuid: string): Cell<T> {
@@ -177,7 +215,7 @@ class Columns<T> {
   }
 
   private getCell(colUuid: string) {
-    const column = this.columnMap.get(colUuid);
+    const column = this.hiddenTranslator.getColumn(colUuid);
     if (column) {
       return column.cell;
     }
@@ -197,7 +235,7 @@ class Columns<T> {
     const translatedPosition1 = this.getTranslatedPosition(col1);
     const translatedPosition2 = this.getTranslatedPosition(col2);
     this.sortTranslator.swap(translatedPosition1, translatedPosition2);
-    this.columnsCache.dirty();
+    this.hiddenTranslator.dirty();
   }
 }
 
