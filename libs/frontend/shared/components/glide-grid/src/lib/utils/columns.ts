@@ -121,7 +121,7 @@ class Columns<T> {
   }
 
   get length() {
-    return this.getColumns().length;
+    return this.originalColumns().length;
   }
 
   getDisplayData(colPos: number) {
@@ -130,25 +130,6 @@ class Columns<T> {
 
   get sortMap() {
     return this._sortMap;
-  }
-
-  private dirty = true;
-  private columnsCache: WrappedGridColumn<T>[] = [];
-  getColumns() {
-    if (!this.dirty) {
-      return this.columnsCache;
-    }
-
-    const out = [];
-    for (const { uuid } of this.translator.translate) {
-      const val = this.columnMap.get(uuid);
-      if (val && !this.hiddenColumnsSet.has(val.id)) {
-        out.push(val);
-      }
-    }
-    this.dirty = false;
-    this.columnsCache = out;
-    return out;
   }
 
   originalColumns() {
@@ -170,7 +151,7 @@ class Columns<T> {
 
   private getCell(colPos: number) {
     this.validateBounds(colPos);
-    const { id } = this.getColumns()[colPos];
+    const { id } = this.columns[colPos];
     const { uuid } = this.translator.getTranslationById(id);
     const column = this.columnMap.get(uuid);
     if (column) {
@@ -180,7 +161,7 @@ class Columns<T> {
   }
 
   private validateBounds(col: number) {
-    const columns = this.getColumns();
+    const columns = this.columns;
     if (col > columns.length || col < 0) {
       throw new Error('Out of bounds access');
     }
@@ -189,14 +170,7 @@ class Columns<T> {
   swap(col1: number, col2: number) {
     this.validateBounds(col1);
     this.validateBounds(col2);
-    const { id: id1 } = this.getColumns()[col1];
-    const { id: id2 } = this.getColumns()[col2];
-    const translatedCol1 = this.translator.getTranslationById(id1);
-    const translatedCol2 = this.translator.getTranslationById(id2);
-    console.log(col1, translatedCol1);
-    console.log(col2, translatedCol2);
     this.translator.swap(col1, col2);
-    this.dirty = true;
   }
 }
 
