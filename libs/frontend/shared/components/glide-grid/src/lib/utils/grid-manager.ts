@@ -47,6 +47,10 @@ class GridManager<T> {
     return this.cellCache.get(rowUuid, translatedCol) as GridCell;
   }
 
+  getColumns() {
+    return this._columns.getColumns();
+  }
+
   get length() {
     return this._rowManager.length;
   }

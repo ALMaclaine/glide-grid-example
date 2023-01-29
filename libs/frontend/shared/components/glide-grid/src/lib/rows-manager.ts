@@ -3,7 +3,6 @@ import { RowCache } from './utils/caches/row-cache';
 import { addIdsToRows } from './utils/general';
 import { SortStateMachine } from './utils/sort/sort-state-machine';
 import { TableSorter } from './utils/sort/table-sorter';
-import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
 import { SortMap } from './utils/sort/sort-map';
