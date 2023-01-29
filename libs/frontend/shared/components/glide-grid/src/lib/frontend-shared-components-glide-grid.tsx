@@ -5,15 +5,13 @@ import {
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
-import type { ColumnsProps, RowsProps } from './types/props';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { RowsManager } from './rows-manager';
 import { GridManager } from './utils/grid-manager';
 
 const divStyles = {
@@ -52,17 +50,12 @@ const theme = {
 type GlideGridProps<T> = {
   onItemHovered: HoverHandler;
   gridManager: GridManager<T>;
-  data: T[];
   getRowThemeOverride: GetRowThemeCallback;
   onHeaderClicked: HeaderClickHandler;
-} & ColumnsProps<T> &
-  RowsProps;
+};
 
 function GlideGrid<T>({
-  columns,
-  data,
   gridManager,
-  rows,
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
@@ -70,19 +63,14 @@ function GlideGrid<T>({
   const [, _refresh] = useState([]);
   const refresh = useCallback(() => _refresh([]), []);
 
-  const rowManager = useMemo(
-    () => new RowsManager(data, gridManager.columns),
-    [data, gridManager.columns]
-  );
-
   const _onHeaderClicked = useCallback(
     (col: number) => {
       const selectedHeader = gridManager.columns.getHeaderKey(col);
       onHeaderClicked(selectedHeader);
-      rowManager.nextSortKey(selectedHeader);
+      gridManager.rowManager.nextSortKey(selectedHeader);
       refresh();
     },
-    [gridManager.columns, onHeaderClicked, refresh, rowManager]
+    [gridManager.columns, gridManager.rowManager, onHeaderClicked, refresh]
   );
 
   const {
@@ -116,7 +104,7 @@ function GlideGrid<T>({
         columns={gridManager.columns.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
-        getCellContent={(item: Item) => rowManager.itemToCell(item)}
+        getCellContent={(item: Item) => gridManager.rowManager.itemToCell(item)}
         onCellClicked={(item: Item) => {
           // const { kind, ...rest } = getCellContent(item);
           // if (kind === 'uri') {
@@ -135,14 +123,14 @@ function GlideGrid<T>({
         drawHeader={(args) => {
           drawHeaderSort(
             args,
-            rowManager.stateMachine.getHistory(STATE_HISTORY_STEPS)
+            gridManager.rowManager.stateMachine.getHistory(STATE_HISTORY_STEPS)
           );
           return false;
         }}
         theme={theme}
         onItemHovered={_onItemHovered}
         getRowThemeOverride={_getRowThemeOverride}
-        rows={rows}
+        rows={gridManager.length}
       />
     </div>
   );

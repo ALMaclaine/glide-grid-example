@@ -11,7 +11,6 @@ import {
   genUriCell,
 } from './utils/cells/generators';
 import type { WrappedGridColumn } from './types/grid';
-import { Columns } from './utils/columns';
 import { uuid } from './utils/general';
 import { GridManager } from './utils/grid-manager';
 
@@ -109,11 +108,6 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
   },
 ];
 
-const columns = new Columns<Property>({
-  columns: columnsDetails,
-  hiddenColumns: ['investor', 'address'],
-});
-
 const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43];
 const INVESTORS = [randCompanyName(), randCompanyName(), randCompanyName()];
 function genProperty(): Property {
@@ -130,8 +124,9 @@ function genProperty(): Property {
 const data: Property[] = [...Array(100).fill(0).map(genProperty)];
 
 Primary.args = {
-  columns,
-  data,
-  gridManager: new GridManager({ columns }),
-  rows: data.length,
+  gridManager: new GridManager({
+    columns: columnsDetails,
+    data,
+    hiddenColumns: ['investor', 'address'],
+  }),
 };
