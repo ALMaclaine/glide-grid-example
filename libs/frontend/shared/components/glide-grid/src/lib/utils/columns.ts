@@ -4,6 +4,7 @@ import { addIdsToColumns, uuid } from './general';
 import { SORT_TYPES, SortTypes } from './sort/object-sort';
 import { IdRow } from '../types/grid';
 import { GridCell } from '@glideapps/glide-data-grid';
+import { SortMap } from './sort/sort-map';
 
 type ColumnsProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -88,14 +89,14 @@ class Columns<T> {
   private readonly columns: IdColumn<WrappedGridColumn<T>>[];
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private hiddenColumnsSet: Set<StringKeys<T>> = new Set();
-  private readonly sortMap: Map<StringKeys<T>, SortTypes>;
+  private readonly _sortMap: SortMap<T>;
   private readonly translator: ColumnsTranslation<T> =
     new ColumnsTranslation<T>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.columns = addIdsToColumns(columns);
     this.addColumnsToMap();
-    this.sortMap = this.processColumns(columns);
+    this._sortMap = new SortMap<T>({ columns });
     this.fillSet(hiddenColumns);
   }
 
@@ -119,15 +120,6 @@ class Columns<T> {
     return this.translator.getTranslation(pos).originalColumn;
   }
 
-  private processColumns(columns: WrappedGridColumn<T>[]) {
-    return new Map(
-      columns.map(({ cell: { displayData, sortType } }) => [
-        displayData,
-        sortType,
-      ])
-    );
-  }
-
   get length() {
     return this.getColumns().length;
   }
@@ -136,8 +128,8 @@ class Columns<T> {
     return this.getCell(colPos).displayData;
   }
 
-  getType(key: StringKeys<T>) {
-    return this.sortMap.get(key) || SORT_TYPES.natural;
+  get sortMap() {
+    return this._sortMap;
   }
 
   private dirty = true;

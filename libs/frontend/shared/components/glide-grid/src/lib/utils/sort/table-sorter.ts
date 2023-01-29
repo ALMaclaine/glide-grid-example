@@ -1,21 +1,20 @@
 import type { StringKeys } from '../../types/general';
 import type { IdRow } from '../../types/grid';
-import { StateSet } from './sort-state-machine';
-import type { ColumnsProps } from '../../types/props';
-import { objectSort, SORT_STATES, SORT_TYPES } from './object-sort';
-import { Columns } from '../columns';
-const { initial } = SORT_STATES;
+import type { StateSet } from './sort-state-machine';
+import type { SortMap } from './sort-map';
+import { objectSort, SORT_TYPES } from './object-sort';
 
-type TableSorterProps<T> = ColumnsProps<T> & {
+type TableSorterProps<T> = {
   originalData: IdRow<T>[];
+  sortMap: SortMap<T>;
 };
 
 class TableSorter<T> {
   private readonly originalData: IdRow<T>[];
-  private readonly columns: Columns<T>;
-  constructor({ originalData, columns }: TableSorterProps<T>) {
+  private readonly sortMap: SortMap<T>;
+  constructor({ originalData, sortMap }: TableSorterProps<T>) {
     this.originalData = originalData;
-    this.columns = columns;
+    this.sortMap = sortMap;
   }
 
   private cloneOriginal() {
@@ -26,7 +25,7 @@ class TableSorter<T> {
     if (key === '') {
       return SORT_TYPES.natural;
     }
-    return this.columns.getType(key);
+    return this.sortMap.getType(key);
   }
 
   stateSort(stateHistory: StateSet<T>[]) {

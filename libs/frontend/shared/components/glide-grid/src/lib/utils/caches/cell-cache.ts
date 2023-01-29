@@ -1,18 +1,8 @@
 import { GridCell } from '@glideapps/glide-data-grid';
-import type { ColumnsProps } from '../../types/props';
-import type { Columns } from '../columns';
-import { IdRow } from '../../types/grid';
 
-type CellCacheProps<T> = ColumnsProps<T>;
-
-class CellCache<T> {
+class CellCache {
   // column -> row -> value
   private cachedContent: Map<string, Map<number, GridCell>> = new Map();
-  private columns: Columns<T>;
-
-  constructor({ columns }: CellCacheProps<T>) {
-    this.columns = columns;
-  }
 
   get(rowUuid: string, col: number): GridCell {
     const rowCache = this.cachedContent.get(rowUuid);
@@ -21,9 +11,7 @@ class CellCache<T> {
       throw new Error('Cache should be set before accessing');
     }
 
-    const translatedCol = this.columns.getTranslation(col);
-
-    return rowCache.get(translatedCol) as GridCell;
+    return rowCache.get(col) as GridCell;
   }
 
   hasRow(rowUuid: string) {
@@ -45,4 +33,3 @@ class CellCache<T> {
 }
 
 export { CellCache };
-export type { CellCacheProps };

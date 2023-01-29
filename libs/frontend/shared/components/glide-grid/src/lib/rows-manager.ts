@@ -8,6 +8,7 @@ import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
 import { CellCache } from './utils/caches/cell-cache';
 import { Item } from '@glideapps/glide-data-grid';
+import { SortMap } from './utils/sort/sort-map';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
@@ -15,7 +16,7 @@ class RowsManager<T> {
   readonly stateMachine: SortStateMachine<T>;
   readonly sorter: TableSorter<T>;
   readonly columns: Columns<T>;
-  readonly cellCache: CellCache<T>;
+  readonly cellCache: CellCache;
   private sorted: IdRow<T>[];
 
   get rows() {
@@ -27,11 +28,10 @@ class RowsManager<T> {
     this.sorted = this._rows;
     this.cache = new RowCache<T>(this.rows);
     this.stateMachine = new SortStateMachine<T>();
-    this.sorter = new TableSorter({ originalData: this._rows, columns });
+    const sortMap = columns.sortMap;
+    this.sorter = new TableSorter({ originalData: this._rows, sortMap });
 
-    this.cellCache = new CellCache({
-      columns: this.columns,
-    });
+    this.cellCache = new CellCache();
 
     for (let row = 0; row < this.length; row++) {
       const item = this.getRowByIndex(row);
@@ -45,8 +45,10 @@ class RowsManager<T> {
 
   itemToCell([col, row]: Item) {
     const { rowUuid } = this.sorted[row];
-    return this.cellCache.get(rowUuid, col);
+    const translatedCol = this.columns.getTranslation(col);
+    return this.cellCache.get(rowUuid, translatedCol);
   }
+
   get length() {
     return this._rows.length;
   }
