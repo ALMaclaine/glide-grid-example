@@ -43,19 +43,19 @@ class GridManager<T> {
   }
 
   get length() {
-    return this.rowManager.length;
+    return this._rowManager.length;
   }
 
   get columns() {
     return this._columns;
   }
 
-  get sorted() {
-    return this._rowManager.sorted;
+  getHistory(steps: number) {
+    return this._rowManager.stateMachine.getHistory(steps);
   }
 
-  get rowManager() {
-    return this._rowManager;
+  nextSortKey(key: StringKeys<T>) {
+    this._rowManager.nextSortKey(key);
   }
 }
 

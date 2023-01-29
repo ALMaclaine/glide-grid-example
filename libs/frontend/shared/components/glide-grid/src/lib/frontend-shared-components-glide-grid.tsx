@@ -67,10 +67,10 @@ function GlideGrid<T>({
     (col: number) => {
       const selectedHeader = gridManager.columns.getHeaderKey(col);
       onHeaderClicked(selectedHeader);
-      gridManager.rowManager.nextSortKey(selectedHeader);
+      gridManager.nextSortKey(selectedHeader);
       refresh();
     },
-    [gridManager.columns, gridManager.rowManager, onHeaderClicked, refresh]
+    [gridManager, onHeaderClicked, refresh]
   );
 
   const {
@@ -121,10 +121,7 @@ function GlideGrid<T>({
         smoothScrollX={true}
         smoothScrollY={true}
         drawHeader={(args) => {
-          drawHeaderSort(
-            args,
-            gridManager.rowManager.stateMachine.getHistory(STATE_HISTORY_STEPS)
-          );
+          drawHeaderSort(args, gridManager.getHistory(STATE_HISTORY_STEPS));
           return false;
         }}
         theme={theme}
