@@ -5,6 +5,7 @@ import { StringKeys } from '../types/general';
 import { CellCache } from './caches/cell-cache';
 import { RowCache } from './caches/row-cache';
 import { GridCell, Item } from '@glideapps/glide-data-grid';
+import { SortMap } from './sort/sort-map';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -20,20 +21,24 @@ class GridManager<T> {
 
   constructor({ columns, data, hiddenColumns }: GridManagerProps<T>) {
     this._columns = new Columns<T>({ columns, hiddenColumns });
-    this._rowManager = new RowsManager<T>(data, this._columns);
+    const sortMap = new SortMap({ columns });
+    this._rowManager = new RowsManager<T>(data, sortMap);
     this.rowCache = new RowCache<T>(this._rowManager.rows);
+    this.cellCache = this.setupCellCache(columns);
+  }
 
-    this.cellCache = new CellCache<T>();
-
+  private setupCellCache(columns: WrappedGridColumn<T>[]) {
+    const cellCache = new CellCache<T>();
     for (let row = 0; row < this.length; row++) {
       const item = this.rowCache.getRowByIndex(row);
       const { rowUuid } = item;
       for (let col = 0; col < columns.length; col++) {
         const { columnUuid } = columns[col];
         const cell = this._columns.genCell(item, columnUuid);
-        this.cellCache.set(rowUuid, columnUuid, cell);
+        cellCache.set(rowUuid, columnUuid, cell);
       }
     }
+    return cellCache;
   }
 
   itemToCell([col, row]: Item): GridCell {

@@ -152,24 +152,16 @@ class HiddenColumnTranslator<T> {
 }
 
 class Columns<T> {
-  private readonly columns: IdColumn<WrappedGridColumn<T>>[];
-  private readonly _sortMap: SortMap<T>;
   private readonly sortTranslator = new SortTranslator<T>();
   private readonly hiddenTranslator = new HiddenColumnTranslator<T>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
-    this.columns = columns;
-    for (const column of this.columns) {
+    for (const column of columns) {
       const { columnUuid, id } = column;
       this.hiddenTranslator.setColumn(columnUuid, column);
       this.sortTranslator.addUuid(columnUuid, id);
     }
-    this._sortMap = new SortMap<T>({ columns });
     this.hiddenTranslator.setHiddenColumns(hiddenColumns);
-  }
-
-  originalColumns() {
-    return [...this.columns];
   }
 
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
@@ -193,10 +185,6 @@ class Columns<T> {
     const { id } = this.getColumns()[colPos];
     const { uuid } = this.sortTranslator.getTranslationById(id);
     return this.getCell(uuid).displayData;
-  }
-
-  get sortMap() {
-    return this._sortMap;
   }
 
   getColumns() {

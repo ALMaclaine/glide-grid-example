@@ -6,14 +6,13 @@ import { TableSorter } from './utils/sort/table-sorter';
 import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
-import { CellCache } from './utils/caches/cell-cache';
+import { SortMap } from './utils/sort/sort-map';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
   private readonly rowCache: RowCache<T>;
   readonly stateMachine: SortStateMachine<T> = new SortStateMachine<T>();
   readonly sorter: TableSorter<T>;
-  readonly columns: Columns<T>;
   private _sorted: IdRow<T>[];
 
   get rows() {
@@ -23,14 +22,13 @@ class RowsManager<T> {
   get sorted() {
     return this._sorted;
   }
-  constructor(data: T[], columns: Columns<T>) {
-    this.columns = columns;
+  constructor(data: T[], sortMap: SortMap<T>) {
     this._rows = addIdsToRows(data);
     this._sorted = this._rows;
     this.rowCache = new RowCache<T>(this.rows);
     this.sorter = new TableSorter({
       originalData: this._rows,
-      sortMap: columns.sortMap,
+      sortMap,
     });
   }
 
