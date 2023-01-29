@@ -4,6 +4,7 @@ import { addIdsToColumns } from './general';
 import { IdRow } from '../types/grid';
 import { GridCell } from '@glideapps/glide-data-grid';
 import { SortMap } from './sort/sort-map';
+import { MiniCache } from './mini-cache';
 
 type ColumnsProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -144,12 +145,11 @@ class Columns<T> {
     return this._sortMap;
   }
 
-  private dirty = true;
-  private columnsCache: WrappedGridColumn<T>[] = [];
   private hiddenTranslatorMap = new Map<number, number>();
+  private columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
   getColumns() {
-    if (!this.dirty) {
-      return this.columnsCache;
+    if (this.columnsCache.isClean) {
+      return this.columnsCache.getCache();
     }
 
     const out = [];
@@ -163,9 +163,8 @@ class Columns<T> {
       }
       j++;
     }
-    this.dirty = false;
-    this.columnsCache = out;
-    return out;
+    this.columnsCache.cache(out);
+    return this.columnsCache.getCache();
   }
 
   genCell(item: IdRow<T>, colUuid: string): Cell<T> {
@@ -198,7 +197,7 @@ class Columns<T> {
     const translatedPosition1 = this.getTranslatedPosition(col1);
     const translatedPosition2 = this.getTranslatedPosition(col2);
     this.sortTranslator.swap(translatedPosition1, translatedPosition2);
-    this.dirty = true;
+    this.columnsCache.dirty();
   }
 }
 
