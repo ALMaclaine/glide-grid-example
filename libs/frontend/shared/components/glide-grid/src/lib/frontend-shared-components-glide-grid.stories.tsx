@@ -12,6 +12,7 @@ import {
 } from './utils/cells/generators';
 import type { WrappedGridColumn } from './types/grid';
 import { Columns } from './utils/columns';
+import { uuid } from './utils/general';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -63,6 +64,7 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
     title: 'Property',
     id: 'property',
     grow: 2,
+    columnUuid: uuid(),
     cell: genUriCell({
       data: 'property',
       displayData: 'property',
@@ -77,24 +79,31 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
     title: 'Address',
     id: 'address',
     grow: 2,
+    columnUuid: uuid(),
     cell: genTextCell({ data: 'address' }),
   },
   {
     title: 'Investor',
     id: 'investor',
     grow: 2,
+    columnUuid: uuid(),
+
     cell: genTextCell({ data: 'investor' }),
   },
   {
     title: 'Units',
     id: 'units',
     grow: 1,
+    columnUuid: uuid(),
+
     cell: genNumericCell({ data: 'units' }),
   },
   {
     title: 'Rent Owed',
     id: 'rentOwed',
     grow: 1,
+    columnUuid: uuid(),
+
     cell: genNumericCell({ data: 'rentOwed', contentAlign: 'right' }),
   },
 ];

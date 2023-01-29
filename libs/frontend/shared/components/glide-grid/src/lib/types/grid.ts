@@ -9,11 +9,13 @@ type Cell<T> = Omit<GridCell, 'data'> &
     sortType: SortTypes;
   };
 
-type WrappedGridColumn<T> = Omit<GridColumn, 'id'> & {
-  id: StringKeys<T>;
-} & {
-  cell: Cell<T>;
-};
+type WrappedGridColumn<T> = IdColumn<
+  Omit<GridColumn, 'id'> & {
+    id: StringKeys<T>;
+  } & {
+    cell: Cell<T>;
+  }
+>;
 
 type IdRow<T> = T & {
   rowUuid: string;

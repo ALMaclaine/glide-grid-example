@@ -159,7 +159,7 @@ class Columns<T> {
   private readonly hiddenTranslator = new HiddenColumnTranslator<T>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
-    this.columns = addIdsToColumns(columns);
+    this.columns = columns;
     for (const column of this.columns) {
       const { columnUuid, id } = column;
       this.hiddenTranslator.setColumn(columnUuid, column);
