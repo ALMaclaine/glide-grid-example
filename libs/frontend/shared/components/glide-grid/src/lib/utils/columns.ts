@@ -195,14 +195,9 @@ class Columns<T> {
   swap(col1: number, col2: number) {
     this.validateBounds(col1);
     this.validateBounds(col2);
-    const { id: id1 } = this.getColumns()[col1];
-    const { id: id2 } = this.getColumns()[col2];
-    const translatedCol1 = this.sortTranslator.getTranslationById(id1);
-    const translatedCol2 = this.sortTranslator.getTranslationById(id2);
-    // console.log(col1, translatedCol1);
-    // console.log(col2, translatedCol2);
-    // console.log(this.hiddenTranslatorMap);
-    this.sortTranslator.swap(col1, col2);
+    const translatedPosition1 = this.getTranslatedPosition(col1);
+    const translatedPosition2 = this.getTranslatedPosition(col2);
+    this.sortTranslator.swap(translatedPosition1, translatedPosition2);
     this.dirty = true;
   }
 }

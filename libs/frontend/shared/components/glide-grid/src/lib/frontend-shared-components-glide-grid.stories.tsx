@@ -101,7 +101,7 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
 
 const columns = new Columns<Property>({
   columns: columnsDetails,
-  // hiddenColumns: ['investor', 'address', 'units'],
+  hiddenColumns: ['investor', 'address'],
 });
 
 const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43];

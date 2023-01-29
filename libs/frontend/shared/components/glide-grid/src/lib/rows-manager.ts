@@ -7,7 +7,7 @@ import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
 import { CellCache } from './utils/caches/cell-cache';
-import { Item } from '@glideapps/glide-data-grid';
+import { GridCell, Item } from '@glideapps/glide-data-grid';
 
 class RowsManager<T> {
   private readonly _rows: IdRow<T>[];
@@ -45,10 +45,10 @@ class RowsManager<T> {
     }
   }
 
-  itemToCell([col, row]: Item) {
+  itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.sorted[row];
     const translatedCol = this.columns.getTranslation(col);
-    return this.cellCache.get(rowUuid, translatedCol);
+    return this.cellCache.get(rowUuid, translatedCol) as GridCell;
   }
 
   get length() {
