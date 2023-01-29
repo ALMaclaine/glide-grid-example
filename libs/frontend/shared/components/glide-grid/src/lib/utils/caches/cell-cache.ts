@@ -1,17 +1,16 @@
-import { GridCell } from '@glideapps/glide-data-grid';
+import type { Cell } from '../../types/grid';
 
-class CellCache {
+class CellCache<T> {
   // column -> row -> value
-  private cachedContent: Map<string, Map<string, GridCell>> = new Map();
+  private cachedContent: Map<string, Map<string, Cell<T>>> = new Map();
 
-  get(rowUuid: string, columnUuid: string): GridCell {
+  get(rowUuid: string, columnUuid: string): Cell<T> {
     const rowCache = this.cachedContent.get(rowUuid);
 
     if (rowCache === undefined) {
       throw new Error('Cache should be set before accessing');
     }
-
-    return rowCache.get(columnUuid) as GridCell;
+    return rowCache.get(columnUuid) as Cell<T>;
   }
 
   hasRow(rowUuid: string) {
@@ -24,12 +23,12 @@ class CellCache {
     );
   }
 
-  set(rowUuid: string, columnUuid: string, cell: GridCell) {
+  set(rowUuid: string, columnUuid: string, cell: Cell<T>) {
     if (this.cachedContent.get(rowUuid) === undefined) {
-      this.cachedContent.set(rowUuid, new Map<string, GridCell>());
+      this.cachedContent.set(rowUuid, new Map<string, Cell<T>>());
     }
 
-    const rowCache = this.cachedContent.get(rowUuid) as Map<string, GridCell>;
+    const rowCache = this.cachedContent.get(rowUuid) as Map<string, Cell<T>>;
     rowCache.set(columnUuid, cell);
   }
 }

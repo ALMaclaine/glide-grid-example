@@ -1,5 +1,5 @@
 import type { StringKeys } from '../types/general';
-import type { IdColumn, WrappedGridColumn } from '../types/grid';
+import type { Cell, IdColumn, WrappedGridColumn } from '../types/grid';
 import { addIdsToColumns } from './general';
 import { IdRow } from '../types/grid';
 import { GridCell } from '@glideapps/glide-data-grid';
@@ -16,7 +16,7 @@ type Translation<T> = {
   originalColumn: number;
 };
 
-class ColumnsTranslation<T> {
+class SortTranslator<T> {
   private readonly _translate: Translation<T>[] = [];
   private readonly idMap = new Map<string, number>();
 
@@ -91,15 +91,14 @@ class Columns<T> {
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private hiddenColumnsSet: Set<StringKeys<T>> = new Set();
   private readonly _sortMap: SortMap<T>;
-  private readonly translator: ColumnsTranslation<T> =
-    new ColumnsTranslation<T>();
+  private readonly sortTranslator: SortTranslator<T> = new SortTranslator<T>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.columns = addIdsToColumns(columns);
     for (const column of this.columns) {
       const { columnUuid } = column;
       this.columnMap.set(columnUuid, column);
-      this.translator.addUuid(columnUuid, column.id);
+      this.sortTranslator.addUuid(columnUuid, column.id);
     }
     this._sortMap = new SortMap<T>({ columns });
     this.fillSet(hiddenColumns);
@@ -117,16 +116,28 @@ class Columns<T> {
     this.fillSet(hiddenColumns);
   }
 
-  getTranslation(pos: number): string {
-    return this.translator.getTranslation(pos).uuid;
+  getTranslation(colPos: number): string {
+    const translatedPosition = this.getTranslatedPosition(colPos);
+    return this.sortTranslator.getTranslation(translatedPosition).uuid;
   }
 
   get length() {
     return this.getColumns().length;
   }
 
-  getDisplayData(colPos: number) {
-    return this.getCell(colPos).displayData;
+  private getTranslatedPosition(colPos: number) {
+    const translatedPosition = this.hiddenTranslatorMap.get(colPos);
+    if (translatedPosition === undefined) {
+      throw new Error('Should not occur');
+    }
+    return translatedPosition;
+  }
+
+  getHeaderKey(colPos: number) {
+    const translatedPosition = this.getTranslatedPosition(colPos);
+    const { id } = this.columns[translatedPosition];
+    const { uuid } = this.sortTranslator.getTranslationById(id);
+    return this.getCell(uuid).displayData;
   }
 
   get sortMap() {
@@ -135,42 +146,39 @@ class Columns<T> {
 
   private dirty = true;
   private columnsCache: WrappedGridColumn<T>[] = [];
+  private hiddenTranslatorMap = new Map<number, number>();
   getColumns() {
     if (!this.dirty) {
       return this.columnsCache;
     }
 
     const out = [];
-    for (const { uuid } of this.translator.translate) {
+    let i = 0;
+    let j = 0;
+    for (const { uuid } of this.sortTranslator.translate) {
       const val = this.columnMap.get(uuid);
       if (val && !this.hiddenColumnsSet.has(val.id)) {
+        this.hiddenTranslatorMap.set(i++, j);
         out.push(val);
       }
+      j++;
     }
     this.dirty = false;
     this.columnsCache = out;
-    console.log(out);
     return out;
   }
 
-  genCell(item: IdRow<T>, col: number): GridCell {
-    if (col < this.length) {
-      const { data, displayData, ...rest } = this.getCell(col);
-      return {
-        ...rest,
-        data: item[data],
-        displayData: item[displayData],
-      } as GridCell;
-    } else {
-      throw new Error("Attempting to access a column that doesn't exist");
-    }
+  genCell(item: IdRow<T>, colUuid: string): Cell<T> {
+    const { data, displayData, ...rest } = this.getCell(colUuid);
+    return {
+      ...rest,
+      data: item[data],
+      displayData: item[displayData],
+    } as Cell<T>;
   }
 
-  private getCell(colPos: number) {
-    this.validateBounds(colPos);
-    const { id } = this.getColumns()[colPos];
-    const { uuid } = this.translator.getTranslationById(id);
-    const column = this.columnMap.get(uuid);
+  private getCell(colUuid: string) {
+    const column = this.columnMap.get(colUuid);
     if (column) {
       return column.cell;
     }
@@ -189,11 +197,12 @@ class Columns<T> {
     this.validateBounds(col2);
     const { id: id1 } = this.getColumns()[col1];
     const { id: id2 } = this.getColumns()[col2];
-    const translatedCol1 = this.translator.getTranslationById(id1);
-    const translatedCol2 = this.translator.getTranslationById(id2);
-    console.log(col1, translatedCol1);
-    console.log(col2, translatedCol2);
-    this.translator.swap(col1, col2);
+    const translatedCol1 = this.sortTranslator.getTranslationById(id1);
+    const translatedCol2 = this.sortTranslator.getTranslationById(id2);
+    // console.log(col1, translatedCol1);
+    // console.log(col2, translatedCol2);
+    // console.log(this.hiddenTranslatorMap);
+    this.sortTranslator.swap(col1, col2);
     this.dirty = true;
   }
 }

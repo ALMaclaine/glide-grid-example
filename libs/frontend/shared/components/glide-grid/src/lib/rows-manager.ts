@@ -15,7 +15,7 @@ class RowsManager<T> {
   readonly stateMachine: SortStateMachine<T> = new SortStateMachine<T>();
   readonly sorter: TableSorter<T>;
   readonly columns: Columns<T>;
-  readonly cellCache: CellCache;
+  readonly cellCache: CellCache<T>;
   private sorted: IdRow<T>[];
 
   get rows() {
@@ -39,7 +39,7 @@ class RowsManager<T> {
       const { rowUuid } = item;
       for (let col = 0; col < originalColumns.length; col++) {
         const { columnUuid } = originalColumns[col];
-        const cell = this.columns.genCell(item, col);
+        const cell = this.columns.genCell(item, columnUuid);
         this.cellCache.set(rowUuid, columnUuid, cell);
       }
     }

@@ -9,8 +9,7 @@ const useHeaderClicked = <T>({
 }: UseHeaderClickedProps<T>) => {
   const _onHeaderClicked = useCallback(
     (col: number) => {
-      const selectedHeader = columns.getDisplayData(col);
-      console.log(selectedHeader);
+      const selectedHeader = columns.getHeaderKey(col);
       onHeaderClicked(selectedHeader, col);
     },
     [columns, onHeaderClicked]
