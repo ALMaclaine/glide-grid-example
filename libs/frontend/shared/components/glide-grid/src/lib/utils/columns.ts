@@ -1,6 +1,6 @@
 import type { StringKeys } from '../types/general';
-import type { WrappedGridColumn } from '../types/grid';
-import { uuid } from './general';
+import type { IdColumn, WrappedGridColumn } from '../types/grid';
+import { addIdsToColumns, uuid } from './general';
 import { SORT_TYPES, SortTypes } from './sort/object-sort';
 
 type ColumnsProps<T> = {
@@ -83,7 +83,7 @@ class ColumnsTranslation<T> {
 }
 
 class Columns<T> {
-  private readonly columns: WrappedGridColumn<T>[];
+  private readonly columns: IdColumn<WrappedGridColumn<T>>[];
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private hiddenColumnsSet: Set<StringKeys<T>> = new Set();
   private readonly sortMap: Map<StringKeys<T>, SortTypes>;
@@ -91,7 +91,7 @@ class Columns<T> {
     new ColumnsTranslation<T>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
-    this.columns = columns;
+    this.columns = addIdsToColumns(columns);
     this.addColumnsToMap();
     this.sortMap = this.processColumns(columns);
     this.fillSet(hiddenColumns);

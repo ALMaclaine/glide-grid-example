@@ -1,28 +1,7 @@
-import { GridCell, Item } from '@glideapps/glide-data-grid';
-import { GlideGridCellGenerator } from '../cells/generators';
+import { GridCell } from '@glideapps/glide-data-grid';
 import type { ColumnsProps, RowsProps } from '../../types/props';
-import type { RowIndexGetter } from '../../types/func';
 import type { Columns } from '../columns';
 import { IdRow } from '../../types/grid';
-
-const genGetCellContent = <T>(
-  columns: Columns<T>,
-  getDataByIndex: RowIndexGetter<T>
-): GlideGridCellGenerator => {
-  return ([col, row]: Item): GridCell => {
-    const item = getDataByIndex(row);
-    if (col < columns.length) {
-      const { data, displayData, ...rest } = columns.getCell(col);
-      return {
-        ...rest,
-        data: item[data],
-        displayData: item[displayData],
-      } as GridCell;
-    } else {
-      throw new Error("Attempting to access a column that doesn't exist");
-    }
-  };
-};
 
 type CellCacheProps<T> = ColumnsProps<T> &
   RowsProps & { getRowByIndex: (index: number) => IdRow<T> };
@@ -31,15 +10,22 @@ class CellCache<T> {
   // column -> row -> value
   private cachedContent: Map<string, Map<number, GridCell>> = new Map();
   private columns: Columns<T>;
-  constructor({ columns, rows, getRowByIndex }: CellCacheProps<T>) {
-    this.columns = columns;
-    const cellGen = genGetCellContent(columns, getRowByIndex);
-    for (let row = 0; row < rows; row++) {
-      const { rowUuid } = getRowByIndex(row);
-      for (let col = 0; col < columns.length; col++) {
-        this.set(rowUuid, col, cellGen([col, row]));
-      }
+
+  private genCell(item: IdRow<T>, col: number): GridCell {
+    if (col < this.columns.length) {
+      const { data, displayData, ...rest } = this.columns.getCell(col);
+      return {
+        ...rest,
+        data: item[data],
+        displayData: item[displayData],
+      } as GridCell;
+    } else {
+      throw new Error("Attempting to access a column that doesn't exist");
     }
+  }
+
+  constructor({ columns }: CellCacheProps<T>) {
+    this.columns = columns;
   }
 
   get(rowUuid: string, col: number): GridCell {
@@ -62,13 +48,15 @@ class CellCache<T> {
     return this.hasRow(rowUuid) && this.cachedContent.get(rowUuid)?.has(col);
   }
 
-  set(rowUuid: string, col: number, value: GridCell) {
+  set(rowUuid: string, col: number, item: IdRow<T>) {
     if (this.cachedContent.get(rowUuid) === undefined) {
       this.cachedContent.set(rowUuid, new Map());
     }
 
+    const cell = this.genCell(item, col);
+
     const rowCache = this.cachedContent.get(rowUuid) as Map<number, GridCell>;
-    rowCache.set(col, value);
+    rowCache.set(col, cell);
   }
 }
 

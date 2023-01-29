@@ -12,8 +12,6 @@ type GenTextCellProps<T> = Omit<GenGridCellProps<T>, 'kind'>;
 type GenUriCellProps<T> = Omit<GenGridCellProps<T>, 'kind' | 'displayData'> &
   Pick<Cell<T>, 'displayData'>;
 
-type GlideGridCellGenerator = (item: Item) => GridCell;
-
 const genGridCell = <T>({
   data,
   displayData = data,
@@ -47,9 +45,4 @@ const genUriCell = <T>(props: GenUriCellProps<T>): Cell<T> => {
 };
 
 export { genTextCell, genGridCell, genUriCell, genNumericCell };
-export type {
-  GenGridCellProps,
-  GenTextCellProps,
-  GlideGridCellGenerator,
-  GenUriCellProps,
-};
+export type { GenGridCellProps, GenTextCellProps, GenUriCellProps };

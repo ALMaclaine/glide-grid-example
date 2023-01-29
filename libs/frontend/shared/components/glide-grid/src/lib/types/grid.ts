@@ -19,4 +19,8 @@ type IdRow<T> = T & {
   rowUuid: string;
 };
 
-export type { Cell, IdRow, WrappedGridColumn };
+type IdColumn<T> = T & {
+  columnUuid: string;
+};
+
+export type { Cell, IdRow, WrappedGridColumn, IdColumn };

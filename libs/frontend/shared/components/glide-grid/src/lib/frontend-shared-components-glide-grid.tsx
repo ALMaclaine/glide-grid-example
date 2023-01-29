@@ -19,7 +19,6 @@ import type { ColumnsProps, RowsProps } from './types/props';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
 import { RowsManager } from './rows-manager';
-import { ItemToGridCell } from './types/func';
 
 const divStyles = {
   border: '1px solid #e9e9e9',

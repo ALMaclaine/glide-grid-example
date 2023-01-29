@@ -6,7 +6,6 @@ import { TableSorter } from './utils/sort/table-sorter';
 import { Columns } from './utils/columns';
 import { STATE_HISTORY_STEPS } from './constants';
 import { StringKeys } from './types/general';
-import { useMemo } from 'react';
 import { CellCache } from './utils/caches/cell-cache';
 import { Item } from '@glideapps/glide-data-grid';
 
@@ -35,6 +34,14 @@ class RowsManager<T> {
       rows: this.length,
       getRowByIndex: (row: number) => this.getRowByIndex(row),
     });
+
+    for (let row = 0; row < this.length; row++) {
+      const item = this.getRowByIndex(row);
+      const { rowUuid } = item;
+      for (let col = 0; col < columns.length; col++) {
+        this.cellCache.set(rowUuid, col, item);
+      }
+    }
   }
 
   itemToCell([col, row]: Item) {
