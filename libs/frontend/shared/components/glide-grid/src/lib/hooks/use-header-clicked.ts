@@ -10,6 +10,7 @@ const useHeaderClicked = <T>({
   const _onHeaderClicked = useCallback(
     (col: number) => {
       const selectedHeader = columns.getDisplayData(col);
+      console.log(selectedHeader);
       onHeaderClicked(selectedHeader, col);
     },
     [columns, onHeaderClicked]

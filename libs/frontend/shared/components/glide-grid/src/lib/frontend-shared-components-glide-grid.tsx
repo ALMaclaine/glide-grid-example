@@ -119,7 +119,7 @@ function GlideGrid<T>({
       <DataEditor
         // width 100% needed otherwise grow/resizing animates slowly to fill extra width
         width="100%"
-        columns={columns.originalColumns()}
+        columns={columns.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
         getCellContent={(item: Item) => rowManager.itemToCell(item)}

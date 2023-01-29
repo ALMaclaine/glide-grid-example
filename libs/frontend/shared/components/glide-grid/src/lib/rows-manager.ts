@@ -33,12 +33,14 @@ class RowsManager<T> {
 
     this.cellCache = new CellCache();
 
+    const originalColumns = columns.originalColumns();
     for (let row = 0; row < this.length; row++) {
       const item = this.getRowByIndex(row);
       const { rowUuid } = item;
-      for (let col = 0; col < columns.length; col++) {
+      for (let col = 0; col < originalColumns.length; col++) {
+        const { columnUuid } = originalColumns[col];
         const cell = this.columns.genCell(item, col);
-        this.cellCache.set(rowUuid, col, cell);
+        this.cellCache.set(rowUuid, columnUuid, cell);
       }
     }
   }

@@ -95,33 +95,33 @@ class Columns<T> {
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.columns = addIdsToColumns(columns);
-    this.addColumnsToMap();
+    for (const column of this.columns) {
+      const { columnUuid } = column;
+      this.columnMap.set(columnUuid, column);
+      this.translator.addUuid(columnUuid, column.id);
+    }
     this._sortMap = new SortMap<T>({ columns });
     this.fillSet(hiddenColumns);
+  }
+
+  originalColumns() {
+    return [...this.columns];
   }
 
   private fillSet(hiddenColumns: StringKeys<T>[]) {
     this.hiddenColumnsSet = new Set(hiddenColumns);
   }
 
-  private addColumnsToMap() {
-    for (const column of this.columns) {
-      const _uuid = uuid();
-      this.columnMap.set(_uuid, column);
-      this.translator.addUuid(_uuid, column.id);
-    }
-  }
-
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
     this.fillSet(hiddenColumns);
   }
 
-  getTranslation(pos: number): number {
-    return this.translator.getTranslation(pos).originalColumn;
+  getTranslation(pos: number): string {
+    return this.translator.getTranslation(pos).uuid;
   }
 
   get length() {
-    return this.originalColumns().length;
+    return this.getColumns().length;
   }
 
   getDisplayData(colPos: number) {
@@ -132,8 +132,24 @@ class Columns<T> {
     return this._sortMap;
   }
 
-  originalColumns() {
-    return [...this.columns];
+  private dirty = true;
+  private columnsCache: WrappedGridColumn<T>[] = [];
+  getColumns() {
+    if (!this.dirty) {
+      return this.columnsCache;
+    }
+
+    const out = [];
+    for (const { uuid } of this.translator.translate) {
+      const val = this.columnMap.get(uuid);
+      if (val && !this.hiddenColumnsSet.has(val.id)) {
+        out.push(val);
+      }
+    }
+    this.dirty = false;
+    this.columnsCache = out;
+    console.log(out);
+    return out;
   }
 
   genCell(item: IdRow<T>, col: number): GridCell {
@@ -151,7 +167,7 @@ class Columns<T> {
 
   private getCell(colPos: number) {
     this.validateBounds(colPos);
-    const { id } = this.columns[colPos];
+    const { id } = this.getColumns()[colPos];
     const { uuid } = this.translator.getTranslationById(id);
     const column = this.columnMap.get(uuid);
     if (column) {
@@ -161,7 +177,7 @@ class Columns<T> {
   }
 
   private validateBounds(col: number) {
-    const columns = this.columns;
+    const columns = this.getColumns();
     if (col > columns.length || col < 0) {
       throw new Error('Out of bounds access');
     }
@@ -170,7 +186,14 @@ class Columns<T> {
   swap(col1: number, col2: number) {
     this.validateBounds(col1);
     this.validateBounds(col2);
+    const { id: id1 } = this.getColumns()[col1];
+    const { id: id2 } = this.getColumns()[col2];
+    const translatedCol1 = this.translator.getTranslationById(id1);
+    const translatedCol2 = this.translator.getTranslationById(id2);
+    console.log(col1, translatedCol1);
+    console.log(col2, translatedCol2);
     this.translator.swap(col1, col2);
+    this.dirty = true;
   }
 }
 
