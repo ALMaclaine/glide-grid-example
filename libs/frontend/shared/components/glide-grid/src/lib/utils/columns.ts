@@ -2,6 +2,8 @@ import type { StringKeys } from '../types/general';
 import type { IdColumn, WrappedGridColumn } from '../types/grid';
 import { addIdsToColumns, uuid } from './general';
 import { SORT_TYPES, SortTypes } from './sort/object-sort';
+import { IdRow } from '../types/grid';
+import { GridCell } from '@glideapps/glide-data-grid';
 
 type ColumnsProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -161,7 +163,20 @@ class Columns<T> {
     return [...this.columns];
   }
 
-  getCell(colPos: number) {
+  genCell(item: IdRow<T>, col: number): GridCell {
+    if (col < this.length) {
+      const { data, displayData, ...rest } = this.getCell(col);
+      return {
+        ...rest,
+        data: item[data],
+        displayData: item[displayData],
+      } as GridCell;
+    } else {
+      throw new Error("Attempting to access a column that doesn't exist");
+    }
+  }
+
+  private getCell(colPos: number) {
     this.validateBounds(colPos);
     const { id } = this.getColumns()[colPos];
     const { uuid } = this.translator.getTranslationById(id);

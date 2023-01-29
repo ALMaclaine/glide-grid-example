@@ -37,7 +37,8 @@ class RowsManager<T> {
       const item = this.getRowByIndex(row);
       const { rowUuid } = item;
       for (let col = 0; col < columns.length; col++) {
-        this.cellCache.set(rowUuid, col, item);
+        const cell = this.columns.genCell(item, col);
+        this.cellCache.set(rowUuid, col, cell);
       }
     }
   }
