@@ -124,7 +124,7 @@ class HiddenColumnTranslator<T> {
     this.columnsCache.dirty();
   }
 
-  setHiddenColumns<T>(hiddenColumns: StringKeys<T>[]) {
+  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
     Array.from(this.columnIsShowing.keys()).map((column) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -137,6 +137,17 @@ class HiddenColumnTranslator<T> {
       this.columnIsShowing.set(key as StringKeys<T>, false)
     );
     this.dirty();
+  }
+
+  toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
+    if (this.columnIsShowing.has(hiddenColumn)) {
+      this.columnIsShowing.set(
+        hiddenColumn,
+        visibility ?? this.columnIsShowing.get(hiddenColumn) ?? true
+      );
+    } else {
+      throw new Error('Invalid column provided: ' + hiddenColumn);
+    }
   }
 
   isShowing(key: StringKeys<T>) {
@@ -182,6 +193,10 @@ class ColumnsManager<T> {
 
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
     this.hiddenTranslator.setHiddenColumns(hiddenColumns);
+  }
+
+  toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
+    this.hiddenTranslator.toggleColumnVisibility(hiddenColumn, visibility);
   }
 
   isShowing(key: StringKeys<T>) {

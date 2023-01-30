@@ -73,21 +73,8 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
   };
 
   const onChangeColumns = (colName: StringKeys<Property>) => {
-    setSelectedColumns((selectedColumns) => {
-      const newSelected = {
-        ...selectedColumns,
-        [colName]: !gridManager.isColumnShowing(colName),
-      };
-      const hiddenColumns = [];
-      for (const key of Object.keys(newSelected)) {
-        if (!newSelected[key as StringKeys<Property>]) {
-          hiddenColumns.push(key);
-        }
-      }
-      gridManager.setHiddenColumns(hiddenColumns as StringKeys<Property>[]);
-      refresh();
-      return newSelected;
-    });
+    gridManager.toggleColumnVisibility(colName);
+    refresh();
   };
 
   return (

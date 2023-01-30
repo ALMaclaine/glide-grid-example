@@ -44,6 +44,10 @@ class GridManager<T> {
     this.addData(data);
   }
 
+  toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
+    this.columnsManager.toggleColumnVisibility(hiddenColumn, visibility);
+  }
+
   isColumnShowing(key: StringKeys<T>) {
     return this.columnsManager.isShowing(key);
   }
