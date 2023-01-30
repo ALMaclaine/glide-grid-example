@@ -85,9 +85,16 @@ class SortTranslator<T> {
 
 class HiddenColumnTranslator<T> {
   private readonly hiddenTranslatorMap = new Map<number, number>();
-  private readonly hiddenColumnsSet = new Set<StringKeys<T>>();
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
+  private readonly columnIsShowing = new Map<StringKeys<T>, boolean>();
+
+  constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
+    for (const { id } of columns) {
+      this.columnIsShowing.set(id, true);
+    }
+    hiddenColumns.map((column) => this.columnIsShowing.set(column, false));
+  }
 
   getColumns(sortTranslations: Translation<T>[]) {
     if (this.columnsCache.isClean) {
@@ -100,7 +107,7 @@ class HiddenColumnTranslator<T> {
     let j = 0;
     for (const { uuid } of sortTranslations) {
       const val = this.getColumn(uuid);
-      if (val && !this.isHidden(val.id)) {
+      if (val && this.isShowing(val.id)) {
         this.hiddenTranslatorMap.set(i++, j);
         out.push(val);
       }
@@ -118,15 +125,22 @@ class HiddenColumnTranslator<T> {
   }
 
   setHiddenColumns<T>(hiddenColumns: StringKeys<T>[]) {
-    this.hiddenColumnsSet.clear();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    hiddenColumns.forEach((key) => this.hiddenColumnsSet.add(key));
+    Array.from(this.columnIsShowing.keys()).map((column) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.columnIsShowing.set(column as StringKeys<T>, true);
+    });
+
+    hiddenColumns.forEach((key) =>
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      this.columnIsShowing.set(key as StringKeys<T>, false)
+    );
     this.dirty();
   }
 
-  isHidden(key: StringKeys<T>) {
-    return this.hiddenColumnsSet.has(key);
+  isShowing(key: StringKeys<T>) {
+    return this.columnIsShowing.get(key);
   }
 
   setColumn(columnUuid: string, column: WrappedGridColumn<T>) {
@@ -152,19 +166,26 @@ class HiddenColumnTranslator<T> {
 
 class ColumnsManager<T> {
   private readonly sortTranslator = new SortTranslator<T>();
-  private readonly hiddenTranslator = new HiddenColumnTranslator<T>();
+  private readonly hiddenTranslator;
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
+    this.hiddenTranslator = new HiddenColumnTranslator({
+      columns,
+      hiddenColumns,
+    });
     for (const column of columns) {
       const { columnUuid, id } = column;
       this.hiddenTranslator.setColumn(columnUuid, column);
       this.sortTranslator.addUuid(columnUuid, id);
     }
-    this.hiddenTranslator.setHiddenColumns(hiddenColumns);
   }
 
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
     this.hiddenTranslator.setHiddenColumns(hiddenColumns);
+  }
+
+  isShowing(key: StringKeys<T>) {
+    return this.hiddenTranslator.isShowing(key);
   }
 
   getTranslation(colPos: number): string {

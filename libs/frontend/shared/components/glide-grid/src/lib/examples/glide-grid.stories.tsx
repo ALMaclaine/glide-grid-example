@@ -48,13 +48,9 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
     return map;
   }, []);
 
-  const [selectedColumns, setSelectedColumns] = useState(() => {
-    const out = {} as Record<StringKeys<Property>, boolean>;
-    for (const column of columns) {
-      out[column] = true;
-    }
-    return out;
-  });
+  const [selectedColumns, setSelectedColumns] = useState(
+    {} as Record<StringKeys<Property>, boolean>
+  );
 
   const [state, setState] = useState('waiting');
   const [company, setCompany] = useState(companies[0]);
@@ -80,7 +76,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
     setSelectedColumns((selectedColumns) => {
       const newSelected = {
         ...selectedColumns,
-        [colName]: !selectedColumns[colName],
+        [colName]: !gridManager.isColumnShowing(colName),
       };
       const hiddenColumns = [];
       for (const key of Object.keys(newSelected)) {
@@ -118,13 +114,13 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           ))}
         </select>
         <div>
-          {columns.map((key) => (
+          {Object.entries(gridManager.getColumnNames()).map(([key, value]) => (
             <>
               <label>{key}</label>
               <input
                 type="checkbox"
-                onClick={() => onChangeColumns(key)}
-                checked={selectedColumns[key]}
+                onChange={() => onChangeColumns(value)}
+                checked={gridManager.isColumnShowing(value)}
               />
             </>
           ))}

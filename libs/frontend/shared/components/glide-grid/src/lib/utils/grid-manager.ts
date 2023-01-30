@@ -1,8 +1,8 @@
 import { ColumnsManager } from './columns-manager';
-import { Cell, IdRow, WrappedGridColumn } from '../types/grid';
-import { StringKeys } from '../types/general';
+import type { Cell, IdRow, WrappedGridColumn } from '../types/grid';
+import type { StringKeys } from '../types/general';
 import { CellCache } from './caches/cell-cache';
-import { GridCell, Item } from '@glideapps/glide-data-grid';
+import type { GridCell, Item } from '@glideapps/glide-data-grid';
 import { SortMap } from './sort/sort-map';
 import { TableSorter } from './sort/table-sorter';
 import { SortStateMachine } from './sort/sort-state-machine';
@@ -28,18 +28,24 @@ class GridManager<T> {
   private readonly columnsManager: ColumnsManager<T>;
   private readonly cellCache: CellCache<T> = new CellCache<T>();
 
-  private readonly stateMachine: SortStateMachine<T> =
+  private readonly sortStateMachine: SortStateMachine<T> =
     new SortStateMachine<T>();
   private readonly sorter: TableSorter<T>;
   private readonly columnUuids: string[];
+  private readonly columnNames: Record<string, StringKeys<T>> = {};
 
   constructor({ columns, data, hiddenColumns }: GridManagerProps<T>) {
+    columns.forEach(({ title, id }) => (this.columnNames[title] = id));
     this.columnUuids = columns.map(({ columnUuid }) => columnUuid);
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.sorter = new TableSorter({
       sortMap: new SortMap({ columns }),
     });
     this.addData(data);
+  }
+
+  isColumnShowing(key: StringKeys<T>) {
+    return this.columnsManager.isShowing(key);
   }
 
   addData(data: T[]) {
@@ -82,6 +88,10 @@ class GridManager<T> {
     return this.columnsManager.getColumns();
   }
 
+  getColumnNames() {
+    return this.columnNames;
+  }
+
   swap(col1: number, col2: number) {
     this.columnsManager.swap(col1, col2);
   }
@@ -94,8 +104,8 @@ class GridManager<T> {
     return this.sorter.length;
   }
 
-  getHistory(steps: number) {
-    return this.stateMachine.getHistory(steps);
+  getSortHistory(steps: number) {
+    return this.sortStateMachine.getHistory(steps);
   }
 
   clearData() {
@@ -104,7 +114,10 @@ class GridManager<T> {
   }
 
   nextSortKey(key: StringKeys<T>) {
-    const stateHistory = this.stateMachine.nextValue(key, STATE_HISTORY_STEPS);
+    const stateHistory = this.sortStateMachine.nextValue(
+      key,
+      STATE_HISTORY_STEPS
+    );
     return this.sorter.stateSort(stateHistory);
   }
 }

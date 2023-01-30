@@ -120,7 +120,7 @@ function GlideGrid<T>({
         smoothScrollX={true}
         smoothScrollY={true}
         drawHeader={(args) => {
-          drawHeaderSort(args, gridManager.getHistory(STATE_HISTORY_STEPS));
+          drawHeaderSort(args, gridManager.getSortHistory(STATE_HISTORY_STEPS));
           return false;
         }}
         theme={theme}
