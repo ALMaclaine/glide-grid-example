@@ -1,9 +1,9 @@
 import { ComponentStory, Meta } from '@storybook/react';
 import { GlideGrid, GlideGridProps } from '../glide-grid';
-import { GridManager } from '../utils/grid-manager';
+import { GridManager } from '../grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate, generate } from './utils';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { StringKeys } from '../types/general';
 
 export default {
@@ -97,19 +97,19 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           onChange={(e) => onCompanyChange(e.target.value)}
         >
           {companies.map((e) => (
-            <option>{e}</option>
+            <option key={e}>{e}</option>
           ))}
         </select>
         <div>
           {Object.entries(gridManager.getColumnNames()).map(([key, value]) => (
-            <>
+            <Fragment key={key}>
               <label>{key}</label>
               <input
                 type="checkbox"
                 onChange={() => onChangeColumns(value)}
                 checked={gridManager.isColumnShowing(value)}
               />
-            </>
+            </Fragment>
           ))}
         </div>
         <button onClick={() => updateData()}>Add Data</button>

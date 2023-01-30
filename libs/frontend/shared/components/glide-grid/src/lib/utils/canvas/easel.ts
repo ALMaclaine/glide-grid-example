@@ -26,7 +26,9 @@ class Easel {
     }
 
     this.canvasRef = new OffscreenCanvas(this._width, this._height);
-    const context = this.canvasRef.getContext('2d');
+    const context = this.canvasRef.getContext('2d', {
+      willReadFrequently: true,
+    });
     if (!context) {
       throw new Error('Context could not be created');
     }

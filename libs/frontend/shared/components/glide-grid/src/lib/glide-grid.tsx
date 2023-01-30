@@ -12,7 +12,7 @@ import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import type { HeaderClickHandler, HoverHandler } from './types/func';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { GridManager } from './utils/grid-manager';
+import { GridManager } from './grid-manager';
 
 const divStyles = {
   border: '1px solid #e9e9e9',

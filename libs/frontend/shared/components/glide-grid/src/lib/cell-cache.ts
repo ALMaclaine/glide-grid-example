@@ -1,4 +1,4 @@
-import type { Cell } from '../../types/grid';
+import type { Cell } from './types/grid';
 
 class CellCache<T> {
   // column -> row -> value

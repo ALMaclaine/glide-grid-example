@@ -1,13 +1,13 @@
 import { ColumnsManager } from './columns-manager';
-import type { Cell, IdRow, WrappedGridColumn } from '../types/grid';
-import type { StringKeys } from '../types/general';
-import { CellCache } from './caches/cell-cache';
+import type { Cell, IdRow, WrappedGridColumn } from './types/grid';
+import type { StringKeys } from './types/general';
+import { CellCache } from './cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
-import { SortMap } from './sort/sort-map';
-import { TableSorter } from './sort/table-sorter';
-import { SortStateMachine } from './sort/sort-state-machine';
-import { STATE_HISTORY_STEPS } from '../constants';
-import { uuid } from './general';
+import { SortMap } from './utils/sort/sort-map';
+import { TableSorter } from './utils/sort/table-sorter';
+import { SortStateMachine } from './utils/sort/sort-state-machine';
+import { STATE_HISTORY_STEPS } from './constants';
+import { uuid } from './utils/general';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -42,6 +42,7 @@ class GridManager<T> {
       sortMap: new SortMap({ columns }),
     });
     this.addData(data);
+    this.getTextKeys(columns);
   }
 
   toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
@@ -50,6 +51,10 @@ class GridManager<T> {
 
   isColumnShowing(key: StringKeys<T>) {
     return this.columnsManager.isShowing(key);
+  }
+
+  private getTextKeys(columns: WrappedGridColumn<T>[]): StringKeys<T>[] {
+    return columns.filter((e) => e.cell.kind !== 'number').map(({ id }) => id);
   }
 
   addData(data: T[]) {

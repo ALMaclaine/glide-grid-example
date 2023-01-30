@@ -44,13 +44,14 @@ class TableSorter<T> {
   }
 
   private sort() {
-    this._sorted = objectSort(this._sorted, [
-      ...this.stateHistory.map(({ state, key }) => ({
+    this._sorted = objectSort(
+      this._sorted,
+      this.stateHistory.map(({ state, key }) => ({
         state,
         type: this.getType(key),
         key,
-      })),
-    ]);
+      }))
+    );
     return this._sorted;
   }
 
