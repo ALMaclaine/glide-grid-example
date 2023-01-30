@@ -48,10 +48,10 @@ const theme = {
 };
 
 type GlideGridProps<T> = {
-  onItemHovered: HoverHandler;
+  onItemHovered?: HoverHandler;
   gridManager: GridManager<T>;
-  getRowThemeOverride: GetRowThemeCallback;
-  onHeaderClicked: HeaderClickHandler;
+  getRowThemeOverride?: GetRowThemeCallback;
+  onHeaderClicked?: HeaderClickHandler;
 };
 
 function GlideGrid<T>({

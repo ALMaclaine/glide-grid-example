@@ -1,37 +1,24 @@
 import type { IdRow } from '../../types/grid';
-import { addIdToRow } from '../general';
+import { v4 as uuid } from 'uuid';
+
+const addIdToRow = <T>(row: T): IdRow<T> => {
+  // mutate directly to avoid performance issues on large tables
+  const changeType = row as IdRow<T>;
+  changeType.rowUuid = uuid();
+  return changeType;
+};
 
 class RowCache<T> {
-  private rowIdArray: string[] = [];
-  private _rows: IdRow<T>[] = [];
-  private cache = new Map<string, IdRow<T>>();
-  private idRowMap = new Map<string, number>();
-  // column -> row -> value
-  constructor(data: T[] = []) {
-    for (const row of data) {
-      const idRow = addIdToRow(row);
-      const { rowUuid } = idRow;
-      this.idRowMap.set(rowUuid, this.rowIdArray.length);
-      this.rowIdArray.push(rowUuid);
-      this.cache.set(rowUuid, idRow);
-    }
-    this._rows = data as IdRow<T>[];
-  }
+  private rowIdArray: IdRow<T>[] = [];
 
-  get rows() {
-    return this._rows;
-  }
-
-  getRowId(n: number) {
-    if (!this.hasIndex(n)) {
-      throw new Error('Attempting to grab row id outside of range.');
-    }
-    return this.rowIdArray[n];
+  addDataItem(item: T): IdRow<T> {
+    const idRow = addIdToRow(item);
+    this.rowIdArray.push(idRow);
+    return item as IdRow<T>;
   }
 
   getRowByIndex(n: number) {
-    const uuid = this.getRowId(n);
-    const row = this.cache.get(uuid);
+    const row = this.rowIdArray[n];
     if (!row) {
       throw new Error('Cache should be set before accessing');
     }
@@ -40,10 +27,6 @@ class RowCache<T> {
 
   hasIndex(n: number) {
     return n >= 0 || n < this.rowIdArray.length;
-  }
-
-  set(uuid: string, value: IdRow<T>) {
-    this.cache.set(uuid, value);
   }
 }
 

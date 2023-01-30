@@ -15,11 +15,12 @@ class RowsManager<T> {
     return this.sorter.sorted;
   }
   constructor(data: T[], sortMap: SortMap<T>) {
-    this.rowCache = new RowCache<T>(data);
+    this.rowCache = new RowCache<T>();
+    const rows = data.map((row) => this.rowCache.addDataItem(row));
     this.sorter = new TableSorter({
-      originalData: this.rowCache.rows,
       sortMap,
     });
+    this.sorter.addData(rows);
   }
 
   get length() {

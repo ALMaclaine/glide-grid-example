@@ -5,17 +5,19 @@ import type { SortMap } from './sort-map';
 import { objectSort, SORT_TYPES } from './object-sort';
 
 type TableSorterProps<T> = {
-  originalData: IdRow<T>[];
   sortMap: SortMap<T>;
 };
 
 class TableSorter<T> {
   private readonly sortMap: SortMap<T>;
-  private _sorted: IdRow<T>[];
+  private _sorted: IdRow<T>[] = [];
 
-  constructor({ originalData, sortMap }: TableSorterProps<T>) {
-    this._sorted = originalData;
+  constructor({ sortMap }: TableSorterProps<T>) {
     this.sortMap = sortMap;
+  }
+
+  addData(data: IdRow<T>[]) {
+    this._sorted = [...this._sorted, ...data];
   }
 
   get sorted() {

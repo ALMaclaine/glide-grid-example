@@ -3,6 +3,7 @@ import { GlideGrid, GlideGridProps } from '../glide-grid';
 import { GridManager } from '../utils/grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { generate } from './utils';
+import { useMemo } from 'react';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -20,11 +21,16 @@ export default {
 export const Primary: ComponentStory<typeof GlideGrid<Property>> = <T,>(
   args: GlideGridProps<T>
 ) => {
-  const gridManager = new GridManager({
-    columns: PROPERTY_COLUMNS,
-    data,
-    hiddenColumns: ['investor', 'address'],
-  });
+  const gridManager = useMemo(
+    () =>
+      new GridManager({
+        columns: PROPERTY_COLUMNS,
+        data: generate(100, genProperty),
+        hiddenColumns: ['investor', 'address'],
+      }),
+    []
+  );
+
   return (
     <div
       style={{
@@ -45,7 +51,5 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = <T,>(
     </div>
   );
 };
-
-const data: Property[] = generate(100, genProperty);
 
 Primary.args = {};
