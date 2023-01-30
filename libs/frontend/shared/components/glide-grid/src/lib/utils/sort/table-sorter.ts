@@ -10,15 +10,20 @@ type TableSorterProps<T> = {
 };
 
 class TableSorter<T> {
-  private readonly originalData: IdRow<T>[];
   private readonly sortMap: SortMap<T>;
+  private _sorted: IdRow<T>[];
+
   constructor({ originalData, sortMap }: TableSorterProps<T>) {
-    this.originalData = originalData;
+    this._sorted = originalData;
     this.sortMap = sortMap;
   }
 
-  private cloneOriginal() {
-    return [...this.originalData];
+  get sorted() {
+    return this._sorted;
+  }
+
+  get length() {
+    return this._sorted.length;
   }
 
   private getType(key: StringKeys<T> | '') {
@@ -29,13 +34,14 @@ class TableSorter<T> {
   }
 
   stateSort(stateHistory: StateSet<T>[]) {
-    return objectSort(this.cloneOriginal(), [
+    this._sorted = objectSort(this._sorted, [
       ...stateHistory.map(({ state, key }) => ({
         state,
         type: this.getType(key),
         key,
       })),
     ]);
+    return this._sorted;
   }
 }
 

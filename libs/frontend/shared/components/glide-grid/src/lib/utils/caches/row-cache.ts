@@ -1,17 +1,25 @@
 import type { IdRow } from '../../types/grid';
+import { addIdToRow } from '../general';
 
 class RowCache<T> {
   private rowIdArray: string[] = [];
+  private _rows: IdRow<T>[] = [];
   private cache = new Map<string, IdRow<T>>();
   private idRowMap = new Map<string, number>();
   // column -> row -> value
-  constructor(data: IdRow<T>[] = []) {
+  constructor(data: T[] = []) {
     for (const row of data) {
-      const { rowUuid } = row;
+      const idRow = addIdToRow(row);
+      const { rowUuid } = idRow;
       this.idRowMap.set(rowUuid, this.rowIdArray.length);
       this.rowIdArray.push(rowUuid);
-      this.cache.set(rowUuid, row);
+      this.cache.set(rowUuid, idRow);
     }
+    this._rows = data as IdRow<T>[];
+  }
+
+  get rows() {
+    return this._rows;
   }
 
   getRowId(n: number) {
