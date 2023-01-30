@@ -125,9 +125,7 @@ class HiddenColumnTranslator<T> {
   }
 
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
-    Array.from(this.columnIsShowing.keys()).map((column) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+    Array.from(this.columnIsShowing.keys()).forEach((column) => {
       this.toggleColumnVisibility(column, true);
     });
 
