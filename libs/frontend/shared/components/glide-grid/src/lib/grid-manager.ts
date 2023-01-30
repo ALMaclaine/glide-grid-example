@@ -8,20 +8,15 @@ import { TableSorter } from './utils/sort/table-sorter';
 import { SortStateMachine } from './utils/sort/sort-state-machine';
 import { STATE_HISTORY_STEPS } from './constants';
 import { uuid } from './utils/general';
+import { Levels } from './levels';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
   data: T[];
   hiddenColumns?: StringKeys<T>[];
 };
-
-const addIdsToRows = <T>(rows: T[]): IdRow<T>[] => {
-  // mutate directly to avoid performance issues on large tables
-  for (const row of rows) {
-    const changeType = row as IdRow<T>;
-    changeType.rowUuid = uuid();
-  }
-  return rows as IdRow<T>[];
+const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
+  return columns.filter((e) => e.cell.kind !== 'number').map(({ id }) => id);
 };
 
 class GridManager<T> {
@@ -33,6 +28,7 @@ class GridManager<T> {
   private readonly sorter: TableSorter<T>;
   private readonly columnUuids: string[];
   private readonly columnNames: Record<string, StringKeys<T>> = {};
+  private readonly levels: Levels<T>;
 
   constructor({ columns, data, hiddenColumns }: GridManagerProps<T>) {
     columns.forEach(({ title, id }) => (this.columnNames[title] = id));
@@ -42,7 +38,7 @@ class GridManager<T> {
       sortMap: new SortMap({ columns }),
     });
     this.addData(data);
-    this.getTextKeys(columns);
+    this.levels = new Levels(getTextKeys(columns));
   }
 
   toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
@@ -53,14 +49,19 @@ class GridManager<T> {
     return this.columnsManager.isShowing(key);
   }
 
-  private getTextKeys(columns: WrappedGridColumn<T>[]): StringKeys<T>[] {
-    return columns.filter((e) => e.cell.kind !== 'number').map(({ id }) => id);
-  }
-
   addData(data: T[]) {
-    const rows = addIdsToRows(data);
+    const rows = this.processRows(data);
     this.sorter.addData(rows);
     this.addDataToCache(rows);
+  }
+
+  private processRows(rows: T[]) {
+    for (const row of rows) {
+      const changeType = row as IdRow<T>;
+      changeType.rowUuid = uuid();
+      this.levels.processItem(row);
+    }
+    return rows as IdRow<T>[];
   }
 
   private genCell(item: IdRow<T>, colUuid: string): Cell<T> {
