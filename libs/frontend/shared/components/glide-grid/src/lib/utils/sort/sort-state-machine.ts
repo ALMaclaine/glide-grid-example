@@ -49,11 +49,8 @@ class SortStateMachine<T> {
   // start at first state after initial
   private stateCycler = genCycleStates(sortStatesArray[1]);
 
-  constructor(stateSet: Partial<StateSet<T>> = {}) {
-    this.stateHistory.push({
-      state: stateSet.state || initialStateSet.state,
-      key: stateSet.key || initialStateSet.key,
-    });
+  constructor(stateSet: StateSet<T>[] = []) {
+    this.stateHistory = stateSet;
   }
 
   get previousState(): StateSet<T> {
