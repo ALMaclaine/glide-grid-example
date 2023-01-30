@@ -1,4 +1,5 @@
-import { GridCell, GridCellKind, Item } from '@glideapps/glide-data-grid';
+import type { GridCell } from '@glideapps/glide-data-grid';
+import { GridCellKind } from '@glideapps/glide-data-grid';
 import type { Cell } from '../../types/grid';
 import { SORT_TYPES } from '../sort/object-sort';
 
@@ -34,7 +35,7 @@ const genTextCell = <T>(props: GenTextCellProps<T>): Cell<T> => {
 
 const genNumericCell = <T>(props: GenTextCellProps<T>): Cell<T> => {
   return genGridCell({
-    kind: GridCellKind.Text,
+    kind: GridCellKind.Number,
     sortType: SORT_TYPES.numeric,
     ...props,
   });

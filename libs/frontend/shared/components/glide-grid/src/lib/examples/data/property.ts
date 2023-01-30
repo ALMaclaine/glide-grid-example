@@ -1,55 +1,11 @@
-// Button.stories.tsx
-import { ComponentStory, Meta } from '@storybook/react';
-import {
-  GlideGrid,
-  GlideGridProps,
-} from './frontend-shared-components-glide-grid';
-import { randAddress, randCompanyName } from '@ngneat/falso';
+import { WrappedGridColumn } from '../../types/grid';
+import { uuid } from '../../utils/general';
 import {
   genNumericCell,
   genTextCell,
   genUriCell,
-} from './utils/cells/generators';
-import type { WrappedGridColumn } from './types/grid';
-import { uuid } from './utils/general';
-import { GridManager } from './utils/grid-manager';
-
-export default {
-  title: 'GlideGrid/PropertiesPage',
-  component: GlideGrid,
-  decorators: [
-    (Story) => (
-      <div style={{ height: '100%' }}>
-        <Story />
-        <div id="portal" />
-      </div>
-    ),
-  ],
-} as Meta;
-
-export const Primary: ComponentStory<typeof GlideGrid<Property>> = <T,>(
-  args: GlideGridProps<T>
-) => {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '80vw',
-          height: '60vh',
-        }}
-      >
-        <GlideGrid {...args} />
-      </div>
-    </div>
-  );
-};
+} from '../../utils/cells/generators';
+import { randAddress, randCompanyName } from '@ngneat/falso';
 
 interface Property {
   property: string;
@@ -59,7 +15,7 @@ interface Property {
   rentOwed: string;
 }
 
-const columnsDetails: WrappedGridColumn<Property>[] = [
+const PROPERTY_COLUMNS: WrappedGridColumn<Property>[] = [
   {
     title: 'Property',
     id: 'property',
@@ -103,14 +59,13 @@ const columnsDetails: WrappedGridColumn<Property>[] = [
     id: 'rentOwed',
     grow: 1,
     columnUuid: uuid(),
-
     cell: genNumericCell({ data: 'rentOwed', contentAlign: 'right' }),
   },
 ];
 
 const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43];
 const INVESTORS = [randCompanyName(), randCompanyName(), randCompanyName()];
-function genProperty(): Property {
+const genProperty = (): Property => {
   return {
     property: randAddress().street,
     address: randAddress().street,
@@ -119,14 +74,7 @@ function genProperty(): Property {
     rentOwed:
       RENT_OWED_SET[Math.floor(Math.random() * RENT_OWED_SET.length)] + '',
   };
-}
-
-const data: Property[] = [...Array(100).fill(0).map(genProperty)];
-
-Primary.args = {
-  gridManager: new GridManager({
-    columns: columnsDetails,
-    data,
-    hiddenColumns: ['investor', 'address'],
-  }),
 };
+
+export type { Property };
+export { PROPERTY_COLUMNS, genProperty };

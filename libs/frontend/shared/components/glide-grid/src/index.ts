@@ -1,1 +1,1 @@
-export * from './lib/frontend-shared-components-glide-grid';
+export * from './lib/glide-grid';
