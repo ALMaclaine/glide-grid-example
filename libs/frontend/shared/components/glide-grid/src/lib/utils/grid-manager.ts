@@ -68,6 +68,10 @@ class GridManager<T> {
     }
   }
 
+  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
+    this.columnsManager.setHiddenColumns(hiddenColumns);
+  }
+
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.sorter.sorted[row];
     const translatedCol = this.columnsManager.getTranslation(col);

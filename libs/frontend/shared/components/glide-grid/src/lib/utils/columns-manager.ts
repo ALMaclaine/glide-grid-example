@@ -122,6 +122,7 @@ class HiddenColumnTranslator<T> {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     hiddenColumns.forEach((key) => this.hiddenColumnsSet.add(key));
+    this.dirty();
   }
 
   isHidden(key: StringKeys<T>) {
