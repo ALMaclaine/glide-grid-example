@@ -1,5 +1,5 @@
 const generate = <T>(len: number, generator: () => T) => {
-  return [...Array(100).fill(0).map(generator)];
+  return [...Array(len).fill(0).map(generator)];
 };
 
 const asyncGenerate = async <T>(
@@ -7,7 +7,7 @@ const asyncGenerate = async <T>(
   generator: () => T,
   timeout = 200
 ) => {
-  return new Promise((res) => {
+  return new Promise<T[]>((res) => {
     setTimeout(() => res(generate(len, generator)), timeout);
   });
 };

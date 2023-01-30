@@ -11,13 +11,21 @@ type TableSorterProps<T> = {
 class TableSorter<T> {
   private readonly sortMap: SortMap<T>;
   private _sorted: IdRow<T>[] = [];
+  private stateHistory: StateSet<T>[] = [];
 
   constructor({ sortMap }: TableSorterProps<T>) {
     this.sortMap = sortMap;
   }
 
+  clear() {
+    this._sorted = [];
+  }
+
   addData(data: IdRow<T>[]) {
     this._sorted = [...this._sorted, ...data];
+    if (this.stateHistory.length > 0) {
+      this.sort();
+    }
   }
 
   get sorted() {
@@ -35,15 +43,20 @@ class TableSorter<T> {
     return this.sortMap.getType(key);
   }
 
-  stateSort(stateHistory: StateSet<T>[]) {
+  private sort() {
     this._sorted = objectSort(this._sorted, [
-      ...stateHistory.map(({ state, key }) => ({
+      ...this.stateHistory.map(({ state, key }) => ({
         state,
         type: this.getType(key),
         key,
       })),
     ]);
     return this._sorted;
+  }
+
+  stateSort(stateHistory: StateSet<T>[]) {
+    this.stateHistory = stateHistory;
+    return this.sort();
   }
 }
 

@@ -23,6 +23,10 @@ class CellCache<T> {
     );
   }
 
+  clear() {
+    this.cachedContent = new Map();
+  }
+
   set(rowUuid: string, columnUuid: string, cell: Cell<T>) {
     if (this.cachedContent.get(rowUuid) === undefined) {
       this.cachedContent.set(rowUuid, new Map<string, Cell<T>>());

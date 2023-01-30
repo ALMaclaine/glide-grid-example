@@ -149,7 +149,7 @@ class HiddenColumnTranslator<T> {
   }
 }
 
-class Columns<T> {
+class ColumnsManager<T> {
   private readonly sortTranslator = new SortTranslator<T>();
   private readonly hiddenTranslator = new HiddenColumnTranslator<T>();
 
@@ -214,4 +214,4 @@ class Columns<T> {
   }
 }
 
-export { Columns };
+export { ColumnsManager };

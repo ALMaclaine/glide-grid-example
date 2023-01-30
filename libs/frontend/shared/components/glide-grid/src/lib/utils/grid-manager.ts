@@ -1,4 +1,4 @@
-import { Columns } from './columns';
+import { ColumnsManager } from './columns-manager';
 import { Cell, IdRow, WrappedGridColumn } from '../types/grid';
 import { StringKeys } from '../types/general';
 import { CellCache } from './caches/cell-cache';
@@ -25,26 +25,31 @@ const addIdsToRows = <T>(rows: T[]): IdRow<T>[] => {
 };
 
 class GridManager<T> {
-  private readonly _columns: Columns<T>;
-  readonly cellCache: CellCache<T>;
-  private readonly rows: IdRow<T>[];
+  private readonly columnsManager: ColumnsManager<T>;
+  private readonly cellCache: CellCache<T> = new CellCache<T>();
 
-  readonly stateMachine: SortStateMachine<T> = new SortStateMachine<T>();
-  readonly sorter: TableSorter<T>;
+  private readonly stateMachine: SortStateMachine<T> =
+    new SortStateMachine<T>();
+  private readonly sorter: TableSorter<T>;
+  private readonly columnUuids: string[];
 
   constructor({ columns, data, hiddenColumns }: GridManagerProps<T>) {
-    this._columns = new Columns<T>({ columns, hiddenColumns });
-    const sortMap = new SortMap({ columns });
-    this.rows = addIdsToRows(data);
+    this.columnUuids = columns.map(({ columnUuid }) => columnUuid);
+    this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.sorter = new TableSorter({
-      sortMap,
+      sortMap: new SortMap({ columns }),
     });
-    this.sorter.addData(this.rows);
-    this.cellCache = this.setupCellCache(columns);
+    this.addData(data);
+  }
+
+  addData(data: T[]) {
+    const rows = addIdsToRows(data);
+    this.sorter.addData(rows);
+    this.addDataToCache(rows);
   }
 
   private genCell(item: IdRow<T>, colUuid: string): Cell<T> {
-    const { data, displayData, ...rest } = this._columns.getCell(colUuid);
+    const { data, displayData, ...rest } = this.columnsManager.getCell(colUuid);
     return {
       ...rest,
       data: item[data],
@@ -52,36 +57,33 @@ class GridManager<T> {
     } as Cell<T>;
   }
 
-  private setupCellCache(columns: WrappedGridColumn<T>[]) {
-    const cellCache = new CellCache<T>();
-    for (let row = 0; row < this.length; row++) {
-      const item = this.rows[row];
+  private addDataToCache(data: IdRow<T>[]) {
+    for (let row = 0; row < data.length; row++) {
+      const item = data[row];
       const { rowUuid } = item;
-      for (let col = 0; col < columns.length; col++) {
-        const { columnUuid } = columns[col];
+      for (const columnUuid of this.columnUuids) {
         const cell = this.genCell(item, columnUuid);
-        cellCache.set(rowUuid, columnUuid, cell);
+        this.cellCache.set(rowUuid, columnUuid, cell);
       }
     }
-    return cellCache;
   }
 
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.sorter.sorted[row];
-    const translatedCol = this._columns.getTranslation(col);
+    const translatedCol = this.columnsManager.getTranslation(col);
     return this.cellCache.get(rowUuid, translatedCol) as GridCell;
   }
 
   getColumns() {
-    return this._columns.getColumns();
+    return this.columnsManager.getColumns();
   }
 
   swap(col1: number, col2: number) {
-    this._columns.swap(col1, col2);
+    this.columnsManager.swap(col1, col2);
   }
 
   getHeaderKey(col: number) {
-    return this._columns.getHeaderKey(col);
+    return this.columnsManager.getHeaderKey(col);
   }
 
   get length() {
@@ -90,6 +92,11 @@ class GridManager<T> {
 
   getHistory(steps: number) {
     return this.stateMachine.getHistory(steps);
+  }
+
+  clearData() {
+    this.cellCache.clear();
+    this.sorter.clear();
   }
 
   nextSortKey(key: StringKeys<T>) {
