@@ -30,8 +30,6 @@ class GridManager<T> {
 
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
-  private filterSet: FilterSet<T>[];
-  private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly pageManager;
 
   constructor({
@@ -48,13 +46,11 @@ class GridManager<T> {
     this.sorter = new TableSorter({ sortMap });
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
-    this.filteredCache.cache([]);
-    this.filterSet = filterSet;
     const filterManager = new FilterManager({ filters: filterSet, sortMap });
   }
 
   setFilterSet(filterSet: FilterSet<T>[]) {
-    this.filterSet = filterSet;
+    // this.filterSet = filterSet;
   }
 
   toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
@@ -72,7 +68,6 @@ class GridManager<T> {
     this.nextSortKey();
   }
 
-  // TODO: ADD ROW CACHE BACK
   private processRows(rows: T[]) {
     for (const row of rows) {
       const changeType = row as IdRow<T>;
@@ -87,8 +82,7 @@ class GridManager<T> {
   }
 
   itemToCell([col, row]: Item): GridCell {
-    const data = this.pageManager.getData();
-    const { rowUuid } = data[row];
+    const { rowUuid } = this.pageManager.getRow(row);
     return this.cellCache.get(rowUuid, col) as GridCell;
   }
 
@@ -138,7 +132,6 @@ class GridManager<T> {
 
   clearData() {
     this.sorter.clear();
-    this.filteredCache.dirty();
     this.pageManager.clear();
     this.cellCache.clear();
   }

@@ -46,6 +46,15 @@ class PageManager<T> {
     }
   }
 
+  getRow(row: number) {
+    if (row < 0 || row >= this.length) {
+      throw new Error(
+        `Out of bounds access. Data Length: ${this.length}, Row Accessed: ${row}`
+      );
+    }
+    return this.getData()[row];
+  }
+
   setPage(page = 0) {
     if (page < 0) {
       return;

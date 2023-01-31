@@ -2,7 +2,7 @@ import type { IdRow } from '../../types/grid';
 import { uuid } from '../general';
 
 // maybe delete, the final data already has rowUuid which can be accessed using array access
-// since most interractions come from [col, row] translation
+// since most interactions come from [col, row] translation
 const addIdToRow = <T>(row: T): IdRow<T> => {
   // mutate directly to avoid performance issues on large tables
   const changeType = row as IdRow<T>;
