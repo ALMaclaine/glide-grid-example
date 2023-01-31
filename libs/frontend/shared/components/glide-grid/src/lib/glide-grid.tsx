@@ -68,8 +68,9 @@ function GlideGrid<T>({
       const selectedHeader = gridManager.getHeaderKey(col);
       gridManager.nextSortKey(selectedHeader);
       onHeaderClicked(selectedHeader);
+      refresh();
     },
-    [gridManager, onHeaderClicked]
+    [gridManager, onHeaderClicked, refresh]
   );
 
   const {

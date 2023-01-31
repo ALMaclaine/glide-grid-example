@@ -1,6 +1,6 @@
 import { ColumnsManager } from './columns-manager';
 import type { Cell, IdRow, WrappedGridColumn } from './types/grid';
-import type { StringKeys } from './types/general';
+import type { ObjectValues, StringKeys } from './types/general';
 import { CellCache } from './cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
 import { SortMap } from './utils/sort/sort-map';

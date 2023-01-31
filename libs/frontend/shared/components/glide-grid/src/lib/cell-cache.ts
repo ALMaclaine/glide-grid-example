@@ -13,16 +13,6 @@ class CellCache<T> {
     return rowCache.get(columnUuid) as Cell<T>;
   }
 
-  hasRow(rowUuid: string) {
-    return this.cachedContent.has(rowUuid);
-  }
-
-  has(rowUuid: string, columnUuid: string) {
-    return (
-      this.hasRow(rowUuid) && this.cachedContent.get(rowUuid)?.has(columnUuid)
-    );
-  }
-
   clear() {
     this.cachedContent = new Map();
   }

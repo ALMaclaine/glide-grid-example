@@ -20,13 +20,6 @@ export default {
 } as Meta;
 
 const companies = ['company1', 'company2', 'company3'];
-const columns: StringKeys<Property>[] = [
-  'property',
-  'address',
-  'investor',
-  'units',
-  'rentOwed',
-] as StringKeys<Property>[];
 
 export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
   const [, _refresh] = useState([]);
@@ -48,10 +41,6 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
     return map;
   }, []);
 
-  const [selectedColumns, setSelectedColumns] = useState(
-    {} as Record<StringKeys<Property>, boolean>
-  );
-
   const [state, setState] = useState('waiting');
   const [company, setCompany] = useState(companies[0]);
 
@@ -65,6 +54,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
   const updateData = async () => {
     setState('loading');
     const data = await asyncGenerate(10, genProperty, Math.random() * 500);
+    console.log('???');
     const companyData = dataManager.get(company)!;
     const newData = [...companyData, ...data];
     gridManager.addData(data);
