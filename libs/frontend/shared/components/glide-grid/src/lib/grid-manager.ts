@@ -7,14 +7,15 @@ import { TableSorter } from './utils/sort/table-sorter';
 import { uuid } from './utils/general';
 import { Levels } from './levels';
 import { MiniCache } from './utils/mini-cache';
-import type { Filters, FiltersSet } from './utils/filters/types';
+import type { FilterSet } from './utils/filters/types';
 import { SortMap } from './utils/sort/sort-map';
+import { FilterManager } from './utils/filters/filter-manager';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
   data: T[];
   hiddenColumns?: StringKeys<T>[];
-  filterSet?: FiltersSet<T>;
+  filterSet?: FilterSet<T>[];
 };
 
 const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
@@ -27,7 +28,7 @@ class GridManager<T> {
 
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
-  private filterSet: FiltersSet<T>;
+  private filterSet: FilterSet<T>[];
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
 
   constructor({
@@ -44,23 +45,11 @@ class GridManager<T> {
     this.levels = new Levels(getTextKeys(columns));
     this.filteredCache.cache([]);
     this.filterSet = filterSet;
+    const filterManager = new FilterManager({ filters: filterSet, sortMap });
   }
 
-  setFilterSet(filterSet: FiltersSet<T>) {
+  setFilterSet(filterSet: FilterSet<T>[]) {
     this.filterSet = filterSet;
-  }
-
-  private filterer(filters: Filters<T>) {
-    const keys = Object.keys(filters);
-    for (const key of keys) {
-      console.log(key);
-    }
-  }
-
-  private filtered() {
-    for (const filters of this.filterSet) {
-      this.filterer(filters);
-    }
   }
 
   toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
@@ -126,7 +115,6 @@ class GridManager<T> {
   }
 
   nextSortKey(key: StringKeys<T>) {
-    this.filtered();
     return this.sorter.stateSort(key);
   }
 }

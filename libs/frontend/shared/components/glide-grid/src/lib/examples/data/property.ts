@@ -70,7 +70,7 @@ const genProperty = (): Property => {
     property: randAddress().street,
     address: randAddress().street,
     investor: INVESTORS[Math.floor(Math.random() * INVESTORS.length)] + '',
-    units: Math.round(Math.random() * 2 + 1).toString(),
+    units: Math.round(Math.random() * 5 + 1).toString(),
     rentOwed:
       RENT_OWED_SET[Math.floor(Math.random() * RENT_OWED_SET.length)] + '',
   };

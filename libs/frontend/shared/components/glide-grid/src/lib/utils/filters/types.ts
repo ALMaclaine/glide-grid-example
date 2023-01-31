@@ -40,37 +40,27 @@ type Filter =
   | FilterRange
   | FilterIdentity;
 
-const isFilterLevels = (filter: Filter): filter is FilterLevels =>
-  filter.type === FILTER_TYPES.levels;
+type FilterSet<T> = Record<StringKeys<T>, Filter>;
 
-const isFilterMin = (filter: Filter): filter is FilterMin =>
-  filter.type === FILTER_TYPES.min;
+type FilterFunc<T> = (val: T) => boolean;
 
-const isFilterMax = (filter: Filter): filter is FilterMax =>
-  filter.type === FILTER_TYPES.max;
-
-const isFilterRange = (filter: Filter): filter is FilterRange =>
-  filter.type === FILTER_TYPES.range;
-
-type Filters<T> = Record<StringKeys<T>, Filter>;
-type FiltersSet<T> = Filters<T>[];
+const VALID_NATURAL_FILTER_SET = new Set<FilterType>([FILTER_TYPES.levels]);
+const VALID_NUMERIC_FILTER_SET = new Set<FilterType>([
+  FILTER_TYPES.min,
+  FILTER_TYPES.max,
+  FILTER_TYPES.range,
+]);
 
 export type {
-  FilterType,
-  FilterLevels,
-  FilterMin,
-  FilterMax,
-  FilterRange,
   Filter,
+  FilterFunc,
   FilterIdentity,
-  Filters,
-  FiltersSet,
+  FilterLevels,
+  FilterMax,
+  FilterMin,
+  FilterRange,
+  FilterSet,
+  FilterType,
 };
 
-export {
-  FILTER_TYPES,
-  isFilterLevels,
-  isFilterMin,
-  isFilterMax,
-  isFilterRange,
-};
+export { FILTER_TYPES, VALID_NUMERIC_FILTER_SET, VALID_NATURAL_FILTER_SET };
