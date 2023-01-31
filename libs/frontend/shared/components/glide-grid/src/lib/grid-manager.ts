@@ -1,5 +1,5 @@
 import { ColumnsManager } from './columns-manager';
-import type { Cell, IdRow, WrappedGridColumn } from './types/grid';
+import type { IdRow, WrappedGridColumn } from './types/grid';
 import type { StringKeys } from './types/general';
 import { CellCache } from './cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
@@ -25,7 +25,7 @@ const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
 
 class GridManager<T> {
   private readonly columnsManager: ColumnsManager<T>;
-  private readonly cellCache: CellCache<T> = new CellCache<T>();
+  private readonly cellCache: CellCache<T>;
 
   private readonly sortStateMachine: SortStateMachine<T> =
     new SortStateMachine<T>();
@@ -41,6 +41,7 @@ class GridManager<T> {
     filterSet = [],
   }: GridManagerProps<T>) {
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
+    this.cellCache = new CellCache<T>(this.columnsManager);
     this.sorter = new TableSorter({
       sortMap: new SortMap({ columns }),
     });
@@ -78,7 +79,7 @@ class GridManager<T> {
   addData(data: T[]) {
     const rows = this.processRows(data);
     this.sorter.addData(rows);
-    this.addDataToCache(rows);
+    this.cellCache.addData(rows);
   }
 
   private processRows(rows: T[]) {
@@ -90,34 +91,13 @@ class GridManager<T> {
     return rows as IdRow<T>[];
   }
 
-  private genCell(item: IdRow<T>, colUuid: string): Cell<T> {
-    const { data, displayData, ...rest } = this.columnsManager.getCell(colUuid);
-    return {
-      ...rest,
-      data: item[data],
-      displayData: item[displayData],
-    } as Cell<T>;
-  }
-
-  private addDataToCache(data: IdRow<T>[]) {
-    for (let row = 0; row < data.length; row++) {
-      const item = data[row];
-      const { rowUuid } = item;
-      for (const columnUuid of this.columnsManager.columnsUuids) {
-        const cell = this.genCell(item, columnUuid);
-        this.cellCache.set(rowUuid, columnUuid, cell);
-      }
-    }
-  }
-
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
     this.columnsManager.setHiddenColumns(hiddenColumns);
   }
 
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.sorter.sorted[row];
-    const translatedCol = this.columnsManager.getTranslation(col);
-    return this.cellCache.get(rowUuid, translatedCol) as GridCell;
+    return this.cellCache.get(rowUuid, col) as GridCell;
   }
 
   getColumns() {

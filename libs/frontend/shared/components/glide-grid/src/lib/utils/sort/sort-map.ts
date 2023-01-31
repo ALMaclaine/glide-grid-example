@@ -16,7 +16,6 @@ class SortMap<T> {
       ])
     );
   }
-
   getType(key: StringKeys<T>) {
     return this.sortMap.get(key) || SORT_TYPES.natural;
   }
