@@ -1,6 +1,6 @@
 import type { StringKeys } from './types/general';
 import type { WrappedGridColumn } from './types/grid';
-import { MiniCache } from './utils/mini-cache';
+import { MiniCache } from './utils/caches/mini-cache';
 
 type ColumnsProps<T> = {
   columns: WrappedGridColumn<T>[];

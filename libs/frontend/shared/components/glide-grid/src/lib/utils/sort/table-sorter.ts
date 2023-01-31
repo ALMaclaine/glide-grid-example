@@ -3,7 +3,7 @@ import type { IdRow } from '../../types/grid';
 import type { StateSet } from './sort-state-machine';
 import { SortMap } from './sort-map';
 import { objectSort } from './object-sort';
-import { MiniCache } from '../mini-cache';
+import { MiniCache } from '../caches/mini-cache';
 import { SortStateMachine } from './sort-state-machine';
 import { STATE_HISTORY_STEPS } from '../../constants';
 

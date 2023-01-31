@@ -1,6 +1,6 @@
-import type { Cell } from './types/grid';
-import { ColumnsManager } from './columns-manager';
-import { IdRow } from './types/grid';
+import type { Cell } from '../../types/grid';
+import { ColumnsManager } from '../../columns-manager';
+import { IdRow } from '../../types/grid';
 
 class CellCache<T> {
   private cachedContent: Map<string, Map<string, Cell<T>>> = new Map();

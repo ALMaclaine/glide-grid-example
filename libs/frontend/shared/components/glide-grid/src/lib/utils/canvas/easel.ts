@@ -1,5 +1,5 @@
 import { Position } from './utils';
-import { MiniCache } from '../mini-cache';
+import { MiniCache } from '../caches/mini-cache';
 
 type Context2dProcessor = (ctx: OffscreenCanvasRenderingContext2D) => void;
 

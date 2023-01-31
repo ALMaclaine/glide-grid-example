@@ -1,15 +1,16 @@
 import { ColumnsManager } from './columns-manager';
 import type { IdRow, WrappedGridColumn } from './types/grid';
 import type { StringKeys } from './types/general';
-import { CellCache } from './cell-cache';
+import { CellCache } from './utils/caches/cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
 import { TableSorter } from './utils/sort/table-sorter';
 import { uuid } from './utils/general';
 import { Levels } from './levels';
-import { MiniCache } from './utils/mini-cache';
+import { MiniCache } from './utils/caches/mini-cache';
 import type { FilterSet } from './utils/filters/types';
 import { SortMap } from './utils/sort/sort-map';
 import { FilterManager } from './utils/filters/filter-manager';
+import { RowCache } from './utils/caches/row-cache';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -30,6 +31,7 @@ class GridManager<T> {
   private readonly levels: Levels<T>;
   private filterSet: FilterSet<T>[];
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
+  private readonly rowCache = new RowCache();
 
   constructor({
     columns,
@@ -66,10 +68,10 @@ class GridManager<T> {
     this.cellCache.addData(rows);
   }
 
+  // TODO: ADD ROW CACHE BACK
   private processRows(rows: T[]) {
     for (const row of rows) {
-      const changeType = row as IdRow<T>;
-      changeType.rowUuid = uuid();
+      this.rowCache.addRow(row);
       this.levels.processItem(row);
     }
     return rows as IdRow<T>[];
@@ -112,6 +114,7 @@ class GridManager<T> {
     this.cellCache.clear();
     this.sorter.clear();
     this.filteredCache.dirty();
+    this.rowCache.clear();
   }
 
   nextSortKey(key: StringKeys<T>) {
