@@ -128,9 +128,10 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
         </select>
         <input
           value={gridManager.pageSize === 0 ? '' : gridManager.pageSize}
+          type="number"
+          min={1}
           onChange={(e) => {
-            const value = e.target.value || '0';
-            gridManager.setPageSize(parseInt(value));
+            gridManager.setPageSize(parseInt(e.target.value));
             refresh();
           }}
         />

@@ -88,10 +88,16 @@ class GridManager<T> {
 
   itemToCell([col, row]: Item): GridCell {
     const data = this.pageManager.getData();
-    console.log(col, row, data);
-    console.log(this.pageManager.length);
     const { rowUuid } = data[row];
     return this.cellCache.get(rowUuid, col) as GridCell;
+  }
+
+  get length() {
+    return this.pageManager.length;
+  }
+
+  getData() {
+    return this.pageManager.getData();
   }
 
   getColumns() {
@@ -124,10 +130,6 @@ class GridManager<T> {
 
   setPageSize(pageSize: number | undefined) {
     this.pageManager.setPageSize(pageSize);
-  }
-
-  get length() {
-    return this.pageManager.length;
   }
 
   getSortHistory(steps: number) {

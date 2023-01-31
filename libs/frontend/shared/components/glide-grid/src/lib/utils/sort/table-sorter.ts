@@ -31,8 +31,13 @@ class TableSorter<T> {
     this.sortCache.dirty();
   }
 
+  get isClean() {
+    return this.sortCache.isClean;
+  }
+
   addData(data: IdRow<T>[]) {
-    this.sort([...this.sorted, ...data]);
+    const toAdd = this.isClean ? this.sorted : [];
+    this.sort([...toAdd, ...data]);
   }
 
   get sorted() {

@@ -1,4 +1,5 @@
 import { IdRow } from '../../types/grid';
+import { MiniCache } from '../caches/mini-cache';
 
 type PageManagerProps = {
   pageSize?: number;
@@ -7,10 +8,11 @@ type PageManagerProps = {
 class PageManager<T> {
   private _pageSize?: number;
   private data: IdRow<T>[] = [];
-  private windowedData: IdRow<T>[] = [];
+  private windowedDataCache = new MiniCache<IdRow<T>[]>();
   private page = 0;
   constructor({ pageSize }: PageManagerProps = {}) {
     this._pageSize = pageSize;
+    this.windowedDataCache.cache([]);
   }
 
   setData(data: IdRow<T>[]) {
@@ -21,13 +23,11 @@ class PageManager<T> {
   clear() {
     this.setData([]);
     this.setPage(0);
+    this.windowedDataCache.dirty();
   }
 
   get length(): number {
-    if (!this._pageSize) {
-      return this.data.length;
-    }
-    return this.windowedData.length;
+    return this.windowedDataCache.getCache().length;
   }
 
   get pageSize() {
@@ -49,19 +49,23 @@ class PageManager<T> {
     this.page = page;
   }
 
-  setPageSize(pageSize: number | undefined) {
+  setPageSize(pageSize?: number) {
     this._pageSize = pageSize;
   }
 
-  getData() {
+  private calculateWindow() {
     if (!this._pageSize) {
-      return this.data;
+      return this.windowedDataCache.cache(this.data);
     }
-    this.windowedData = this.data.slice(
+    const windowedData = this.data.slice(
       this.page * this._pageSize,
       (this.page + 1) * this._pageSize
     );
-    return this.windowedData;
+    return this.windowedDataCache.cache(windowedData);
+  }
+
+  getData() {
+    return this.calculateWindow();
   }
 }
 
