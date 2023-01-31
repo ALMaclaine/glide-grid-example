@@ -3,10 +3,7 @@ import type { IdRow, WrappedGridColumn } from './types/grid';
 import type { StringKeys } from './types/general';
 import { CellCache } from './cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
-import { SortMap } from './utils/sort/sort-map';
 import { TableSorter } from './utils/sort/table-sorter';
-import { SortStateMachine } from './utils/sort/sort-state-machine';
-import { STATE_HISTORY_STEPS } from './constants';
 import { uuid } from './utils/general';
 import { Levels } from './levels';
 import { Filters, FilterSet } from './utils/filters';
@@ -27,8 +24,6 @@ class GridManager<T> {
   private readonly columnsManager: ColumnsManager<T>;
   private readonly cellCache: CellCache<T>;
 
-  private readonly sortStateMachine: SortStateMachine<T> =
-    new SortStateMachine<T>();
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
   private filterSet: FilterSet<T>;
@@ -42,9 +37,7 @@ class GridManager<T> {
   }: GridManagerProps<T>) {
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.cellCache = new CellCache<T>(this.columnsManager);
-    this.sorter = new TableSorter({
-      sortMap: new SortMap({ columns }),
-    });
+    this.sorter = new TableSorter({ columns });
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
     this.filteredCache.cache([]);
@@ -121,7 +114,7 @@ class GridManager<T> {
   }
 
   getSortHistory(steps: number) {
-    return this.sortStateMachine.getHistory(steps);
+    return this.sorter.getSortHistory(steps);
   }
 
   clearData() {
@@ -131,12 +124,8 @@ class GridManager<T> {
   }
 
   nextSortKey(key: StringKeys<T>) {
-    const stateHistory = this.sortStateMachine.nextValue(
-      key,
-      STATE_HISTORY_STEPS
-    );
     this.filtered();
-    return this.sorter.stateSort(stateHistory);
+    return this.sorter.stateSort(key);
   }
 }
 

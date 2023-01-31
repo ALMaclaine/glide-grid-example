@@ -1,22 +1,30 @@
 import type { StringKeys } from '../../types/general';
-import type { IdRow } from '../../types/grid';
+import type { IdRow, WrappedGridColumn } from '../../types/grid';
 import type { StateSet } from './sort-state-machine';
-import type { SortMap } from './sort-map';
+import { SortMap } from './sort-map';
 import { objectSort, SORT_TYPES } from './object-sort';
 import { MiniCache } from '../mini-cache';
+import { SortStateMachine } from './sort-state-machine';
+import { STATE_HISTORY_STEPS } from '../../constants';
 
 type TableSorterProps<T> = {
-  sortMap: SortMap<T>;
+  columns: WrappedGridColumn<T>[];
 };
 
 class TableSorter<T> {
   private readonly sortMap: SortMap<T>;
   private stateHistory: StateSet<T>[] = [];
   private readonly sortCache = new MiniCache<IdRow<T>[]>();
+  private readonly sortStateMachine: SortStateMachine<T> =
+    new SortStateMachine<T>();
 
-  constructor({ sortMap }: TableSorterProps<T>) {
-    this.sortMap = sortMap;
+  constructor({ columns }: TableSorterProps<T>) {
+    this.sortMap = new SortMap({ columns });
     this.sortCache.cache([]);
+  }
+
+  getSortHistory(steps: number) {
+    return this.sortStateMachine.getHistory(steps);
   }
 
   clear() {
@@ -51,8 +59,11 @@ class TableSorter<T> {
     return this.sortCache.cache(sorted);
   }
 
-  stateSort(stateHistory: StateSet<T>[]) {
-    this.stateHistory = stateHistory;
+  stateSort(key: StringKeys<T>) {
+    this.stateHistory = this.sortStateMachine.nextValue(
+      key,
+      STATE_HISTORY_STEPS
+    );
     return this.sort(this.sorted);
   }
 }
