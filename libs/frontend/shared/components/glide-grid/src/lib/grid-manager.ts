@@ -30,8 +30,6 @@ class GridManager<T> {
   private readonly sortStateMachine: SortStateMachine<T> =
     new SortStateMachine<T>();
   private readonly sorter: TableSorter<T>;
-  private readonly columnUuids: string[];
-  private readonly columnNames: Record<string, StringKeys<T>> = {};
   private readonly levels: Levels<T>;
   private filterSet: FilterSet<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
@@ -42,8 +40,6 @@ class GridManager<T> {
     hiddenColumns,
     filterSet = [],
   }: GridManagerProps<T>) {
-    columns.forEach(({ title, id }) => (this.columnNames[title] = id));
-    this.columnUuids = columns.map(({ columnUuid }) => columnUuid);
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.sorter = new TableSorter({
       sortMap: new SortMap({ columns }),
@@ -107,7 +103,7 @@ class GridManager<T> {
     for (let row = 0; row < data.length; row++) {
       const item = data[row];
       const { rowUuid } = item;
-      for (const columnUuid of this.columnUuids) {
+      for (const columnUuid of this.columnsManager.columnsUuids) {
         const cell = this.genCell(item, columnUuid);
         this.cellCache.set(rowUuid, columnUuid, cell);
       }
@@ -128,8 +124,8 @@ class GridManager<T> {
     return this.columnsManager.getColumns();
   }
 
-  getColumnNames() {
-    return this.columnNames;
+  get columnTitleIdMap() {
+    return this.columnsManager.columnTitleIdMap;
   }
 
   swap(col1: number, col2: number) {

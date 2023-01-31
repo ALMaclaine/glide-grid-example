@@ -99,7 +99,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           ))}
         </select>
         <div>
-          {Object.entries(gridManager.getColumnNames()).map(([key, value]) => (
+          {Object.entries(gridManager.columnTitleIdMap).map(([key, value]) => (
             <Fragment key={key}>
               <label>{key}</label>
               <input

@@ -172,17 +172,30 @@ class HiddenColumnTranslator<T> {
 class ColumnsManager<T> {
   private readonly sortTranslator = new SortTranslator<T>();
   private readonly hiddenTranslator;
+  private readonly _columnTitleIdMap: Record<string, StringKeys<T>> = {};
+  private readonly _columnsUuids: string[] = [];
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
     this.hiddenTranslator = new HiddenColumnTranslator({
       columns,
       hiddenColumns,
     });
+
     for (const column of columns) {
-      const { columnUuid, id } = column;
+      const { columnUuid, id, title } = column;
+      this._columnsUuids.push(columnUuid);
+      this._columnTitleIdMap[title] = id;
       this.hiddenTranslator.setColumn(columnUuid, column);
       this.sortTranslator.addUuid(columnUuid, id);
     }
+  }
+
+  get columnTitleIdMap() {
+    return this._columnTitleIdMap;
+  }
+
+  get columnsUuids() {
+    return this._columnsUuids;
   }
 
   setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
