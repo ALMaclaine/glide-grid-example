@@ -41,7 +41,7 @@ class GridManager<T> {
     pageSize,
     filterSet = [],
   }: GridManagerProps<T>) {
-    this.pageManager = new PageManager({ pageSize });
+    this.pageManager = new PageManager<T>({ pageSize });
     const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.cellCache = new CellCache<T>(this.columnsManager);
@@ -96,10 +96,6 @@ class GridManager<T> {
     return this.pageManager.length;
   }
 
-  getData() {
-    return this.pageManager.getData();
-  }
-
   getColumns() {
     return this.columnsManager.getColumns();
   }
@@ -118,6 +114,10 @@ class GridManager<T> {
 
   setPage(page = 0) {
     this.pageManager.setPage(page);
+  }
+
+  get page() {
+    return this.pageManager.page;
   }
 
   get pageSize() {

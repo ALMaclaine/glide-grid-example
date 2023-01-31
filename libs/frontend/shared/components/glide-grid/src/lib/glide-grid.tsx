@@ -127,7 +127,7 @@ function GlideGrid<T>({
         theme={theme}
         onItemHovered={_onItemHovered}
         getRowThemeOverride={_getRowThemeOverride}
-        rows={gridManager.getData().length}
+        rows={gridManager.length}
       />
     </div>
   );

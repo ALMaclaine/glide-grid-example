@@ -9,7 +9,7 @@ class PageManager<T> {
   private _pageSize?: number;
   private data: IdRow<T>[] = [];
   private windowedDataCache = new MiniCache<IdRow<T>[]>();
-  private page = 0;
+  private _page = 0;
   constructor({ pageSize }: PageManagerProps = {}) {
     this._pageSize = pageSize;
     this.windowedDataCache.cache([]);
@@ -24,6 +24,10 @@ class PageManager<T> {
     this.setData([]);
     this.setPage(0);
     this.windowedDataCache.dirty();
+  }
+
+  get page() {
+    return this._page;
   }
 
   get length(): number {
@@ -46,21 +50,30 @@ class PageManager<T> {
     if (page < 0) {
       return;
     }
-    this.page = page;
+    this._page = page;
+    this.calculateWindow();
   }
 
-  setPageSize(pageSize?: number) {
+  setPageSize(pageSize = 1) {
+    if (pageSize > this.data.length) {
+      return;
+    }
     this._pageSize = pageSize;
+    this.setPage(0);
   }
 
   private calculateWindow() {
     if (!this._pageSize) {
       return this.windowedDataCache.cache(this.data);
     }
-    const windowedData = this.data.slice(
-      this.page * this._pageSize,
-      (this.page + 1) * this._pageSize
-    );
+    const windowedData = [];
+    const start = this._page * this._pageSize;
+    const end = Math.min(this.data.length, (this._page + 1) * this._pageSize);
+    for (let i = start; i < end; i++) {
+      if (this.data[i]) {
+        windowedData.push(this.data[i]);
+      }
+    }
     return this.windowedDataCache.cache(windowedData);
   }
 

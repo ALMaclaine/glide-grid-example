@@ -118,7 +118,9 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           onChange={(e) => {
             gridManager.setPage(parseInt(e.target.value));
             refresh();
+            console.log(gridManager.page);
           }}
+          value={gridManager.page}
         >
           {Array(gridManager.pageCount || 1)
             .fill(0)
@@ -131,7 +133,8 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           type="number"
           min={1}
           onChange={(e) => {
-            gridManager.setPageSize(parseInt(e.target.value));
+            const num = e.target.value === '' ? 0 : parseInt(e.target.value);
+            gridManager.setPageSize(num);
             refresh();
           }}
         />
