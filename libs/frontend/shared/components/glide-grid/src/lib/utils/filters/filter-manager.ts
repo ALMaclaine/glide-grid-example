@@ -1,28 +1,85 @@
 import type { SortMap } from '../sort/sort-map';
-import {
-  Filter,
-  FILTER_TYPES,
-  FilterFunc,
-  FilterSet,
-  VALID_NATURAL_FILTER_SET,
-  VALID_NUMERIC_FILTER_SET,
-} from './types';
+import type { Filter, FilterFunc, FilterSet } from './types';
 import { StringKeys } from '../../types/general';
 import { SORT_TYPES, SortTypes } from '../sort/object-sort';
 import { generateFilter, genereateRowAccessor } from './filters';
+import {
+  FILTER_TYPES,
+  VALID_NATURAL_FILTER_SET,
+  VALID_NUMERIC_FILTER_SET,
+} from './types';
+import { IdRow } from '../../types/grid';
 
 type FilterManagerProps<T> = {
   sortMap: SortMap<T>;
   filters?: FilterSet<T>[];
+  searchTerms?: string[];
 };
 
 class FilterManager<T> {
   private readonly sortMap: SortMap<T>;
-  filterGroup: FilterFunc<T>[] = [];
+  filterGroups: FilterFunc<T>[][] = [];
+  private searchTerms: string[] = [];
 
-  constructor({ sortMap, filters = [] }: FilterManagerProps<T>) {
+  constructor({
+    sortMap,
+    filters = [],
+    searchTerms = [],
+  }: FilterManagerProps<T>) {
     this.sortMap = sortMap;
-    filters.map((filter) => this.createFilterGroup(filter));
+    this.filterGroups = filters.map((filter) => this.createFilterGroup(filter));
+    this.searchTerms = searchTerms;
+  }
+
+  setFilterGroups(filters: FilterSet<T>[]) {
+    this.filterGroups = filters.map((filter) => this.createFilterGroup(filter));
+  }
+
+  setSearchTerms(terms: string[]) {
+    this.searchTerms = terms;
+  }
+
+  testItem(item: IdRow<T>) {
+    for (const filterGroup of this.filterGroups) {
+      const filterTest = this.testFilterGroup(filterGroup, item);
+      if (filterTest && this.testSearchTerms(item)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // TODO: ignore numeric fields
+  private testSearchTerm(key: StringKeys<T>, item: IdRow<T>) {
+    for (const term of this.searchTerms) {
+      const toSearch = `${item[key as StringKeys<T>]}`;
+      if (toSearch.toLowerCase().includes(term.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private testSearchTerms(item: IdRow<T>) {
+    if (this.searchTerms.length === 0) {
+      return true;
+    }
+    const keys = Object.keys(item) as StringKeys<T>[];
+    for (const key of keys) {
+      if (this.testSearchTerm(key, item)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private testFilterGroup(filterGroup: FilterFunc<T>[], item: T) {
+    for (const filter of filterGroup) {
+      if (!filter(item)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private createFilterGroup(filterSet: FilterSet<T>) {
@@ -40,7 +97,7 @@ class FilterManager<T> {
         genereateRowAccessor(filterKey, generateFilter(keyFilter))
       );
     }
-    this.filterGroup = filterGroup;
+    return filterGroup;
   }
 
   private validateFilter(filter: Filter, sortType: SortTypes) {

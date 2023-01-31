@@ -18,6 +18,7 @@ type GridManagerProps<T> = {
   pageSize?: number;
   hiddenColumns?: StringKeys<T>[];
   filterSet?: FilterSet<T>[];
+  searchTerms?: string[];
 };
 
 const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
@@ -30,14 +31,17 @@ class GridManager<T> {
 
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
+  private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly pageManager;
 
+  private filterManager: FilterManager<T>;
   constructor({
     columns,
     data,
     hiddenColumns,
     pageSize,
     filterSet = [],
+    searchTerms = [],
   }: GridManagerProps<T>) {
     this.pageManager = new PageManager<T>({ pageSize });
     const sortMap = new SortMap({ columns });
@@ -46,11 +50,22 @@ class GridManager<T> {
     this.sorter = new TableSorter({ sortMap });
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
-    const filterManager = new FilterManager({ filters: filterSet, sortMap });
+    this.filteredCache.cache([]);
+    this.filterManager = new FilterManager({
+      filters: filterSet,
+      sortMap,
+      searchTerms,
+    });
   }
 
   setFilterSet(filterSet: FilterSet<T>[]) {
-    // this.filterSet = filterSet;
+    this.filterManager.setFilterGroups(filterSet);
+    this.filterSorted();
+  }
+
+  setSearchTerms(terms: string[]) {
+    this.filterManager.setSearchTerms(terms);
+    this.filterSorted();
   }
 
   toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
@@ -132,13 +147,20 @@ class GridManager<T> {
 
   clearData() {
     this.sorter.clear();
+    this.filteredCache.dirty();
     this.pageManager.clear();
     this.cellCache.clear();
   }
 
+  private filterSorted() {
+    const sorted = this.sorter.sorted;
+    const filtered = sorted.filter((item) => this.filterManager.testItem(item));
+    this.pageManager.setData(filtered);
+  }
+
   nextSortKey(key?: StringKeys<T>) {
-    const sorted = this.sorter.stateSort(key);
-    this.pageManager.setData(sorted);
+    this.sorter.stateSort(key);
+    this.filterSorted();
   }
 }
 

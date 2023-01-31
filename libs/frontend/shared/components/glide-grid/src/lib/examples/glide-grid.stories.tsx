@@ -30,14 +30,21 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
         data: [],
-        pageSize: 5,
+        searchTerms: ['gateway', 'drive', 'vista'],
         filterSet: [
           {
-            address: { type: 'levels', levels: ['level1', 'level2', 'level3'] },
+            address: { type: 'identity' },
             investor: { type: 'identity' },
             property: { type: 'identity' },
             rentOwed: { type: 'min', min: 1000 },
-            units: { type: 'range', min: 2, max: 4 },
+            units: { type: 'range', min: 3, max: 4 },
+          },
+          {
+            address: { type: 'identity' },
+            investor: { type: 'identity' },
+            property: { type: 'identity' },
+            rentOwed: { type: 'max', max: 1000 },
+            units: { type: 'range', min: 1, max: 2 },
           },
         ],
         // hiddenColumns: ['investor', 'address'],
@@ -125,7 +132,9 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           {Array(gridManager.pageCount || 1)
             .fill(0)
             .map((_, i) => (
-              <option value={i}>{i + 1}</option>
+              <option key={i} value={i}>
+                {i + 1}
+              </option>
             ))}
         </select>
         <input

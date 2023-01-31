@@ -35,14 +35,14 @@ class PageManager<T> {
   }
 
   get pageSize() {
-    return this._pageSize ?? this.data.length;
+    return this._pageSize ?? 0;
   }
 
   get pageCount() {
     if (this._pageSize) {
       return Math.ceil(this.data.length / this._pageSize);
     } else {
-      return this.data.length;
+      return 1;
     }
   }
 
