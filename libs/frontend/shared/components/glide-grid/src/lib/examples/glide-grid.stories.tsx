@@ -1,9 +1,9 @@
 import { ComponentStory, Meta } from '@storybook/react';
-import { GlideGrid, GlideGridProps } from '../glide-grid';
+import { GlideGrid } from '../glide-grid';
 import { GridManager } from '../grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
-import { asyncGenerate, generate } from './utils';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { asyncGenerate } from './utils';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { StringKeys } from '../types/general';
 
 export default {
@@ -30,6 +30,15 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
         data: [],
+        filterSet: [
+          {
+            address: { type: 'levels', levels: ['level1', 'level2', 'level3'] },
+            investor: { type: 'identity' },
+            property: { type: 'identity' },
+            rentOwed: { type: 'min', min: 1000 },
+            units: { type: 'range', min: 2, max: 4 },
+          },
+        ],
         // hiddenColumns: ['investor', 'address'],
       }),
     []
@@ -54,7 +63,6 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
   const updateData = async () => {
     setState('loading');
     const data = await asyncGenerate(10, genProperty, Math.random() * 500);
-    console.log('???');
     const companyData = dataManager.get(company)!;
     const newData = [...companyData, ...data];
     gridManager.addData(data);

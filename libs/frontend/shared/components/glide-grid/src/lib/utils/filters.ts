@@ -1,10 +1,11 @@
-import { ObjectValues, StringKeys } from '../types/general';
+import type { ObjectValues, StringKeys } from '../types/general';
 
 const FILTER_TYPES = {
   levels: 'levels',
   min: 'min',
   max: 'max',
   range: 'range',
+  identity: 'identity',
 } as const;
 
 type FilterType = ObjectValues<typeof FILTER_TYPES>;
@@ -30,7 +31,14 @@ type RangeFilter = FilterBase<'range'> & {
   max: number;
 };
 
-type Filter = LevelsFilter | MinFilter | MaxFilter | RangeFilter;
+type IdentityFilter = FilterBase<'identity'>;
+
+type Filter =
+  | LevelsFilter
+  | MinFilter
+  | MaxFilter
+  | RangeFilter
+  | IdentityFilter;
 
 const levelsFilter = (value: string, levels: string[]) =>
   levels.includes(value);

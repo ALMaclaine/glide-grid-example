@@ -1,6 +1,6 @@
 import { ColumnsManager } from './columns-manager';
 import type { Cell, IdRow, WrappedGridColumn } from './types/grid';
-import type { ObjectValues, StringKeys } from './types/general';
+import type { StringKeys } from './types/general';
 import { CellCache } from './cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
 import { SortMap } from './utils/sort/sort-map';
@@ -9,12 +9,16 @@ import { SortStateMachine } from './utils/sort/sort-state-machine';
 import { STATE_HISTORY_STEPS } from './constants';
 import { uuid } from './utils/general';
 import { Levels } from './levels';
+import { Filters, FilterSet } from './utils/filters';
+import { MiniCache } from './utils/mini-cache';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
   data: T[];
   hiddenColumns?: StringKeys<T>[];
+  filterSet?: FilterSet<T>;
 };
+
 const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
   return columns.filter((e) => e.cell.kind !== 'number').map(({ id }) => id);
 };
@@ -29,8 +33,15 @@ class GridManager<T> {
   private readonly columnUuids: string[];
   private readonly columnNames: Record<string, StringKeys<T>> = {};
   private readonly levels: Levels<T>;
+  private filterSet: FilterSet<T>;
+  private readonly filteredCache = new MiniCache<IdRow<T>[]>();
 
-  constructor({ columns, data, hiddenColumns }: GridManagerProps<T>) {
+  constructor({
+    columns,
+    data,
+    hiddenColumns,
+    filterSet = [],
+  }: GridManagerProps<T>) {
     columns.forEach(({ title, id }) => (this.columnNames[title] = id));
     this.columnUuids = columns.map(({ columnUuid }) => columnUuid);
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
@@ -39,6 +50,25 @@ class GridManager<T> {
     });
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
+    this.filteredCache.cache([]);
+    this.filterSet = filterSet;
+  }
+
+  setFilterSet(filterSet: FilterSet<T>) {
+    this.filterSet = filterSet;
+  }
+
+  private filterer(filters: Filters<T>) {
+    const keys = Object.keys(filters);
+    for (const key of keys) {
+      console.log(key);
+    }
+  }
+
+  private filtered() {
+    for (const filters of this.filterSet) {
+      this.filterer(filters);
+    }
   }
 
   toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
@@ -121,6 +151,7 @@ class GridManager<T> {
   clearData() {
     this.cellCache.clear();
     this.sorter.clear();
+    this.filteredCache.dirty();
   }
 
   nextSortKey(key: StringKeys<T>) {
@@ -128,6 +159,7 @@ class GridManager<T> {
       key,
       STATE_HISTORY_STEPS
     );
+    this.filtered();
     return this.sorter.stateSort(stateHistory);
   }
 }

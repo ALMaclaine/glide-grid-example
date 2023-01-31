@@ -86,7 +86,7 @@ class SortTranslator<T> {
 class HiddenColumnTranslator<T> {
   private readonly hiddenTranslatorMap = new Map<number, number>();
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
-  private columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
+  private readonly columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
   private readonly columnIsShowing = new Map<StringKeys<T>, boolean>();
 
   constructor({ columns, hiddenColumns = [] }: ColumnsProps<T>) {
