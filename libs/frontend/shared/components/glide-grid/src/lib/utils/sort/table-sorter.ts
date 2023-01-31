@@ -55,7 +55,10 @@ class TableSorter<T> {
     return this.sortCache.cache(sorted);
   }
 
-  stateSort(key: StringKeys<T>) {
+  stateSort(key?: StringKeys<T>) {
+    if (key === undefined) {
+      return this.sort(this.sorted);
+    }
     this.stateHistory = this.sortStateMachine.nextValue(
       key,
       STATE_HISTORY_STEPS

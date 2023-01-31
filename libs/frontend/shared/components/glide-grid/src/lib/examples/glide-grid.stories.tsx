@@ -1,10 +1,10 @@
 import { ComponentStory, Meta } from '@storybook/react';
 import { GlideGrid } from '../glide-grid';
-import { GridManager } from '../grid-manager';
+import { GridManager } from '../utils/managers/grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
 import { Fragment, useCallback, useMemo, useState } from 'react';
-import { StringKeys } from '../types/general';
+import type { StringKeys } from '../types/general';
 
 export default {
   title: 'GlideGrid/PropertiesPage',
@@ -30,6 +30,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
         data: [],
+        pageSize: 5,
         filterSet: [
           {
             address: { type: 'levels', levels: ['level1', 'level2', 'level3'] },
@@ -111,8 +112,28 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           ))}
         </div>
         <button onClick={() => updateData()}>Add Data</button>
-        <div>Count: {gridManager.length}</div>
         <div>State: {state}</div>
+        <div>Page Count: {gridManager.pageCount}</div>
+        <select
+          onChange={(e) => {
+            gridManager.setPage(parseInt(e.target.value));
+            refresh();
+          }}
+        >
+          {Array(gridManager.pageCount || 1)
+            .fill(0)
+            .map((_, i) => (
+              <option value={i}>{i + 1}</option>
+            ))}
+        </select>
+        <input
+          value={gridManager.pageSize === 0 ? '' : gridManager.pageSize}
+          onChange={(e) => {
+            const value = e.target.value || '0';
+            gridManager.setPageSize(parseInt(value));
+            refresh();
+          }}
+        />
         <GlideGrid gridManager={gridManager} />
       </div>
     </div>

@@ -1,19 +1,21 @@
 import { ColumnsManager } from './columns-manager';
-import type { IdRow, WrappedGridColumn } from './types/grid';
-import type { StringKeys } from './types/general';
-import { CellCache } from './utils/caches/cell-cache';
+import type { IdRow, WrappedGridColumn } from '../../types/grid';
+import type { StringKeys } from '../../types/general';
+import { CellCache } from '../caches/cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
-import { TableSorter } from './utils/sort/table-sorter';
-import { uuid } from './utils/general';
-import { Levels } from './levels';
-import { MiniCache } from './utils/caches/mini-cache';
-import type { FilterSet } from './utils/filters/types';
-import { SortMap } from './utils/sort/sort-map';
-import { FilterManager } from './utils/filters/filter-manager';
+import { TableSorter } from '../sort/table-sorter';
+import { uuid } from '../general';
+import { Levels } from '../../levels';
+import { MiniCache } from '../caches/mini-cache';
+import type { FilterSet } from '../filters/types';
+import { SortMap } from '../sort/sort-map';
+import { FilterManager } from '../filters/filter-manager';
+import { PageManager } from './page-manager';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
   data: T[];
+  pageSize?: number;
   hiddenColumns?: StringKeys<T>[];
   filterSet?: FilterSet<T>[];
 };
@@ -30,13 +32,16 @@ class GridManager<T> {
   private readonly levels: Levels<T>;
   private filterSet: FilterSet<T>[];
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
+  private readonly pageManager;
 
   constructor({
     columns,
     data,
     hiddenColumns,
+    pageSize,
     filterSet = [],
   }: GridManagerProps<T>) {
+    this.pageManager = new PageManager({ pageSize });
     const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.cellCache = new CellCache<T>(this.columnsManager);
@@ -64,6 +69,7 @@ class GridManager<T> {
     const rows = this.processRows(data);
     this.sorter.addData(rows);
     this.cellCache.addData(rows);
+    this.nextSortKey();
   }
 
   // TODO: ADD ROW CACHE BACK
@@ -81,7 +87,10 @@ class GridManager<T> {
   }
 
   itemToCell([col, row]: Item): GridCell {
-    const { rowUuid } = this.sorter.sorted[row];
+    const data = this.pageManager.getData();
+    console.log(col, row, data);
+    console.log(this.pageManager.length);
+    const { rowUuid } = data[row];
     return this.cellCache.get(rowUuid, col) as GridCell;
   }
 
@@ -101,8 +110,24 @@ class GridManager<T> {
     return this.columnsManager.getHeaderKey(col);
   }
 
+  setPage(page = 0) {
+    this.pageManager.setPage(page);
+  }
+
+  get pageSize() {
+    return this.pageManager.pageSize;
+  }
+
+  get pageCount() {
+    return this.pageManager.pageCount;
+  }
+
+  setPageSize(pageSize: number | undefined) {
+    this.pageManager.setPageSize(pageSize);
+  }
+
   get length() {
-    return this.sorter.length;
+    return this.pageManager.length;
   }
 
   getSortHistory(steps: number) {
@@ -110,13 +135,15 @@ class GridManager<T> {
   }
 
   clearData() {
-    this.cellCache.clear();
     this.sorter.clear();
     this.filteredCache.dirty();
+    this.pageManager.clear();
+    this.cellCache.clear();
   }
 
-  nextSortKey(key: StringKeys<T>) {
-    return this.sorter.stateSort(key);
+  nextSortKey(key?: StringKeys<T>) {
+    const sorted = this.sorter.stateSort(key);
+    this.pageManager.setData(sorted);
   }
 }
 

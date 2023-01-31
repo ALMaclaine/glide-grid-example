@@ -1,5 +1,5 @@
 import type { Cell } from '../../types/grid';
-import { ColumnsManager } from '../../columns-manager';
+import { ColumnsManager } from '../managers/columns-manager';
 import { IdRow } from '../../types/grid';
 
 class CellCache<T> {
