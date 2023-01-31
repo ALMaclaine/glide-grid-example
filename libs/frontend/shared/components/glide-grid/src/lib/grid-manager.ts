@@ -10,7 +10,6 @@ import { MiniCache } from './utils/caches/mini-cache';
 import type { FilterSet } from './utils/filters/types';
 import { SortMap } from './utils/sort/sort-map';
 import { FilterManager } from './utils/filters/filter-manager';
-import { RowCache } from './utils/caches/row-cache';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -31,7 +30,6 @@ class GridManager<T> {
   private readonly levels: Levels<T>;
   private filterSet: FilterSet<T>[];
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
-  private readonly rowCache = new RowCache();
 
   constructor({
     columns,
@@ -71,7 +69,8 @@ class GridManager<T> {
   // TODO: ADD ROW CACHE BACK
   private processRows(rows: T[]) {
     for (const row of rows) {
-      this.rowCache.addRow(row);
+      const changeType = row as IdRow<T>;
+      changeType.rowUuid = uuid();
       this.levels.processItem(row);
     }
     return rows as IdRow<T>[];
@@ -114,7 +113,6 @@ class GridManager<T> {
     this.cellCache.clear();
     this.sorter.clear();
     this.filteredCache.dirty();
-    this.rowCache.clear();
   }
 
   nextSortKey(key: StringKeys<T>) {
