@@ -1,25 +1,25 @@
 import type { StringKeys } from '../../types/general';
-import type { IdRow, WrappedGridColumn } from '../../types/grid';
+import type { IdRow } from '../../types/grid';
 import type { StateSet } from './sort-state-machine';
 import { SortMap } from './sort-map';
-import { objectSort, SORT_TYPES } from './object-sort';
+import { objectSort } from './object-sort';
 import { MiniCache } from '../mini-cache';
 import { SortStateMachine } from './sort-state-machine';
 import { STATE_HISTORY_STEPS } from '../../constants';
 
 type TableSorterProps<T> = {
-  columns: WrappedGridColumn<T>[];
+  sortMap: SortMap<T>;
 };
 
 class TableSorter<T> {
-  private readonly sortMap: SortMap<T>;
   private stateHistory: StateSet<T>[] = [];
   private readonly sortCache = new MiniCache<IdRow<T>[]>();
   private readonly sortStateMachine: SortStateMachine<T> =
     new SortStateMachine<T>();
+  private readonly sortMap: SortMap<T>;
 
-  constructor({ columns }: TableSorterProps<T>) {
-    this.sortMap = new SortMap({ columns });
+  constructor({ sortMap }: TableSorterProps<T>) {
+    this.sortMap = sortMap;
     this.sortCache.cache([]);
   }
 
@@ -43,16 +43,12 @@ class TableSorter<T> {
     return this.sortCache.getCache().length;
   }
 
-  private getType(key: StringKeys<T> | '') {
-    return key === '' ? SORT_TYPES.natural : this.sortMap.getType(key);
-  }
-
   private sort(cache: IdRow<T>[]) {
     const sorted = objectSort(
       cache,
       this.stateHistory.map(({ state, key }) => ({
         state,
-        type: this.getType(key),
+        type: this.sortMap.getType(key),
         key,
       }))
     );

@@ -16,7 +16,10 @@ class SortMap<T> {
       ])
     );
   }
-  getType(key: StringKeys<T>) {
+  getType(key: StringKeys<T> | '') {
+    if (key === '') {
+      return SORT_TYPES.natural;
+    }
     return this.sortMap.get(key) || SORT_TYPES.natural;
   }
 }

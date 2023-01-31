@@ -8,6 +8,7 @@ import { uuid } from './utils/general';
 import { Levels } from './levels';
 import { MiniCache } from './utils/mini-cache';
 import type { Filters, FiltersSet } from './utils/filters/types';
+import { SortMap } from './utils/sort/sort-map';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
@@ -35,9 +36,10 @@ class GridManager<T> {
     hiddenColumns,
     filterSet = [],
   }: GridManagerProps<T>) {
+    const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.cellCache = new CellCache<T>(this.columnsManager);
-    this.sorter = new TableSorter({ columns });
+    this.sorter = new TableSorter({ sortMap });
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
     this.filteredCache.cache([]);
