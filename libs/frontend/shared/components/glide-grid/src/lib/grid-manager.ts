@@ -6,14 +6,14 @@ import type { GridCell, Item } from '@glideapps/glide-data-grid';
 import { TableSorter } from './utils/sort/table-sorter';
 import { uuid } from './utils/general';
 import { Levels } from './levels';
-import { Filters, FilterSet } from './utils/filters';
 import { MiniCache } from './utils/mini-cache';
+import type { Filters, FiltersSet } from './utils/filters/types';
 
 type GridManagerProps<T> = {
   columns: WrappedGridColumn<T>[];
   data: T[];
   hiddenColumns?: StringKeys<T>[];
-  filterSet?: FilterSet<T>;
+  filterSet?: FiltersSet<T>;
 };
 
 const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
@@ -26,7 +26,7 @@ class GridManager<T> {
 
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
-  private filterSet: FilterSet<T>;
+  private filterSet: FiltersSet<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
 
   constructor({
@@ -44,7 +44,7 @@ class GridManager<T> {
     this.filterSet = filterSet;
   }
 
-  setFilterSet(filterSet: FilterSet<T>) {
+  setFilterSet(filterSet: FiltersSet<T>) {
     this.filterSet = filterSet;
   }
 
