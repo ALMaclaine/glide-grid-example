@@ -11,9 +11,13 @@ import type { FilterSet } from '../filters/types';
 import { SortMap } from '../sort/sort-map';
 import { FilterManager } from '../filters/filter-manager';
 import { PageManager } from './page-manager';
+import {
+  generateWrappedColumn,
+  GenerateWrappedColumnProps,
+} from '../cells/generators';
 
 type GridManagerProps<T> = {
-  columns: WrappedGridColumn<T>[];
+  columns: GenerateWrappedColumnProps<T>[];
   data: T[];
   pageSize?: number;
   hiddenColumns?: StringKeys<T>[];
@@ -36,13 +40,14 @@ class GridManager<T> {
 
   private filterManager: FilterManager<T>;
   constructor({
-    columns,
+    columns: _columns,
     data,
     hiddenColumns,
     pageSize,
     filterSet = [],
     searchTerms = [],
   }: GridManagerProps<T>) {
+    const columns = _columns.map(generateWrappedColumn);
     this.pageManager = new PageManager<T>({ pageSize });
     const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });

@@ -1,6 +1,5 @@
-import { WrappedGridColumn } from '../../types/grid';
-import { uuid } from '../../utils/general';
 import {
+  GenerateWrappedColumnProps,
   genNumericCell,
   genTextCell,
   genUriCell,
@@ -15,51 +14,42 @@ interface Property {
   rentOwed: string;
 }
 
-const PROPERTY_COLUMNS: WrappedGridColumn<Property>[] = [
+const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
   {
     title: 'Property',
-    id: 'property',
     grow: 2,
-    columnUuid: uuid(),
-    cell: genUriCell({
-      data: 'property',
-      displayData: 'property',
-      cursor: 'pointer',
-      themeOverride: {
-        textDark: 'blue',
-        baseFontStyle: '12px underlined',
-      },
-    }),
+    cellGen: genUriCell,
+    data: 'property',
+    cursor: 'pointer',
+    themeOverride: {
+      textDark: 'blue',
+      baseFontStyle: '12px underlined',
+    },
   },
   {
     title: 'Address',
-    id: 'address',
     grow: 2,
-    columnUuid: uuid(),
-    cell: genTextCell({ data: 'address' }),
+    cellGen: genTextCell,
+    data: 'address',
   },
   {
     title: 'Investor',
-    id: 'investor',
     grow: 2,
-    columnUuid: uuid(),
-
-    cell: genTextCell({ data: 'investor' }),
+    cellGen: genTextCell,
+    data: 'investor',
   },
   {
     title: 'Units',
-    id: 'units',
     grow: 1,
-    columnUuid: uuid(),
-
-    cell: genNumericCell({ data: 'units' }),
+    cellGen: genNumericCell,
+    data: 'units',
   },
   {
     title: 'Rent Owed',
-    id: 'rentOwed',
     grow: 1,
-    columnUuid: uuid(),
-    cell: genNumericCell({ data: 'rentOwed', contentAlign: 'right' }),
+    cellGen: genNumericCell,
+    data: 'rentOwed',
+    contentAlign: 'right',
   },
 ];
 
