@@ -124,7 +124,7 @@ function GlideGrid<T extends object>({
         smoothScrollY={true}
         drawHeader={(args) => {
           drawHeaderSort(args, gridManager.getSortHistory(STATE_HISTORY_STEPS));
-          return false;
+          return true;
         }}
         theme={theme}
         onItemHovered={_onItemHovered}

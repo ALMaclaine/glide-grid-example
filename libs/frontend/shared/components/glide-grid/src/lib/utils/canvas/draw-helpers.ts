@@ -1,9 +1,11 @@
 import { Triangle, TRIANGLE_DIRECTIONS } from './triangle';
 import { StackedTriangles } from './stacked-triangles';
 import type { DrawHeaderCallback } from '@glideapps/glide-data-grid';
-import type { StateSet, StateSetHistory } from '../sort/sort-state-machine';
+import type { StateSet } from '../sort/sort-state-machine';
 import { SORT_STATES, SortStates } from '../sort/object-sort';
 import { positioner } from './utils';
+import { drawTextCell } from '@glideapps/glide-data-grid';
+import { WrappedGridColumn } from '../../types/grid';
 
 const WIDTH = 8;
 const HEIGHT = 5;
@@ -126,16 +128,17 @@ const getHeaderSortImage = (props: GetHeaderImageProps) => {
 
 type DrawHeaderCallbackProps = Parameters<DrawHeaderCallback>[0];
 
-const drawHeaderSort = <T>(
+const drawHeaderSort = <T extends object>(
   headerProps: DrawHeaderCallbackProps,
   stateHistory: StateSet<T>[]
 ) => {
+  const { ctx, rect, theme, column: _column } = headerProps;
+  const column = _column as WrappedGridColumn<T>;
   const {
-    ctx,
-    rect,
-    theme,
-    column: { id },
-  } = headerProps;
+    id,
+    title,
+    cell: { contentAlign },
+  } = column;
 
   const { x, y, width, height } = rect;
   const zoomed = window.devicePixelRatio > 1;
@@ -144,6 +147,23 @@ const drawHeaderSort = <T>(
   const stateSet = stateHistory.find((state) => state.key === id);
   const isSorted = stateSet !== undefined;
   const sortState = stateSet?.state || SORT_STATES.initial;
+
+  if (contentAlign === 'right') {
+    drawTextCell(
+      {
+        rect: {
+          ...rect,
+          x: rect.x - 16,
+        },
+        theme,
+        ctx,
+      },
+      title,
+      contentAlign
+    );
+  } else {
+    drawTextCell({ rect, theme, ctx }, title, contentAlign);
+  }
 
   const image = getHeaderSortImage({
     isSorted,
