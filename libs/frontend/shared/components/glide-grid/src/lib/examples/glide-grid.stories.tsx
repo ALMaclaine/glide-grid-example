@@ -147,7 +147,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
             refresh();
           }}
         />
-        <GlideGrid gridManager={gridManager} />
+        <GlideGrid onItemClicked={console.log} gridManager={gridManager} />
       </div>
     </div>
   );

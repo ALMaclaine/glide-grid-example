@@ -1,5 +1,5 @@
 import { ColumnsManager } from './columns-manager';
-import type { IdRow, WrappedGridColumn } from '../../types/grid';
+import type { Cell, IdRow, WrappedGridColumn } from '../../types/grid';
 import type { StringKeys } from '../../types/general';
 import { CellCache } from '../caches/cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';
@@ -15,6 +15,7 @@ import {
   generateWrappedColumn,
   GenerateWrappedColumnProps,
 } from '../cells/generators';
+import { OnItemClickedProps } from '../../types/func';
 
 type GridManagerProps<T extends object> = {
   columns: GenerateWrappedColumnProps<T>[];
@@ -106,6 +107,12 @@ class GridManager<T extends object> {
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.pageManager.getRow(row);
     return this.cellCache.get(rowUuid, col) as GridCell;
+  }
+
+  onCellClicked([colPos, rowPos]: Item): OnItemClickedProps<T> {
+    const row = this.pageManager.getRow(rowPos);
+    const cell = this.cellCache.get(row.rowUuid, colPos);
+    return { row, cell };
   }
 
   get length() {

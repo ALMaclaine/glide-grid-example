@@ -9,10 +9,15 @@ import { useCallback, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
-import type { HeaderClickHandler, HoverHandler } from './types/func';
+import type {
+  HeaderClickHandler,
+  HoverHandler,
+  OnItemClickedHandler,
+} from './types/func';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
 import { GridManager } from './utils/managers/grid-manager';
+import { Cell, IdRow } from './types/grid';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -49,6 +54,7 @@ const theme = {
 
 type GlideGridProps<T extends object> = {
   onItemHovered?: HoverHandler;
+  onItemClicked?: OnItemClickedHandler;
   gridManager: GridManager<T>;
   getRowThemeOverride?: GetRowThemeCallback;
   onHeaderClicked?: HeaderClickHandler;
@@ -57,6 +63,7 @@ type GlideGridProps<T extends object> = {
 function GlideGrid<T extends object>({
   gridManager,
   onItemHovered = noOp,
+  onItemClicked = noOp,
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
@@ -105,13 +112,9 @@ function GlideGrid<T extends object>({
         // turns on copy support
         getCellsForSelection={true}
         getCellContent={(item: Item) => gridManager.itemToCell(item)}
-        onCellClicked={(item: Item) => {
-          // const { kind, ...rest } = getCellContent(item);
-          // if (kind === 'uri') {
-          //   // TODO: use type guard
-          //   const { data } = rest as UriCell;
-          //   window.alert('Navigating to: ' + data);
-          // }
+        onCellClicked={(itemPos: Item) => {
+          const cellInfo = gridManager.onCellClicked(itemPos);
+          onItemClicked(cellInfo);
         }}
         onColumnMoved={(col1, col2) => {
           gridManager.swap(col1, col2);
