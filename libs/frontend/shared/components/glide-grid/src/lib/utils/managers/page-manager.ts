@@ -5,7 +5,7 @@ type PageManagerProps = {
   pageSize?: number;
 };
 
-class PageManager<T> {
+class PageManager<T extends object> {
   private _pageSize?: number;
   private data: IdRow<T>[] = [];
   private windowedDataCache = new MiniCache<IdRow<T>[]>();

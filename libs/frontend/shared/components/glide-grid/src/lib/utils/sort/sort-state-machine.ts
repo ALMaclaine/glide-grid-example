@@ -25,12 +25,12 @@ const genCycleStates = (initial: SortStates = SORT_STATES.initial) => {
   return () => generator.next().value as SortStates;
 };
 
-type StateSet<T> = {
+type StateSet<T extends object> = {
   state: SortStates;
   key: StringKeys<T> | '';
 };
 
-type StateSetHistory<T> = {
+type StateSetHistory<T extends object> = {
   currentStateSet: StateSet<T>;
   previousStateSet: StateSet<T>;
 };
@@ -40,7 +40,7 @@ const initialStateSet = {
   key: '',
 } as const;
 
-class SortStateMachine<T> {
+class SortStateMachine<T extends object> {
   private keySet = new Set<StringKeys<T>>();
 
   private stateHistory: StateSet<T>[] = [];

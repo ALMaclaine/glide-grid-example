@@ -1,6 +1,6 @@
 import type { StringKeys } from './types/general';
 
-class Levels<T> {
+class Levels<T extends object> {
   private readonly levelSets = new Map<StringKeys<T>, Set<string>>();
   private readonly keys: StringKeys<T>[] = [];
   constructor(keys: StringKeys<T>[]) {

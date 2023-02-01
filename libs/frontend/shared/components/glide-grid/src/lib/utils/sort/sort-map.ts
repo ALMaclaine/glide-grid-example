@@ -3,7 +3,7 @@ import { SORT_TYPES } from './object-sort';
 import type { SortTypes } from './object-sort';
 import type { WrappedGridColumn } from '../../types/grid';
 
-class SortMap<T> {
+class SortMap<T extends object> {
   private readonly sortMap: Map<StringKeys<T>, SortTypes>;
   constructor({ columns }: { columns: WrappedGridColumn<T>[] }) {
     this.sortMap = this.processColumns(columns);

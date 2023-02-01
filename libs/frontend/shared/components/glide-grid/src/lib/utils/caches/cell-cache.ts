@@ -2,7 +2,7 @@ import type { Cell } from '../../types/grid';
 import { ColumnsManager } from '../managers/columns-manager';
 import { IdRow } from '../../types/grid';
 
-class CellCache<T> {
+class CellCache<T extends object> {
   private cachedContent: Map<string, Map<string, Cell<T>>> = new Map();
   private readonly columnsManager: ColumnsManager<T>;
 

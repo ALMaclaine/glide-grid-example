@@ -11,7 +11,7 @@ type GenGridCellBaseProps<T> = {
 
 type GenGridCellProps<T> = Omit<GenGridCellBaseProps<T>, 'kind'>;
 
-const genGridCell = <T>({
+const genGridCell = <T extends object>({
   data,
   displayData = data,
   allowOverlay = false,
@@ -27,11 +27,13 @@ const genGridCell = <T>({
   };
 };
 
-const genTextCell = <T>(props: GenGridCellProps<T>): Cell<T> => {
+const genTextCell = <T extends object>(props: GenGridCellProps<T>): Cell<T> => {
   return genGridCell({ ...props, kind: GridCellKind.Text });
 };
 
-const genNumericCell = <T>(props: GenGridCellProps<T>): Cell<T> => {
+const genNumericCell = <T extends object>(
+  props: GenGridCellProps<T>
+): Cell<T> => {
   return genGridCell({
     ...props,
     sortType: SORT_TYPES.numeric,
@@ -39,19 +41,19 @@ const genNumericCell = <T>(props: GenGridCellProps<T>): Cell<T> => {
   });
 };
 
-const genUriCell = <T>(props: GenGridCellProps<T>): Cell<T> => {
+const genUriCell = <T extends object>(props: GenGridCellProps<T>): Cell<T> => {
   return genGridCell({ ...props, kind: GridCellKind.Uri });
 };
 
-type CellGenerator<T> = (props: GenGridCellProps<T>) => Cell<T>;
+type CellGenerator<T extends object> = (props: GenGridCellProps<T>) => Cell<T>;
 
-type GenerateWrappedColumnProps<T> = GenGridCellProps<T> & {
+type GenerateWrappedColumnProps<T extends object> = GenGridCellProps<T> & {
   title: string;
   cellGen: CellGenerator<T>;
   grow?: number;
 };
 
-const generateWrappedColumn = <T>({
+const generateWrappedColumn = <T extends object>({
   title,
   displayData,
   data,

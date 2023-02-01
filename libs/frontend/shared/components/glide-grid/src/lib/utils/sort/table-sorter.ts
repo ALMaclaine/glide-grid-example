@@ -7,11 +7,11 @@ import { MiniCache } from '../caches/mini-cache';
 import { SortStateMachine } from './sort-state-machine';
 import { STATE_HISTORY_STEPS } from '../../constants';
 
-type TableSorterProps<T> = {
+type TableSorterProps<T extends object> = {
   sortMap: SortMap<T>;
 };
 
-class TableSorter<T> {
+class TableSorter<T extends object> {
   private stateHistory: StateSet<T>[] = [];
   private readonly sortCache = new MiniCache<IdRow<T>[]>();
   private readonly sortStateMachine: SortStateMachine<T> =

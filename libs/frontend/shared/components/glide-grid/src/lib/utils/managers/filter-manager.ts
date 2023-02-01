@@ -1,22 +1,22 @@
 import type { SortMap } from '../sort/sort-map';
-import type { Filter, FilterFunc, FilterSet } from './types';
+import type { Filter, FilterFunc, FilterSet } from '../filters/types';
 import { StringKeys } from '../../types/general';
 import { SORT_TYPES, SortTypes } from '../sort/object-sort';
-import { generateFilter, genereateRowAccessor } from './filters';
+import { generateFilter, genereateRowAccessor } from '../filters/filters';
 import {
   FILTER_TYPES,
   VALID_NATURAL_FILTER_SET,
   VALID_NUMERIC_FILTER_SET,
-} from './types';
+} from '../filters/types';
 import { IdRow } from '../../types/grid';
 
-type FilterManagerProps<T> = {
+type FilterManagerProps<T extends object> = {
   sortMap: SortMap<T>;
   filters?: FilterSet<T>[];
   searchTerms?: string[];
 };
 
-class FilterManager<T> {
+class FilterManager<T extends object> {
   private readonly sortMap: SortMap<T>;
   filterGroups: FilterFunc<T>[][] = [];
   private searchTerms: string[] = [];

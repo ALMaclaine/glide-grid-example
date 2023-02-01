@@ -2,18 +2,18 @@ import type { StringKeys } from '../../types/general';
 import type { WrappedGridColumn } from '../../types/grid';
 import { MiniCache } from '../caches/mini-cache';
 
-type ColumnsProps<T> = {
+type ColumnsProps<T extends object> = {
   columns: WrappedGridColumn<T>[];
   hiddenColumns?: StringKeys<T>[];
 };
 
-type Translation<T> = {
+type Translation<T extends object> = {
   uuid: string;
   id: StringKeys<T>;
   originalColumn: number;
 };
 
-class SortTranslator<T> {
+class SortTranslator<T extends object> {
   private readonly _translate: Translation<T>[] = [];
   private readonly idMap = new Map<string, number>();
 
@@ -83,7 +83,7 @@ class SortTranslator<T> {
   }
 }
 
-class HiddenColumnTranslator<T> {
+class HiddenColumnTranslator<T extends object> {
   private readonly hiddenTranslatorMap = new Map<number, number>();
   private readonly columnMap = new Map<string, WrappedGridColumn<T>>();
   private readonly columnsCache = new MiniCache<WrappedGridColumn<T>[]>();
@@ -169,7 +169,7 @@ class HiddenColumnTranslator<T> {
   }
 }
 
-class ColumnsManager<T> {
+class ColumnsManager<T extends object> {
   private readonly sortTranslator = new SortTranslator<T>();
   private readonly hiddenTranslator;
   private readonly _columnTitleIdMap: Record<string, StringKeys<T>> = {};

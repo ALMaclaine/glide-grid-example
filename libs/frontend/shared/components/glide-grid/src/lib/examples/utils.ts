@@ -1,8 +1,8 @@
-const generate = <T>(len: number, generator: () => T) => {
+const generate = <T extends object>(len: number, generator: () => T) => {
   return [...Array(len).fill(0).map(generator)];
 };
 
-const asyncGenerate = async <T>(
+const asyncGenerate = async <T extends object>(
   len: number,
   generator: () => T,
   timeout = 200

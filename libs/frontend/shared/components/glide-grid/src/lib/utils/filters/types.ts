@@ -40,7 +40,7 @@ type Filter =
   | FilterRange
   | FilterIdentity;
 
-type FilterSet<T> = Record<StringKeys<T>, Filter>;
+type FilterSet<T extends object> = Record<StringKeys<T>, Filter>;
 
 type FilterFunc<T> = (val: T) => boolean;
 

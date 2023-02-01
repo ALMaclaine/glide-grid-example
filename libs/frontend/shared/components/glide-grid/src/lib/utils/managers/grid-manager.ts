@@ -9,14 +9,14 @@ import { Levels } from '../../levels';
 import { MiniCache } from '../caches/mini-cache';
 import type { FilterSet } from '../filters/types';
 import { SortMap } from '../sort/sort-map';
-import { FilterManager } from '../filters/filter-manager';
+import { FilterManager } from './filter-manager';
 import { PageManager } from './page-manager';
 import {
   generateWrappedColumn,
   GenerateWrappedColumnProps,
 } from '../cells/generators';
 
-type GridManagerProps<T> = {
+type GridManagerProps<T extends object> = {
   columns: GenerateWrappedColumnProps<T>[];
   data: T[];
   pageSize?: number;
@@ -25,11 +25,13 @@ type GridManagerProps<T> = {
   searchTerms?: string[];
 };
 
-const getTextKeys = <T>(columns: WrappedGridColumn<T>[]): StringKeys<T>[] => {
+const getTextKeys = <T extends object>(
+  columns: WrappedGridColumn<T>[]
+): StringKeys<T>[] => {
   return columns.filter((e) => e.cell.kind !== 'number').map(({ id }) => id);
 };
 
-class GridManager<T> {
+class GridManager<T extends object> {
   private readonly columnsManager: ColumnsManager<T>;
   private readonly cellCache: CellCache<T>;
 

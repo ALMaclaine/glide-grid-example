@@ -47,14 +47,14 @@ const theme = {
   cellVerticalPadding: 10,
 };
 
-type GlideGridProps<T> = {
+type GlideGridProps<T extends object> = {
   onItemHovered?: HoverHandler;
   gridManager: GridManager<T>;
   getRowThemeOverride?: GetRowThemeCallback;
   onHeaderClicked?: HeaderClickHandler;
 };
 
-function GlideGrid<T>({
+function GlideGrid<T extends object>({
   gridManager,
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,

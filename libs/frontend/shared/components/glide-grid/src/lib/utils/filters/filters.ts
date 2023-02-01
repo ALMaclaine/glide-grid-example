@@ -26,7 +26,7 @@ function generateFilterRange(min: number, max: number): FilterFunc<string> {
   return (value: string) => filterRange(parseFloat(value), min, max);
 }
 
-function genereateRowAccessor<T>(
+function genereateRowAccessor<T extends object>(
   key: StringKeys<T>,
   filterGen: FilterFunc<string>
 ): FilterFunc<T> {
