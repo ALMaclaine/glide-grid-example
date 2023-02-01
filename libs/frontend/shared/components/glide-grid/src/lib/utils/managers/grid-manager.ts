@@ -173,6 +173,9 @@ class GridManager<T extends object> {
   }
 
   nextSortKey(key?: StringKeys<T>) {
+    if (key !== undefined && !this.columnsManager.isSortColumn(key)) {
+      return;
+    }
     this.sorter.stateSort(key);
     this.filterSorted();
   }

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ComponentStory, Meta } from '@storybook/react';
-import { Easel } from './easel';
-import { positioner } from './utils';
-import { StackedTriangles } from './stacked-triangles';
+import { Easel } from '../../utils/canvas/easel';
+import { positioner } from '../../utils/canvas/utils';
+import { StackedTriangles } from '../../utils/canvas/stacked-triangles';
 
 const WIDTH = 1024;
 const HEIGHT = 512;

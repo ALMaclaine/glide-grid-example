@@ -11,7 +11,7 @@ type EaselProps = {
 const DEFAULT_WIDTH = 512;
 const DEFAULT_HEIGHT = 512;
 
-class Easel {
+class Easel extends MiniCache<ImageData> {
   private canvasRef: OffscreenCanvas;
   private readonly context: OffscreenCanvasRenderingContext2D;
   private readonly _width: number;
@@ -19,6 +19,7 @@ class Easel {
   private _background = 'white';
 
   constructor(props?: EaselProps) {
+    super();
     this._width = props?.width ? props.width : DEFAULT_WIDTH;
     this._height = props?.height ? props.height : DEFAULT_HEIGHT;
     if (!document.createElement) {
@@ -46,14 +47,12 @@ class Easel {
     this._background = color;
   }
 
-  private imageCache = new MiniCache<ImageData>();
-
   private clearScreen() {
     this.context.clearRect(0, 0, this._width, this._height);
   }
 
   clear() {
-    this.imageCache.dirty();
+    this.dirty();
     this.clearScreen();
   }
 
@@ -62,8 +61,8 @@ class Easel {
   }
 
   image() {
-    if (this.imageCache.isClean) {
-      return this.imageCache.getCache();
+    if (this.isClean) {
+      return this.getCache();
     }
     const imageData = this.context.getImageData(
       0,
@@ -71,12 +70,12 @@ class Easel {
       this._width,
       this._height
     );
-    this.imageCache.cache(imageData);
-    return this.imageCache.getCache();
+    this.cache(imageData);
+    return this.getCache();
   }
 
   draw(processor: Context2dProcessor) {
-    this.imageCache.dirty();
+    this.dirty();
     processor(this.context);
   }
 }

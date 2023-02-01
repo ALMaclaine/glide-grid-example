@@ -137,6 +137,7 @@ const drawHeaderSort = <T extends object>(
   const {
     id,
     title,
+    shouldSort,
     cell: { contentAlign },
   } = column;
 
@@ -147,13 +148,12 @@ const drawHeaderSort = <T extends object>(
   const stateSet = stateHistory.find((state) => state.key === id);
   const isSorted = stateSet !== undefined;
   const sortState = stateSet?.state || SORT_STATES.initial;
-
   if (contentAlign === 'right') {
     drawTextCell(
       {
         rect: {
           ...rect,
-          x: rect.x - 16,
+          x: rect.x - (shouldSort ? 16 : 0),
         },
         theme,
         ctx,
@@ -161,28 +161,41 @@ const drawHeaderSort = <T extends object>(
       title,
       contentAlign
     );
+    drawTextCell(
+      {
+        rect: {
+          ...rect,
+          x: rect.x - (shouldSort ? 16 : 0),
+        },
+        theme,
+        ctx,
+      },
+      '_'.repeat(title.length),
+      contentAlign
+    );
   } else {
     drawTextCell({ rect, theme, ctx }, title, contentAlign);
   }
 
-  const image = getHeaderSortImage({
-    isSorted,
-    sortState,
-    backgroundColor: headerThemePriority(headerProps),
-    fillColor: theme.textHeaderSelected,
-    zoomed,
-  });
+  if (shouldSort) {
+    const image = getHeaderSortImage({
+      isSorted,
+      sortState,
+      backgroundColor: headerThemePriority(headerProps),
+      fillColor: theme.textHeaderSelected,
+      zoomed,
+    });
 
-  const pos = positioner({
-    containerWidth: width,
-    containerHeight: zoomFactor * height,
-    itemWidth: image.width,
-    itemHeight: image.height,
-    position: 'midRight',
-    padding: theme.cellHorizontalPadding,
-  });
-
-  ctx.putImageData(image, zoomFactor * (pos.x + x), pos.y + y);
+    const pos = positioner({
+      containerWidth: width,
+      containerHeight: zoomFactor * height,
+      itemWidth: image.width,
+      itemHeight: image.height,
+      position: 'midRight',
+      padding: theme.cellHorizontalPadding,
+    });
+    ctx.putImageData(image, zoomFactor * (pos.x + x), pos.y + y);
+  }
 };
 
 export {

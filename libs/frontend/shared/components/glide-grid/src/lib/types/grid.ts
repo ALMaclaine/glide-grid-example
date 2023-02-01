@@ -19,6 +19,7 @@ type WrappedGridColumn<T extends object> = IdColumn<
     id: StringKeys<T>;
   } & {
     cell: CellPrototype<T>;
+    shouldSort: boolean;
   }
 >;
 

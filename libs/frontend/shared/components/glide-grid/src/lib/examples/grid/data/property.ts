@@ -3,7 +3,7 @@ import {
   genNumericCell,
   genTextCell,
   genUriCell,
-} from '../../utils/cells/generators';
+} from '../../../utils/cells/generators';
 import { randAddress, randCompanyName } from '@ngneat/falso';
 
 interface Property {
@@ -21,6 +21,7 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
     cellGen: genUriCell,
     dataId: 'property',
     cursor: 'pointer',
+    shouldSort: true,
     themeOverride: {
       textDark: 'blue',
       baseFontStyle: '12px underlined',
@@ -41,6 +42,7 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
   {
     title: 'Units',
     grow: 1,
+    shouldSort: true,
     cellGen: genNumericCell,
     dataId: 'units',
   },

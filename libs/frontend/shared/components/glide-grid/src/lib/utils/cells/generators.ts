@@ -57,6 +57,7 @@ type GenerateWrappedColumnProps<T extends object> = GenGridCellProps<T> & {
   title: string;
   cellGen: CellGenerator<T>;
   grow?: number;
+  shouldSort?: boolean;
 };
 
 const generateWrappedColumn = <T extends object>({
@@ -67,12 +68,14 @@ const generateWrappedColumn = <T extends object>({
   cursor,
   cellGen,
   grow,
+  shouldSort = false,
   contentAlign,
 }: GenerateWrappedColumnProps<T>): WrappedGridColumn<T> => ({
   title,
   id: displayDataId || dataId,
   columnUuid: uuid(),
   grow,
+  shouldSort,
   cell: cellGen({ dataId, themeOverride, cursor, contentAlign }),
 });
 

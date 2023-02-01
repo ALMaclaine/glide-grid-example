@@ -1,10 +1,10 @@
 import { ComponentStory, Meta } from '@storybook/react';
-import { GlideGrid } from '../glide-grid';
-import { GridManager } from '../utils/managers/grid-manager';
+import { GlideGrid } from '../../glide-grid';
+import { GridManager } from '../../utils/managers/grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
 import { useCallback, useMemo, useState } from 'react';
-import type { StringKeys } from '../types/general';
+import type { StringKeys } from '../../types/general';
 
 export default {
   title: 'GlideGrid/PropertiesPage',

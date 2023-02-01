@@ -17,7 +17,7 @@ type TriangleProps = EaselProps;
 class Triangle {
   private readonly _width;
   private readonly _height;
-  private readonly easel;
+  private readonly easel: Easel;
   private fillColor = 'black';
   // private
   constructor(props?: TriangleProps) {
