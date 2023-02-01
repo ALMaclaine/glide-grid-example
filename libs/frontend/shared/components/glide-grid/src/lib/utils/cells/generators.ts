@@ -4,12 +4,12 @@ import type { Cell, WrappedGridColumn } from '../../types/grid';
 import { SORT_TYPES } from '../sort/object-sort';
 import { uuid } from '../general';
 
-type GenGridCellBaseProps<T> = {
+type GenGridCellBaseProps<T extends object> = {
   kind: GridCell['kind'];
   data: Cell<T>['data'];
 } & Partial<Omit<Cell<T>, 'kind' | 'data'>>;
 
-type GenGridCellProps<T> = Omit<GenGridCellBaseProps<T>, 'kind'>;
+type GenGridCellProps<T extends object> = Omit<GenGridCellBaseProps<T>, 'kind'>;
 
 const genGridCell = <T extends object>({
   data,
