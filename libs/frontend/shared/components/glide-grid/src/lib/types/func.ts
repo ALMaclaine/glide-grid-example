@@ -1,6 +1,6 @@
 import { GridMouseEventArgs } from '@glideapps/glide-data-grid';
 import type { StringKeys } from './general';
-import { Cell, IdRow } from './grid';
+import { CellPrototype, IdRow } from './grid';
 
 type HeaderClickHandler = <T extends object>(
   headerVal: StringKeys<T>,
@@ -10,7 +10,7 @@ type HeaderClickHandler = <T extends object>(
 type HoverHandler = (args: GridMouseEventArgs) => void;
 
 type OnItemClickedProps<T extends object> = {
-  cell: Cell<T>;
+  cell: CellPrototype<T>;
   row: IdRow<T>;
 };
 

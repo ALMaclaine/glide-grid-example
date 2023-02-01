@@ -19,7 +19,7 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
     title: 'Property',
     grow: 2,
     cellGen: genUriCell,
-    data: 'property',
+    dataId: 'property',
     cursor: 'pointer',
     themeOverride: {
       textDark: 'blue',
@@ -30,25 +30,25 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
     title: 'Address',
     grow: 2,
     cellGen: genTextCell,
-    data: 'address',
+    dataId: 'address',
   },
   {
     title: 'Investor',
     grow: 2,
     cellGen: genTextCell,
-    data: 'investor',
+    dataId: 'investor',
   },
   {
     title: 'Units',
     grow: 1,
     cellGen: genNumericCell,
-    data: 'units',
+    dataId: 'units',
   },
   {
     title: 'Rent Owed',
     grow: 1,
     cellGen: genNumericCell,
-    data: 'rentOwed',
+    dataId: 'rentOwed',
     contentAlign: 'right',
   },
 ];

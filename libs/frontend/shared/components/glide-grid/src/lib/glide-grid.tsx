@@ -17,7 +17,6 @@ import type {
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
 import { GridManager } from './utils/managers/grid-manager';
-import { Cell, IdRow } from './types/grid';
 
 const divStyles = {
   border: '1px solid #e9e9e9',

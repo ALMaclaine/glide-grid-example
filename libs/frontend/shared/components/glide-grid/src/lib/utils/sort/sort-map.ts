@@ -10,8 +10,8 @@ class SortMap<T extends object> {
   }
   private processColumns(columns: WrappedGridColumn<T>[]) {
     return new Map(
-      columns.map(({ cell: { displayData, sortType } }) => [
-        displayData,
+      columns.map(({ cell: { displayDataId, sortType } }) => [
+        displayDataId,
         sortType,
       ])
     );

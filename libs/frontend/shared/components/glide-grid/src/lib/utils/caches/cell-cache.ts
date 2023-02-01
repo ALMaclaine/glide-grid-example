@@ -1,22 +1,25 @@
-import type { Cell } from '../../types/grid';
+import type { CellInstance } from '../../types/grid';
 import { ColumnsManager } from '../managers/columns-manager';
 import { IdRow } from '../../types/grid';
 
 class CellCache<T extends object> {
-  private cachedContent: Map<string, Map<string, Cell<T>>> = new Map();
+  private cachedContent: Map<string, Map<string, CellInstance<T>>> = new Map();
   private readonly columnsManager: ColumnsManager<T>;
 
   constructor(columnsManager: ColumnsManager<T>) {
     this.columnsManager = columnsManager;
   }
 
-  private genCell(item: IdRow<T>, colUuid: string): Cell<T> {
-    const { data, displayData, ...rest } = this.columnsManager.getCell(colUuid);
+  private genCell(item: IdRow<T>, colUuid: string): CellInstance<T> {
+    const { dataId, displayDataId, ...rest } =
+      this.columnsManager.getCell(colUuid);
     return {
       ...rest,
-      data: item[data],
-      displayData: item[displayData],
-    } as Cell<T>;
+      dataId,
+      displayDataId,
+      data: item[dataId],
+      displayData: item[displayDataId],
+    } as CellInstance<T>;
   }
 
   addData(data: IdRow<T>[]) {
@@ -30,26 +33,29 @@ class CellCache<T extends object> {
     }
   }
 
-  get(rowUuid: string, col: number): Cell<T> {
+  get(rowUuid: string, col: number): CellInstance<T> {
     const rowCache = this.cachedContent.get(rowUuid);
     const columnUuid = this.columnsManager.getTranslation(col);
 
     if (rowCache === undefined) {
       throw new Error('Cache should be set before accessing');
     }
-    return rowCache.get(columnUuid) as Cell<T>;
+    return rowCache.get(columnUuid) as CellInstance<T>;
   }
 
   clear() {
     this.cachedContent = new Map();
   }
 
-  set(rowUuid: string, columnUuid: string, cell: Cell<T>) {
+  set(rowUuid: string, columnUuid: string, cell: CellInstance<T>) {
     if (this.cachedContent.get(rowUuid) === undefined) {
-      this.cachedContent.set(rowUuid, new Map<string, Cell<T>>());
+      this.cachedContent.set(rowUuid, new Map<string, CellInstance<T>>());
     }
 
-    const rowCache = this.cachedContent.get(rowUuid) as Map<string, Cell<T>>;
+    const rowCache = this.cachedContent.get(rowUuid) as Map<
+      string,
+      CellInstance<T>
+    >;
     rowCache.set(columnUuid, cell);
   }
 }

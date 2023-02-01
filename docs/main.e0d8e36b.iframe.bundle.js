@@ -123,8 +123,8 @@
                         item = getDataByIndex(row);
                       if (col < columns.length) {
                         var _columns$getCell = columns.getCell(col),
-                          data = _columns$getCell.data,
-                          displayData = _columns$getCell.displayData,
+                          data = _columns$getCell.dataId,
+                          displayData = _columns$getCell.displayDataId,
                           rest = objectWithoutPropertiesLoose_default()(
                             _columns$getCell,
                             _excluded

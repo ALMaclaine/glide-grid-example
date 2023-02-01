@@ -2,18 +2,23 @@ import { GridCell, GridColumn, UriCell } from '@glideapps/glide-data-grid';
 import type { StringKeys } from './general';
 import type { SortTypes } from '../utils/sort/object-sort';
 
-type Cell<T extends object> = Omit<GridCell, 'data'> &
+type CellPrototype<T extends object> = Omit<GridCell, 'data'> &
   Pick<UriCell, 'readonly'> & {
-    data: StringKeys<T>;
-    displayData: StringKeys<T>;
+    dataId: StringKeys<T>;
+    displayDataId: StringKeys<T>;
     sortType: SortTypes;
   };
+
+type CellInstance<T extends object> = CellPrototype<T> & {
+  data: string | number | Date;
+  displayData: string | number | Date;
+};
 
 type WrappedGridColumn<T extends object> = IdColumn<
   Omit<GridColumn, 'id'> & {
     id: StringKeys<T>;
   } & {
-    cell: Cell<T>;
+    cell: CellPrototype<T>;
   }
 >;
 
@@ -25,4 +30,4 @@ type IdColumn<T extends object> = T & {
   columnUuid: string;
 };
 
-export type { Cell, IdRow, WrappedGridColumn, IdColumn };
+export type { CellPrototype, IdRow, WrappedGridColumn, IdColumn, CellInstance };

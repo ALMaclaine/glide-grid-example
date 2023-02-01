@@ -227,7 +227,7 @@ class ColumnsManager<T extends object> {
   getHeaderKey(colPos: number) {
     const { id } = this.getColumns()[colPos];
     const { uuid } = this.sortTranslator.getTranslationById(id);
-    return this.getCell(uuid).displayData;
+    return this.getCell(uuid).displayDataId;
   }
 
   getColumns() {

@@ -1,5 +1,5 @@
 import { ColumnsManager } from './columns-manager';
-import type { Cell, IdRow, WrappedGridColumn } from '../../types/grid';
+import type { IdRow, WrappedGridColumn } from '../../types/grid';
 import type { StringKeys } from '../../types/general';
 import { CellCache } from '../caches/cell-cache';
 import type { GridCell, Item } from '@glideapps/glide-data-grid';

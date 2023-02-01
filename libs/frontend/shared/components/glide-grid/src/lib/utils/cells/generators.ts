@@ -1,39 +1,41 @@
 import type { GridCell } from '@glideapps/glide-data-grid';
 import { GridCellKind } from '@glideapps/glide-data-grid';
-import type { Cell, WrappedGridColumn } from '../../types/grid';
+import type { CellPrototype, WrappedGridColumn } from '../../types/grid';
 import { SORT_TYPES } from '../sort/object-sort';
 import { uuid } from '../general';
 
 type GenGridCellBaseProps<T extends object> = {
   kind: GridCell['kind'];
-  data: Cell<T>['data'];
-} & Partial<Omit<Cell<T>, 'kind' | 'data'>>;
+  dataId: CellPrototype<T>['dataId'];
+} & Partial<Omit<CellPrototype<T>, 'kind' | 'data'>>;
 
 type GenGridCellProps<T extends object> = Omit<GenGridCellBaseProps<T>, 'kind'>;
 
 const genGridCell = <T extends object>({
-  data,
-  displayData = data,
+  dataId,
+  displayDataId = dataId,
   allowOverlay = false,
   sortType = SORT_TYPES.natural,
   ...rest
-}: GenGridCellBaseProps<T>): Cell<T> => {
+}: GenGridCellBaseProps<T>): CellPrototype<T> => {
   return {
-    data,
-    displayData,
+    dataId,
+    displayDataId,
     allowOverlay,
     sortType,
     ...rest,
   };
 };
 
-const genTextCell = <T extends object>(props: GenGridCellProps<T>): Cell<T> => {
+const genTextCell = <T extends object>(
+  props: GenGridCellProps<T>
+): CellPrototype<T> => {
   return genGridCell({ ...props, kind: GridCellKind.Text });
 };
 
 const genNumericCell = <T extends object>(
   props: GenGridCellProps<T>
-): Cell<T> => {
+): CellPrototype<T> => {
   return genGridCell({
     ...props,
     sortType: SORT_TYPES.numeric,
@@ -41,11 +43,15 @@ const genNumericCell = <T extends object>(
   });
 };
 
-const genUriCell = <T extends object>(props: GenGridCellProps<T>): Cell<T> => {
+const genUriCell = <T extends object>(
+  props: GenGridCellProps<T>
+): CellPrototype<T> => {
   return genGridCell({ ...props, kind: GridCellKind.Uri });
 };
 
-type CellGenerator<T extends object> = (props: GenGridCellProps<T>) => Cell<T>;
+type CellGenerator<T extends object> = (
+  props: GenGridCellProps<T>
+) => CellPrototype<T>;
 
 type GenerateWrappedColumnProps<T extends object> = GenGridCellProps<T> & {
   title: string;
@@ -55,8 +61,8 @@ type GenerateWrappedColumnProps<T extends object> = GenGridCellProps<T> & {
 
 const generateWrappedColumn = <T extends object>({
   title,
-  displayData,
-  data,
+  displayDataId,
+  dataId,
   themeOverride,
   cursor,
   cellGen,
@@ -64,10 +70,10 @@ const generateWrappedColumn = <T extends object>({
   contentAlign,
 }: GenerateWrappedColumnProps<T>): WrappedGridColumn<T> => ({
   title,
-  id: displayData || data,
+  id: displayDataId || dataId,
   columnUuid: uuid(),
   grow,
-  cell: cellGen({ data, themeOverride, cursor, contentAlign }),
+  cell: cellGen({ dataId, themeOverride, cursor, contentAlign }),
 });
 
 export {

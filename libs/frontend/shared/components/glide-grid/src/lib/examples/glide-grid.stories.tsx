@@ -3,7 +3,7 @@ import { GlideGrid } from '../glide-grid';
 import { GridManager } from '../utils/managers/grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
-import { Fragment, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { StringKeys } from '../types/general';
 
 export default {
@@ -70,7 +70,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
 
   const updateData = async () => {
     setState('loading');
-    const data = await asyncGenerate(10, genProperty, Math.random() * 500);
+    const data = await asyncGenerate(10000, genProperty, Math.random() * 500);
     const companyData = dataManager.get(company)!;
     const newData = [...companyData, ...data];
     gridManager.addData(data);
@@ -125,7 +125,6 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
           onChange={(e) => {
             gridManager.setPage(parseInt(e.target.value));
             refresh();
-            console.log(gridManager.page);
           }}
           value={gridManager.page}
         >
