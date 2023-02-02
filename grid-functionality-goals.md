@@ -1,14 +1,7 @@
 # grid functionality goals
 
 ## Style
-- turn off vertical grid lines
-- align text in grid
 - change row marker type
-- grouping/collapsing?
-- custom headers
-- reorder rows/columns
-- smooth scrolling
-- row hover highlight
 
 ## Functionality
 - get selected rows

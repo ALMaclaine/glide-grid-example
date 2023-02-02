@@ -1,7 +1,5 @@
 import type { EaselProps } from './easel';
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH, Easel } from './easel';
-import { ObjectValues } from '../../types/general';
-import { midPoint } from './utils';
+import { Easel } from './easel';
 
 type RectangleProps = EaselProps;
 

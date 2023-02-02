@@ -3,7 +3,7 @@ import { GridCellKind } from '@glideapps/glide-data-grid';
 import type { CellPrototype, WrappedGridColumn } from '../../types/grid';
 import { SORT_TYPES } from '../sort/object-sort';
 import { uuid } from '../general';
-import { ObjectValues } from '../../types/general';
+import type { ObjectValues } from '../../types/general';
 
 type GenGridCellBaseProps<T extends object> = {
   kind: GridCell['kind'];
@@ -74,10 +74,13 @@ type GenerateWrappedColumnProps<T extends object> = GenGridCellProps<T> & {
   title: string;
   cellType: GeneratorTypes;
   grow?: number;
+  width?: number;
   shouldSort?: boolean;
 };
 
-const cellTypeToGenerator = (type: GeneratorTypes) => {
+const cellTypeToGenerator = <T extends object>(
+  type: GeneratorTypes
+): CellGenerator<T> => {
   switch (type) {
     case GENERATOR_TYPES.uri:
       return genUriCell;
@@ -102,14 +105,16 @@ const generateWrappedColumn = <T extends object>({
   cellType,
   grow,
   shouldSort = false,
+  width,
   contentAlign,
 }: GenerateWrappedColumnProps<T>): WrappedGridColumn<T> => ({
   title,
   id: displayDataId || dataId,
   columnUuid: uuid(),
   grow,
+  ...(width ? { width } : {}), // source types are complicated, hard to get this typed correctly
   shouldSort,
-  cell: cellTypeToGenerator(cellType)({
+  cell: cellTypeToGenerator<T>(cellType)({
     dataId,
     themeOverride,
     cursor,
@@ -124,6 +129,7 @@ export {
   genNumericCell,
   generateWrappedColumn,
 };
+
 export type {
   GenGridCellProps,
   GenerateWrappedColumnProps,

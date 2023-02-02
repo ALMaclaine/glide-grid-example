@@ -13,6 +13,7 @@ import type {
   HeaderClickHandler,
   HoverHandler,
   OnItemClickedHandler,
+  OnRowClickedHandler,
 } from './types/func';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
@@ -57,15 +58,21 @@ const theme = {
 type GlideGridProps<T extends object> = {
   onItemHovered?: HoverHandler;
   onItemClicked?: OnItemClickedHandler;
+  onRowClicked?: OnRowClickedHandler;
   gridManager: GridManager<T>;
   getRowThemeOverride?: GetRowThemeCallback;
   onHeaderClicked?: HeaderClickHandler;
+};
+
+const isMarkerClick = ([col]: Item): boolean => {
+  return col === -1;
 };
 
 function GlideGrid<T extends object>({
   gridManager,
   onItemHovered = noOp,
   onItemClicked = noOp,
+  onRowClicked = noOp,
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
@@ -110,13 +117,17 @@ function GlideGrid<T extends object>({
       <DataEditor
         // width 100% needed otherwise grow/resizing animates slowly to fill extra width
         width="100%"
+        freezeColumns={1}
+        rowMarkers="both"
         columns={gridManager.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
         getCellContent={(item: Item) => gridManager.itemToCell(item)}
-        onCellClicked={(itemPos: Item) => {
-          const cellInfo = gridManager.onCellClicked(itemPos);
-          onItemClicked(cellInfo);
+        onCellClicked={(itemPos: Item, args) => {
+          if (!isMarkerClick(itemPos)) {
+            const cellInfo = gridManager.onCellClicked(itemPos);
+            onItemClicked(cellInfo);
+          }
         }}
         onColumnMoved={(col1, col2) => {
           gridManager.swap(col1, col2);
@@ -126,6 +137,9 @@ function GlideGrid<T extends object>({
         smoothScrollX={true}
         smoothScrollY={true}
         drawHeader={(args) => {
+          if (args.columnIndex === -1) {
+            return false;
+          }
           drawHeaderSort(args, gridManager.getSortHistory(STATE_HISTORY_STEPS));
           return true;
         }}

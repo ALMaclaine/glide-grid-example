@@ -18,9 +18,22 @@ type OnItemClickedHandler = <T extends object>(
   props: OnItemClickedProps<T>
 ) => void;
 
+type OnRowClickedProps<T extends object> = {
+  lastSelectedIndex: number;
+  selectedIndices: number[];
+  lastSelectedRow: IdRow<T>;
+  selectedRows: IdRow<T>;
+};
+
+type OnRowClickedHandler = <T extends object>(
+  props: OnRowClickedProps<T>
+) => void;
+
 export type {
   HeaderClickHandler,
   HoverHandler,
   OnItemClickedHandler,
   OnItemClickedProps,
+  OnRowClickedHandler,
+  OnRowClickedProps,
 };
