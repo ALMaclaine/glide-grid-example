@@ -14,37 +14,17 @@ type TriangleDirection = ObjectValues<typeof TRIANGLE_DIRECTIONS>;
 
 type TriangleProps = EaselProps;
 
-class Triangle {
-  private readonly _width;
-  private readonly _height;
-  private readonly easel: Easel;
-  private fillColor = 'black';
-  // private
-  constructor(props?: TriangleProps) {
-    this._width = props?.width ? props.width : DEFAULT_WIDTH;
-    this._height = props?.height ? props.height : DEFAULT_HEIGHT;
-    this.easel = new Easel(props);
-  }
-
-  image(): ImageData {
-    return this.easel.image();
-  }
-
-  fill(color: string) {
-    this.fillColor = color;
-    this.clear();
-  }
-
-  background(color: string) {
-    this.easel.background(color);
-    this.clear();
+class Triangle extends Easel {
+  clear() {
+    super.clear();
+    this.lastDirection = undefined;
   }
 
   private drawUp() {
-    this.easel.draw((ctx) => {
-      this.easel.drawBackground();
+    super.draw((ctx) => {
+      this.drawBackground();
       const _midPoint = midPoint(0, this._width);
-      ctx.fillStyle = this.fillColor;
+      ctx.fillStyle = this.fill;
       ctx.beginPath();
       ctx.moveTo(_midPoint, 0);
       ctx.lineTo(0, this._height);
@@ -54,10 +34,10 @@ class Triangle {
   }
 
   private drawDown() {
-    this.easel.draw((ctx) => {
-      this.easel.drawBackground();
+    super.draw((ctx) => {
+      this.drawBackground();
       const _midPoint = midPoint(0, this._width);
-      ctx.fillStyle = this.fillColor;
+      ctx.fillStyle = this.fill;
       ctx.beginPath();
       ctx.moveTo(_midPoint, this._height);
       ctx.lineTo(0, 0);
@@ -67,10 +47,10 @@ class Triangle {
   }
 
   private drawRight() {
-    this.easel.draw((ctx) => {
-      this.easel.drawBackground();
+    super.draw((ctx) => {
+      this.drawBackground();
       const _midPoint = midPoint(0, this._height);
-      ctx.fillStyle = this.fillColor;
+      ctx.fillStyle = this.fill;
       ctx.beginPath();
       ctx.moveTo(this._width, _midPoint);
       ctx.lineTo(0, 0);
@@ -80,10 +60,10 @@ class Triangle {
   }
 
   private drawLeft() {
-    this.easel.draw((ctx) => {
-      this.easel.drawBackground();
+    super.draw((ctx) => {
+      this.drawBackground();
       const _midPoint = midPoint(0, this._height);
-      ctx.fillStyle = this.fillColor;
+      ctx.fillStyle = this.fill;
       ctx.beginPath();
       ctx.moveTo(0, _midPoint);
       ctx.lineTo(this._width, this._height);
@@ -92,23 +72,15 @@ class Triangle {
     });
   }
 
-  clear() {
-    this.easel.clear();
-    this.lastDirection = undefined;
-    this.dirty = true;
-  }
-
-  private dirty = true;
-
   private lastDirection?: TriangleDirection;
-  draw(direction: TriangleDirection = TRIANGLE_DIRECTIONS.up) {
-    if (this.lastDirection === direction || !this.dirty) {
+  drawTriangle(direction: TriangleDirection = TRIANGLE_DIRECTIONS.up) {
+    if (this.lastDirection === direction || !this.isDirty) {
       return;
     } else {
       this.lastDirection = direction;
     }
 
-    this.dirty = false;
+    this.dirty();
     switch (direction) {
       case TRIANGLE_DIRECTIONS.up: {
         this.drawUp();

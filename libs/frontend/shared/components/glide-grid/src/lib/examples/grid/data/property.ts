@@ -22,10 +22,6 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
     dataId: 'property',
     cursor: 'pointer',
     shouldSort: true,
-    themeOverride: {
-      textDark: 'blue',
-      baseFontStyle: '12px underlined',
-    },
   },
   {
     title: 'Address',
@@ -52,6 +48,7 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
     cellGen: genNumericCell,
     dataId: 'rentOwed',
     contentAlign: 'right',
+    shouldSort: true,
   },
 ];
 

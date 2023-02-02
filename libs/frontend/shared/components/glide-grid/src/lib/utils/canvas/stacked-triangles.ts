@@ -40,13 +40,13 @@ class StackedTriangles {
   }
 
   fill(color: string) {
-    this.triangle.fill(color);
+    this.triangle.fill = color;
     this.clear();
   }
 
   background(color: string) {
-    this.triangle.background(color);
-    this.easel.background(color);
+    this.triangle.background = color;
+    this.easel.background = color;
     this.clear();
   }
 
@@ -61,11 +61,11 @@ class StackedTriangles {
       return;
     }
 
-    this.triangle.draw(TRIANGLE_DIRECTIONS.up);
+    this.triangle.drawTriangle(TRIANGLE_DIRECTIONS.up);
     const triangleUpImage = this.triangle.image();
     this.triangle.clear();
 
-    this.triangle.draw(TRIANGLE_DIRECTIONS.down);
+    this.triangle.drawTriangle(TRIANGLE_DIRECTIONS.down);
     const triangleDownImage = this.triangle.image();
     this.triangle.clear();
 

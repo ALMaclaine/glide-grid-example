@@ -14,9 +14,10 @@ const DEFAULT_HEIGHT = 512;
 class Easel extends MiniCache<ImageData> {
   private canvasRef: OffscreenCanvas;
   private readonly context: OffscreenCanvasRenderingContext2D;
-  private readonly _width: number;
-  private readonly _height: number;
+  protected readonly _width: number;
+  protected readonly _height: number;
   private _background = 'white';
+  private _fill = 'black';
 
   constructor(props?: EaselProps) {
     super();
@@ -36,6 +37,23 @@ class Easel extends MiniCache<ImageData> {
     this.context = context;
   }
 
+  get width() {
+    return this._width;
+  }
+
+  get height() {
+    return this._height;
+  }
+
+  get fill() {
+    return this._fill;
+  }
+
+  set fill(color: string) {
+    this._fill = color;
+    this.clear();
+  }
+
   drawBackground() {
     this.context.fillStyle = this._background;
     this.context.beginPath();
@@ -43,8 +61,13 @@ class Easel extends MiniCache<ImageData> {
     this.context.fill();
   }
 
-  background(color: string) {
+  set background(color: string) {
     this._background = color;
+    this.clear();
+  }
+
+  get background() {
+    return this._background;
   }
 
   private clearScreen() {

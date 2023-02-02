@@ -46,7 +46,14 @@ const genNumericCell = <T extends object>(
 const genUriCell = <T extends object>(
   props: GenGridCellProps<T>
 ): CellPrototype<T> => {
-  return genGridCell({ ...props, kind: GridCellKind.Uri });
+  return genGridCell({
+    ...props,
+    kind: GridCellKind.Uri,
+    themeOverride: {
+      ...props.themeOverride,
+      textDark: '#5843be',
+    },
+  });
 };
 
 type CellGenerator<T extends object> = (

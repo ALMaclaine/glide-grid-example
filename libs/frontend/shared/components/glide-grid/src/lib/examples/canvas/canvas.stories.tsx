@@ -3,6 +3,7 @@ import { ComponentStory, Meta } from '@storybook/react';
 import { Easel } from '../../utils/canvas/easel';
 import { positioner } from '../../utils/canvas/utils';
 import { StackedTriangles } from '../../utils/canvas/stacked-triangles';
+import { Rectangle } from '../../utils/canvas/rectangle';
 
 const WIDTH = 1024;
 const HEIGHT = 512;
@@ -22,9 +23,12 @@ const CanvasDemo = () => {
     }
     triangle.fill('red');
     triangle.draw();
-    const image = triangle.image();
 
-    const pos = positioner({
+    const rectangle = new Rectangle({ width: WIDTH, height: 4 });
+    rectangle.fill = 'blue';
+    rectangle.drawRectangle();
+
+    const pos1 = positioner({
       containerWidth: WIDTH,
       containerHeight: HEIGHT,
       itemWidth: triangle.width,
@@ -33,10 +37,19 @@ const CanvasDemo = () => {
       padding: 32,
     });
 
-    easel.putImageData(image, pos);
+    const pos2 = positioner({
+      containerWidth: WIDTH,
+      containerHeight: HEIGHT,
+      itemWidth: rectangle.width,
+      itemHeight: rectangle.height,
+      position: 'botMid',
+    });
+
+    easel.putImageData(rectangle.image(), pos2);
+    easel.putImageData(triangle.image(), pos1);
     context.putImageData(easel.image(), 0, 0);
     easel.clear();
-  }, []);
+  }, [easel, triangle]);
 
   useEffect(() => {
     const timeoutRef = setInterval(innerDraw, SIZE);
@@ -46,22 +59,19 @@ const CanvasDemo = () => {
   return (
     <div
       style={{
-        height: 'SIZE%',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
-      <div
-        style={{
-          width: `${WIDTH}px`,
-          height: `${HEIGHT}px}`,
-          border: '1px solid black',
-        }}
-      >
-        <canvas width={WIDTH} height={HEIGHT} ref={canvasRef} />
-      </div>
+      <canvas
+        style={{ border: '1px solid black' }}
+        width={WIDTH}
+        height={HEIGHT}
+        ref={canvasRef}
+      />
     </div>
   );
 };
