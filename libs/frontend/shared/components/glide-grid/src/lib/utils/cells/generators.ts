@@ -49,6 +49,7 @@ const genUriCell = <T extends object>(
   return genGridCell({
     ...props,
     kind: GridCellKind.Uri,
+    cursor: 'pointer',
     themeOverride: {
       ...props.themeOverride,
       textDark: '#5843be',

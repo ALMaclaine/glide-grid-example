@@ -106,7 +106,20 @@ class GridManager<T extends object> {
 
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.pageManager.getRow(row);
-    return this.cellCache.get(rowUuid, col) as GridCell;
+    const cell = this.cellCache.get(rowUuid, col);
+
+    if (cell.kind === 'number') {
+      const clonedCell = { ...cell };
+      const displayNumber = parseFloat(clonedCell.displayData + '');
+      if (displayNumber < 0) {
+        clonedCell.displayData = `(${Math.abs(displayNumber)})`;
+      } else {
+        clonedCell.displayData = `${displayNumber} `;
+      }
+      return clonedCell as GridCell;
+    } else {
+      return cell as GridCell;
+    }
   }
 
   onCellClicked([colPos, rowPos]: Item): OnItemClickedProps<T> {

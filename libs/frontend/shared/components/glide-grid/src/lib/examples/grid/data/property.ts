@@ -20,7 +20,6 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
     grow: 2,
     cellGen: genUriCell,
     dataId: 'property',
-    cursor: 'pointer',
     shouldSort: true,
   },
   {
@@ -52,7 +51,7 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
   },
 ];
 
-const RENT_OWED_SET = [1300.32, 1500.0, 700.12, 900.43];
+const RENT_OWED_SET = [1300.32, -1500.0, 700.12, -900.43];
 const INVESTORS = [randCompanyName(), randCompanyName(), randCompanyName()];
 const genProperty = (): Property => {
   return {
