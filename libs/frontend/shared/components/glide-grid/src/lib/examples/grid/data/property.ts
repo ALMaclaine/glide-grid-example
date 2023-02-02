@@ -1,8 +1,6 @@
 import {
   GenerateWrappedColumnProps,
-  genNumericCell,
-  genTextCell,
-  genUriCell,
+  GENERATOR_TYPES,
 } from '../../../utils/cells/generators';
 import { randAddress, randCompanyName } from '@ngneat/falso';
 
@@ -18,33 +16,33 @@ const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
   {
     title: 'Property',
     grow: 2,
-    cellGen: genUriCell,
+    cellType: GENERATOR_TYPES.uri,
     dataId: 'property',
     shouldSort: true,
   },
   {
     title: 'Address',
     grow: 2,
-    cellGen: genTextCell,
+    cellType: GENERATOR_TYPES.text,
     dataId: 'address',
   },
   {
     title: 'Investor',
     grow: 2,
-    cellGen: genTextCell,
+    cellType: GENERATOR_TYPES.text,
     dataId: 'investor',
   },
   {
     title: 'Units',
     grow: 1,
     shouldSort: true,
-    cellGen: genNumericCell,
+    cellType: GENERATOR_TYPES.numeric,
     dataId: 'units',
   },
   {
     title: 'Rent Owed',
     grow: 1,
-    cellGen: genNumericCell,
+    cellType: GENERATOR_TYPES.numeric,
     dataId: 'rentOwed',
     contentAlign: 'right',
     shouldSort: true,

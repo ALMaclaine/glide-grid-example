@@ -3,6 +3,7 @@ import { GridCellKind } from '@glideapps/glide-data-grid';
 import type { CellPrototype, WrappedGridColumn } from '../../types/grid';
 import { SORT_TYPES } from '../sort/object-sort';
 import { uuid } from '../general';
+import { ObjectValues } from '../../types/general';
 
 type GenGridCellBaseProps<T extends object> = {
   kind: GridCell['kind'];
@@ -10,6 +11,14 @@ type GenGridCellBaseProps<T extends object> = {
 } & Partial<Omit<CellPrototype<T>, 'kind' | 'data'>>;
 
 type GenGridCellProps<T extends object> = Omit<GenGridCellBaseProps<T>, 'kind'>;
+
+const GENERATOR_TYPES = {
+  uri: 'uri',
+  text: 'text',
+  numeric: 'numeric',
+} as const;
+
+type GeneratorTypes = ObjectValues<typeof GENERATOR_TYPES>;
 
 const genGridCell = <T extends object>({
   dataId,
@@ -63,9 +72,25 @@ type CellGenerator<T extends object> = (
 
 type GenerateWrappedColumnProps<T extends object> = GenGridCellProps<T> & {
   title: string;
-  cellGen: CellGenerator<T>;
+  cellType: GeneratorTypes;
   grow?: number;
   shouldSort?: boolean;
+};
+
+const cellTypeToGenerator = (type: GeneratorTypes) => {
+  switch (type) {
+    case GENERATOR_TYPES.uri:
+      return genUriCell;
+    case GENERATOR_TYPES.text:
+      return genTextCell;
+    case GENERATOR_TYPES.numeric:
+      return genNumericCell;
+    default: {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const _default: never = type;
+      return genTextCell;
+    }
+  }
 };
 
 const generateWrappedColumn = <T extends object>({
@@ -74,7 +99,7 @@ const generateWrappedColumn = <T extends object>({
   dataId,
   themeOverride,
   cursor,
-  cellGen,
+  cellType,
   grow,
   shouldSort = false,
   contentAlign,
@@ -84,7 +109,12 @@ const generateWrappedColumn = <T extends object>({
   columnUuid: uuid(),
   grow,
   shouldSort,
-  cell: cellGen({ dataId, themeOverride, cursor, contentAlign }),
+  cell: cellTypeToGenerator(cellType)({
+    dataId,
+    themeOverride,
+    cursor,
+    contentAlign,
+  }),
 });
 
 export {
@@ -94,4 +124,10 @@ export {
   genNumericCell,
   generateWrappedColumn,
 };
-export type { GenGridCellProps, GenerateWrappedColumnProps, CellGenerator };
+export type {
+  GenGridCellProps,
+  GenerateWrappedColumnProps,
+  CellGenerator,
+  GeneratorTypes,
+};
+export { GENERATOR_TYPES };
