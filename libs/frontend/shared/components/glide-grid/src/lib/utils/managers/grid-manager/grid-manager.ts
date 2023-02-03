@@ -145,7 +145,7 @@ class GridManager<T extends object> {
     this.pageManager.setData(filtered);
   }
 
-  nextSortKey(key?: StringKeys<T>) {
+  private nextSortKey(key?: StringKeys<T>) {
     if (key !== undefined && !this.columnsManager.isSortColumn(key)) {
       return;
     }
