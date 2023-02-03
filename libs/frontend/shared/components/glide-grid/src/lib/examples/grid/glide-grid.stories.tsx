@@ -98,13 +98,13 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
         display: 'flex',
         height: '100%',
         justifyContent: 'center',
-        alignItems: 'center',
+        marginTop: '90px',
       }}
     >
       <div
         style={{
           width: '80vw',
-          height: '60vh',
+          height: '40vh',
         }}
       >
         <select

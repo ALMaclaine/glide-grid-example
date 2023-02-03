@@ -2,7 +2,6 @@ import type {
   GridEventHandlers,
   OnAreaSelectedHandler,
   OnColSelectedHandler,
-  OnHeaderClickHandler,
   OnItemSelectedHandler,
   OnRowSelectedHandler,
 } from './grid-manager/types';

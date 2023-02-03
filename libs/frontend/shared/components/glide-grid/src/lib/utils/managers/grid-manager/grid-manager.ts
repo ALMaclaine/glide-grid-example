@@ -60,14 +60,17 @@ class GridManager<T extends object> {
     onHeaderClicked,
   }: GridManagerProps<T>) {
     this.onHeaderClicked = onHeaderClicked;
-    const columns = _columns.map(generateWrappedColumn);
+
     this.pageManager = new PageManager<IdRow<T>>({ pageSize });
+
+    const columns = _columns.map(generateWrappedColumn);
     const sortMap = new SortMap({ columns });
-    this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
-    this.cellCache = new CellCache<T>(this.columnsManager);
-    this.sorter = new TableSorter<IdRow<T>>({ sortMap });
-    this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
+    this.sorter = new TableSorter<IdRow<T>>({ sortMap });
+
+    this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
+
+    this.cellCache = new CellCache<T>(this.columnsManager);
     this.filteredCache.cache([]);
 
     this.filterManager = new FilterManager({
@@ -87,40 +90,8 @@ class GridManager<T extends object> {
       onHeaderClicked,
       cellCache: this.cellCache,
     });
-  }
 
-  onHeaderClickedHandler(col: number) {
-    const selectedHeader = this.getHeaderKey(col);
-    this.nextSortKey(selectedHeader);
-    this.onHeaderClicked?.(selectedHeader);
-  }
-
-  get selection(): GridSelection {
-    return this.selectionManager.selection;
-  }
-  handleSelectionChange(selection: GridSelection): void {
-    this.eventManager.handleSelectionChange(selection);
-  }
-
-  setFilterSet(filterSet: FilterSet<T>[]): void {
-    this.filterManager.setFilterGroups(filterSet);
-    this.filterSorted();
-  }
-
-  setSearchTerms(terms: string[]): void {
-    this.filterManager.setSearchTerms(terms);
-    this.filterSorted();
-  }
-
-  toggleColumnVisibility(
-    hiddenColumn: StringKeys<T>,
-    visibility?: boolean
-  ): void {
-    this.columnsManager.toggleColumnVisibility(hiddenColumn, visibility);
-  }
-
-  isColumnShowing(key: StringKeys<T>): boolean {
-    return this.columnsManager.isShowing(key);
+    this.addData(data);
   }
 
   addData(data: T[]) {
@@ -139,10 +110,6 @@ class GridManager<T extends object> {
     return rows as IdRow<T>[];
   }
 
-  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
-    this.columnsManager.setHiddenColumns(hiddenColumns);
-  }
-
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.pageManager.getRow(row);
     const cell = this.cellCache.get(rowUuid, col);
@@ -159,50 +126,6 @@ class GridManager<T extends object> {
     } else {
       return cell as GridCell;
     }
-  }
-
-  cellSelectedHandler(item: Item): void {
-    this.eventManager.cellSelectedHandler(item);
-  }
-
-  get length() {
-    return this.pageManager.length;
-  }
-
-  getColumns() {
-    return this.columnsManager.getColumns();
-  }
-
-  get columnTitleIdMap() {
-    return this.columnsManager.columnTitleIdMap;
-  }
-
-  swap(col1: number, col2: number) {
-    this.columnsManager.swap(col1, col2);
-  }
-
-  getHeaderKey(col: number) {
-    return this.columnsManager.getHeaderKey(col);
-  }
-
-  setPage(page = 0) {
-    this.pageManager.setPage(page);
-  }
-
-  get page() {
-    return this.pageManager.page;
-  }
-
-  get pageSize() {
-    return this.pageManager.pageSize;
-  }
-
-  get pageCount() {
-    return this.pageManager.pageCount;
-  }
-
-  setPageSize(pageSize: number | undefined) {
-    this.pageManager.setPageSize(pageSize);
   }
 
   getSortHistory(steps: number) {
@@ -227,6 +150,100 @@ class GridManager<T extends object> {
       return;
     }
     this.sorter.stateSort(key);
+    this.filterSorted();
+  }
+
+  //
+  // page manager only
+  //
+  get length() {
+    return this.pageManager.length;
+  }
+
+  setPage(page = 0) {
+    this.pageManager.setPage(page);
+  }
+
+  get page() {
+    return this.pageManager.page;
+  }
+
+  get pageSize() {
+    return this.pageManager.pageSize;
+  }
+
+  get pageCount() {
+    return this.pageManager.pageCount;
+  }
+
+  setPageSize(pageSize: number | undefined) {
+    this.pageManager.setPageSize(pageSize);
+  }
+
+  //
+  // event manager only
+  //
+  onHeaderClickedHandler(col: number) {
+    const selectedHeader = this.columnsManager.getHeaderKey(col);
+    this.nextSortKey(selectedHeader);
+    this.onHeaderClicked?.(selectedHeader);
+  }
+
+  handleSelectionChange(selection: GridSelection): void {
+    this.eventManager.handleSelectionChange(selection);
+  }
+
+  cellSelectedHandler(item: Item): void {
+    this.eventManager.cellSelectedHandler(item);
+  }
+
+  //
+  // columns manager only
+  //
+  getColumns() {
+    return this.columnsManager.getColumns();
+  }
+
+  get columnTitleIdMap() {
+    return this.columnsManager.columnTitleIdMap;
+  }
+
+  swap(col1: number, col2: number) {
+    this.columnsManager.swap(col1, col2);
+  }
+
+  toggleColumnVisibility(
+    hiddenColumn: StringKeys<T>,
+    visibility?: boolean
+  ): void {
+    this.columnsManager.toggleColumnVisibility(hiddenColumn, visibility);
+  }
+
+  isColumnShowing(key: StringKeys<T>): boolean {
+    return this.columnsManager.isShowing(key);
+  }
+
+  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
+    this.columnsManager.setHiddenColumns(hiddenColumns);
+  }
+
+  //
+  // selection manager only
+  //
+  get selection(): GridSelection {
+    return this.selectionManager.selection;
+  }
+
+  //
+  // filter manager only
+  //
+  setFilterGroups(filterSet: FilterSet<T>[]): void {
+    this.filterManager.setFilterGroups(filterSet);
+    this.filterSorted();
+  }
+
+  setSearchTerms(terms: string[]): void {
+    this.filterManager.setSearchTerms(terms);
     this.filterSorted();
   }
 }
