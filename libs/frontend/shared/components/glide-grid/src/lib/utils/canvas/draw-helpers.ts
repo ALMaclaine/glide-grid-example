@@ -2,11 +2,12 @@ import { Triangle, TRIANGLE_DIRECTIONS } from './triangle';
 import { StackedTriangles } from './stacked-triangles';
 import type { DrawHeaderCallback } from '@glideapps/glide-data-grid';
 import type { StateSet } from '../sort/sort-state-machine';
-import { SORT_STATES, SortStates } from '../sort/object-sort';
+import type { SortStates } from '../sort/object-sort';
+import { SORT_STATES } from '../sort/object-sort';
 import { positioner } from './utils';
 import { drawTextCell } from '@glideapps/glide-data-grid';
 import { Rectangle } from './rectangle';
-import { WrappedGridColumn } from '../managers/grid-manager/types';
+import type { WrappedGridColumn } from '../managers/grid-manager/types';
 
 const WIDTH = 8;
 const HEIGHT = 5;

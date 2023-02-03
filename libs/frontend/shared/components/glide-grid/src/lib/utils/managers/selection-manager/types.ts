@@ -1,4 +1,4 @@
-import { ObjectValues } from '../../../types/general';
+import type { ObjectValues } from '../../../types/general';
 
 const LAST_SELECTION_CHANGE_TYPE = {
   columns: 'columns',

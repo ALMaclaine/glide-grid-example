@@ -1,18 +1,19 @@
-import {
-  DataEditor,
+import type {
   GridMouseEventArgs,
-  Item,
+  Item} from '@glideapps/glide-data-grid';
+import {
+  DataEditor
 } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
 import { useCallback, useState } from 'react';
-import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
+import type { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { GridManager } from './utils/managers/grid-manager/grid-manager';
-import {
+import type { GridManager } from './utils/managers/grid-manager/grid-manager';
+import type {
   HeaderClickHandler,
   HoverHandler,
   OnRowClickedHandler,

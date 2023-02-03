@@ -3,7 +3,7 @@ import { GridCellKind } from '@glideapps/glide-data-grid';
 import { SORT_TYPES } from '../sort/object-sort';
 import { uuid } from '../general';
 import type { ObjectValues } from '../../types/general';
-import {
+import type {
   CellPrototype,
   WrappedGridColumn,
 } from '../managers/grid-manager/types';

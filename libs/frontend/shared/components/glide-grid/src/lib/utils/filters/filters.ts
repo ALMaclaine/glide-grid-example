@@ -1,5 +1,6 @@
-import { Filter, FILTER_TYPES, FilterFunc } from './types';
-import { StringKeys } from '../../types/general';
+import type { Filter, FilterFunc } from './types';
+import { FILTER_TYPES } from './types';
+import type { StringKeys } from '../../types/general';
 
 const filterLevels = (value: string, levels: string[]) =>
   levels.includes(value);

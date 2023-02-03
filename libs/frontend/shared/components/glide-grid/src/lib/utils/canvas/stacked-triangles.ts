@@ -1,6 +1,7 @@
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, Easel } from './easel';
 import { positioner, ALIGNMENTS } from './utils';
-import { Triangle, TRIANGLE_DIRECTIONS, TriangleProps } from './triangle';
+import type { TriangleProps } from './triangle';
+import { Triangle, TRIANGLE_DIRECTIONS } from './triangle';
 
 type StackedTriangleProps = TriangleProps & {
   gap?: number;

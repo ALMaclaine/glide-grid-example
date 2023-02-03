@@ -1,5 +1,5 @@
 import type { StringKeys } from '../../../types/general';
-import {
+import type {
   GridCell,
   GridColumn,
   GridMouseEventArgs,

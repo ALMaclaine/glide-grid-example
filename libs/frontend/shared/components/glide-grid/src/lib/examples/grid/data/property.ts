@@ -1,5 +1,6 @@
+import type {
+  GenerateWrappedColumnProps} from '../../../utils/cells/generators';
 import {
-  GenerateWrappedColumnProps,
   GENERATOR_TYPES,
 } from '../../../utils/cells/generators';
 import { randAddress, randCompanyName } from '@ngneat/falso';

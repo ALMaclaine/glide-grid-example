@@ -1,6 +1,6 @@
 import type { EaselProps } from './easel';
 import { Easel } from './easel';
-import { ObjectValues } from '../../types/general';
+import type { ObjectValues } from '../../types/general';
 import { midPoint } from './utils';
 
 const TRIANGLE_DIRECTIONS = {

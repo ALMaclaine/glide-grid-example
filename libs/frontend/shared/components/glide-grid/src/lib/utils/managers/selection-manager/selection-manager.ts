@@ -1,7 +1,8 @@
-import {
-  CompactSelection,
+import type {
   GridSelection,
-  Rectangle,
+  Rectangle} from '@glideapps/glide-data-grid';
+import {
+  CompactSelection
 } from '@glideapps/glide-data-grid';
 import type { LastSelectionChangeType } from './types';
 import { LAST_SELECTION_CHANGE_TYPE } from './types';

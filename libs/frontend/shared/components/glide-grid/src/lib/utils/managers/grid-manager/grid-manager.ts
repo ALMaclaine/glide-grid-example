@@ -11,14 +11,15 @@ import { SortMap } from '../../sort/sort-map';
 import { FilterManager } from '../filter-manager';
 import { PageManager } from '../page-manager';
 
+import type {
+  GenerateWrappedColumnProps} from '../../cells/generators';
 import {
-  generateWrappedColumn,
-  GenerateWrappedColumnProps,
+  generateWrappedColumn
 } from '../../cells/generators';
 
 import { SelectionManager } from '../selection-manager/selection-manager';
-import { IdRow, OnItemClickedHandler, WrappedGridColumn } from './types';
-import { LastSelectionChangeType } from '../selection-manager/types';
+import type { IdRow, OnItemClickedHandler, WrappedGridColumn } from './types';
+import type { LastSelectionChangeType } from '../selection-manager/types';
 
 type GridManagerProps<T extends object> = {
   columns: GenerateWrappedColumnProps<T>[];

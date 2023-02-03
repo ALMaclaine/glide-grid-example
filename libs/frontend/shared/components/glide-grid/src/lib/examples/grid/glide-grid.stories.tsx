@@ -1,7 +1,8 @@
-import { ComponentStory, Meta } from '@storybook/react';
+import type { ComponentStory, Meta } from '@storybook/react';
 import { GlideGrid } from '../../glide-grid';
 import { GridManager } from '../../utils/managers/grid-manager/grid-manager';
-import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
+import type { Property} from './data/property';
+import { genProperty, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
 import { useCallback, useMemo, useState } from 'react';
 import type { StringKeys } from '../../types/general';

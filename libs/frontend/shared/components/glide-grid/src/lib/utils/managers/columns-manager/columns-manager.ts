@@ -2,7 +2,7 @@ import type { StringKeys } from '../../../types/general';
 import { HiddenColumnTranslator } from './hidden-column-translator';
 import { SortTranslator } from './sort-translator';
 import type { ColumnsProps } from './types';
-import { CellPrototype, WrappedGridColumn } from '../grid-manager/types';
+import type { CellPrototype, WrappedGridColumn } from '../grid-manager/types';
 
 class ColumnsManager<T extends object> {
   private readonly sortTranslator = new SortTranslator<T>();

@@ -1,5 +1,5 @@
-import { StringKeys } from '../../../types/general';
-import { WrappedGridColumn } from '../grid-manager/types';
+import type { StringKeys } from '../../../types/general';
+import type { WrappedGridColumn } from '../grid-manager/types';
 
 type ColumnsProps<T extends object> = {
   columns: WrappedGridColumn<T>[];

@@ -1,5 +1,5 @@
-import { ColumnsManager } from '../managers/columns-manager/columns-manager';
-import { CellInstance, IdRow } from '../managers/grid-manager/types';
+import type { ColumnsManager } from '../managers/columns-manager/columns-manager';
+import type { CellInstance, IdRow } from '../managers/grid-manager/types';
 
 class CellCache<T extends object> {
   private cachedContent: Map<string, Map<string, CellInstance<T>>> = new Map();

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ComponentStory, Meta } from '@storybook/react';
+import type { ComponentStory, Meta } from '@storybook/react';
 import { Easel } from '../../utils/canvas/easel';
 import { positioner } from '../../utils/canvas/utils';
 import { StackedTriangles } from '../../utils/canvas/stacked-triangles';

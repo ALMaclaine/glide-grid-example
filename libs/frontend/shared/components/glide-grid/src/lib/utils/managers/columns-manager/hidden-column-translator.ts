@@ -1,7 +1,7 @@
 import { MiniCache } from '../../caches/mini-cache';
 import type { StringKeys } from '../../../types/general';
 import type { ColumnsProps, Translation } from './types';
-import { WrappedGridColumn } from '../grid-manager/types';
+import type { WrappedGridColumn } from '../grid-manager/types';
 
 class HiddenColumnTranslator<T extends object> {
   private readonly hiddenTranslatorMap = new Map<number, number>();

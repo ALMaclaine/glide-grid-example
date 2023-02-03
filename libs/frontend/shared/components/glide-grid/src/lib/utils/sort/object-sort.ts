@@ -1,4 +1,4 @@
-import { ObjectValues, StringKeys } from '../../types/general';
+import type { ObjectValues, StringKeys } from '../../types/general';
 
 const SORT_TYPES = {
   natural: 'natural',
