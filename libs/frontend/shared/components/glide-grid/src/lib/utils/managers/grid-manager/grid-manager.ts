@@ -14,33 +14,17 @@ import { PageManager } from '../page-manager';
 import type { GenerateWrappedColumnProps } from '../../cells/generators';
 import { generateWrappedColumn } from '../../cells/generators';
 
+import type { GridEventHandlers, IdRow, WrappedGridColumn } from './types';
+import { EventManager } from '../event-manager';
 import { SelectionManager } from '../selection-manager/selection-manager';
-import type {
-  IdRow,
-  OnAreaSelectedHandler,
-  OnColSelectedHandler,
-  OnItemSelectedHandler,
-  WrappedGridColumn,
-} from './types';
-import type { LastSelectionChangeType } from '../selection-manager/types';
-import { LAST_SELECTION_CHANGE_TYPE } from '../selection-manager/types';
-import type { OnRowSelectedHandler } from './types';
 
-type GridManagerProps<T extends object> = {
+type GridManagerProps<T extends object> = GridEventHandlers<T> & {
   columns: GenerateWrappedColumnProps<T>[];
   data: T[];
   pageSize?: number;
   hiddenColumns?: StringKeys<T>[];
   filterSet?: FilterSet<T>[];
   searchTerms?: string[];
-  onItemSelected?: OnItemSelectedHandler;
-  onRowSelected?: OnRowSelectedHandler;
-  onColSelected?: OnColSelectedHandler;
-  onAreaSelected?: OnAreaSelectedHandler;
-};
-
-const isMarkerClick = ([col]: Item): boolean => {
-  return col === -1;
 };
 
 const getTextKeys = <T extends object>(
@@ -50,22 +34,15 @@ const getTextKeys = <T extends object>(
 };
 
 class GridManager<T extends object> {
-  private readonly columnsManager: ColumnsManager<T>;
+  private readonly selectionManager = new SelectionManager();
+
   private readonly cellCache: CellCache<T>;
   private readonly sorter: TableSorter<IdRow<T>>;
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
+  private readonly columnsManager: ColumnsManager<T>;
   private readonly pageManager: PageManager<IdRow<T>>;
-  private readonly selectionManager = new SelectionManager();
-  private readonly onItemSelected?: OnItemSelectedHandler;
-  private readonly onRowSelected?: OnRowSelectedHandler;
-  private readonly onColSelected?: OnColSelectedHandler;
-  private readonly onAreaSelected?: OnAreaSelectedHandler;
-
-  get selection(): GridSelection {
-    return this.selectionManager.selection;
-  }
-
+  private readonly eventManager: EventManager<T>;
   private filterManager: FilterManager<T>;
   constructor({
     columns: _columns,
@@ -75,14 +52,10 @@ class GridManager<T extends object> {
     filterSet = [],
     searchTerms = [],
     onItemSelected,
-    onRowSelected,
-    onColSelected,
     onAreaSelected,
+    onColSelected,
+    onRowSelected,
   }: GridManagerProps<T>) {
-    this.onItemSelected = onItemSelected;
-    this.onRowSelected = onRowSelected;
-    this.onColSelected = onColSelected;
-    this.onAreaSelected = onAreaSelected;
     const columns = _columns.map(generateWrappedColumn);
     this.pageManager = new PageManager<IdRow<T>>({ pageSize });
     const sortMap = new SortMap({ columns });
@@ -92,96 +65,30 @@ class GridManager<T extends object> {
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
     this.filteredCache.cache([]);
+
     this.filterManager = new FilterManager({
       filters: filterSet,
       sortMap,
       searchTerms,
     });
-  }
 
-  private handleRowSelected(selection: GridSelection) {
-    // don't bother wasting cycles if we don't have a handler
-    if (!this.onRowSelected) {
-      return;
-    }
-    const lastSelectedIndex = selection.rows.last();
-    if (lastSelectedIndex === undefined) {
-      throw new Error('Should not occur');
-    }
-    const lastSelectedRow = this.pageManager.getRow(lastSelectedIndex);
-    const selectedIndices = selection.rows.toArray();
-    const selectedRows = selectedIndices.map((index) =>
-      this.pageManager.getRow(index)
-    );
-    this.onRowSelected({
-      lastSelectedIndex,
-      selectedIndices,
-      lastSelectedRow,
-      selectedRows,
+    this.eventManager = new EventManager<T>({
+      selectionManager: this.selectionManager,
+      columnsManager: this.columnsManager,
+      pageManager: this.pageManager,
+      onItemSelected,
+      onAreaSelected,
+      onColSelected,
+      onRowSelected,
+      cellCache: this.cellCache,
     });
   }
 
-  private handleAreaSelected(selection: GridSelection) {
-    // don't bother wasting cycles if we don't have a handler
-    if (!this.onAreaSelected) {
-      return;
-    }
-    const rect = selection.current?.range;
-    if (!rect) {
-      throw new Error('Should not occur');
-    }
-    this.onAreaSelected({
-      rect,
-    });
+  get selection(): GridSelection {
+    return this.selectionManager.selection;
   }
-
-  private handleColSelected(selection: GridSelection) {
-    // don't bother wasting cycles if we don't have a handler
-    if (!this.onColSelected) {
-      return;
-    }
-    const lastSelectedIndex = selection.columns.last();
-    if (lastSelectedIndex === undefined) {
-      throw new Error('Should not occur');
-    }
-    const lastSelectedCol =
-      this.columnsManager.getCellByIndex(lastSelectedIndex);
-    const selectedIndices = selection.columns.toArray();
-    const selectedCols = selectedIndices.map((index) =>
-      this.columnsManager.getCellByIndex(index)
-    );
-    this.onColSelected({
-      lastSelectedIndex,
-      selectedIndices,
-      lastSelectedCol,
-      selectedCols,
-    });
-  }
-
   handleSelectionChange(selection: GridSelection): void {
-    // updateSelections must be called before accessing lastChangeType
-    this.selectionManager.updateSelections(selection);
-    const lastType = this.lastChangeType;
-    switch (lastType) {
-      case LAST_SELECTION_CHANGE_TYPE.rows: {
-        this.handleRowSelected(selection);
-        return;
-      }
-      case LAST_SELECTION_CHANGE_TYPE.columns: {
-        this.handleColSelected(selection);
-        return;
-      }
-      case LAST_SELECTION_CHANGE_TYPE.rect: {
-        this.handleAreaSelected(selection);
-        return;
-      }
-      case LAST_SELECTION_CHANGE_TYPE.initial:
-        break;
-      default: {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const _default: never = lastType;
-      }
-    }
+    this.eventManager.handleSelectionChange(selection);
   }
 
   setFilterSet(filterSet: FilterSet<T>[]): void {
@@ -243,17 +150,8 @@ class GridManager<T extends object> {
     }
   }
 
-  cellClickedHandler(item: Item): void {
-    if (!isMarkerClick(item)) {
-      // don't bother wasting cycles if we don't have a handler
-      if (!this.onItemSelected) {
-        return;
-      }
-      const [colPos, rowPos] = item;
-      const row = this.pageManager.getRow(rowPos);
-      const cell = this.cellCache.get(row.rowUuid, colPos);
-      this.onItemSelected({ row, cell });
-    }
+  cellSelectedHandler(item: Item): void {
+    this.eventManager.cellSelectedHandler(item);
   }
 
   get length() {
@@ -311,10 +209,6 @@ class GridManager<T extends object> {
     const sorted = this.sorter.sorted;
     const filtered = sorted.filter((item) => this.filterManager.testItem(item));
     this.pageManager.setData(filtered);
-  }
-
-  get lastChangeType(): LastSelectionChangeType {
-    return this.selectionManager.lastChangeType;
   }
 
   nextSortKey(key?: StringKeys<T>) {

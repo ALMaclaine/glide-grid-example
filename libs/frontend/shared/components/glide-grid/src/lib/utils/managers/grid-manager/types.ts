@@ -81,7 +81,15 @@ type OnAreaSelectedProps = {
 
 type OnAreaSelectedHandler = (props: OnAreaSelectedProps) => void;
 
+type GridEventHandlers<T> = {
+  onAreaSelected: OnAreaSelectedHandler;
+  onRowSelected: OnRowSelectedHandler;
+  onColSelected: OnColSelectedHandler;
+  onItemSelected: OnItemSelectedHandler;
+};
+
 export type {
+  GridEventHandlers,
   OnAreaSelectedProps,
   OnAreaSelectedHandler,
   OnRowSelectedHandler,

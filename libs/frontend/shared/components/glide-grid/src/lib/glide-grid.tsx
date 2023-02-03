@@ -118,7 +118,7 @@ function GlideGrid<T extends object>({
         }}
         getCellContent={(item: Item) => gridManager.itemToCell(item)}
         onCellClicked={(itemPos: Item) => {
-          gridManager.cellClickedHandler(itemPos);
+          gridManager.cellSelectedHandler(itemPos);
         }}
         onColumnMoved={(col1, col2) => {
           gridManager.swap(col1, col2);
