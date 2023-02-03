@@ -154,7 +154,12 @@ class EventManager<T extends object> {
       const [colPos, rowPos] = item;
       const row = this.pageManager.getRow(rowPos);
       const cell = this.cellCache.get(row.rowUuid, colPos);
-      this.onItemSelected({ row, cell });
+      this.onItemSelected({
+        row,
+        cell,
+        displayData: cell.displayData,
+        data: cell.data,
+      });
     }
   }
 }

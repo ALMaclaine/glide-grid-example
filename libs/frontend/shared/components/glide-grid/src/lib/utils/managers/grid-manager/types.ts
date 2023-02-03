@@ -47,6 +47,8 @@ type IdColumn<T extends object> = T & {
 type OnItemSelectedProps<T extends object> = {
   cell: CellPrototype<T>;
   row: IdRow<T>;
+  displayData: number | string | Date;
+  data: number | string | Date;
 };
 
 type OnItemSelectedHandler = <T extends object>(
