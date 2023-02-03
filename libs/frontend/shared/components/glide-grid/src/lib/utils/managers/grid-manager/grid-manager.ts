@@ -44,7 +44,7 @@ class GridManager<T extends object> {
   private readonly sorter: TableSorter<IdRow<T>>;
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
-  private readonly pageManager: PageManager<T>;
+  private readonly pageManager: PageManager<IdRow<T>>;
   private readonly selectionManager = new SelectionManager();
   private readonly onItemClicked: OnItemClickedHandler;
 
@@ -68,7 +68,7 @@ class GridManager<T extends object> {
   }: GridManagerProps<T>) {
     this.onItemClicked = onItemClicked;
     const columns = _columns.map(generateWrappedColumn);
-    this.pageManager = new PageManager<T>({ pageSize });
+    this.pageManager = new PageManager<IdRow<T>>({ pageSize });
     const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.cellCache = new CellCache<T>(this.columnsManager);

@@ -1,5 +1,4 @@
 import { MiniCache } from '../caches/mini-cache';
-import type { IdRow } from './grid-manager/types';
 
 type PageManagerProps = {
   pageSize?: number;
@@ -7,15 +6,15 @@ type PageManagerProps = {
 
 class PageManager<T extends object> {
   private _pageSize?: number;
-  private data: IdRow<T>[] = [];
-  private windowedDataCache = new MiniCache<IdRow<T>[]>();
+  private data: T[] = [];
+  private windowedDataCache = new MiniCache<T[]>();
   private _page = 0;
   constructor({ pageSize }: PageManagerProps = {}) {
     this._pageSize = pageSize;
     this.windowedDataCache.cache([]);
   }
 
-  setData(data: IdRow<T>[]) {
+  setData(data: T[]) {
     this.data = data;
     this.getData();
   }
@@ -75,7 +74,7 @@ class PageManager<T extends object> {
     if (!this._pageSize) {
       return this.windowedDataCache.cache(this.data);
     }
-    const windowedData: IdRow<T>[] = [];
+    const windowedData: T[] = [];
     const start = this._page * this._pageSize;
     const end = Math.min(this.data.length, (this._page + 1) * this._pageSize);
     for (let i = start; i < end; i++) {
