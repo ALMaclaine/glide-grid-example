@@ -10,10 +10,13 @@ import {
   VALID_NUMERIC_FILTER_SET,
 } from '../filters/types';
 
-type FilterManagerProps<T extends object> = {
-  sortMap: SortMap<T>;
+type FilterManagerFilterProps<T extends object> = {
   filters?: FilterSet<T>[];
   searchTerms?: string[];
+};
+
+type FilterManagerProps<T extends object> = FilterManagerFilterProps<T> & {
+  sortMap: SortMap<T>;
 };
 
 class FilterManager<T extends object> {
@@ -134,3 +137,4 @@ class FilterManager<T extends object> {
 }
 
 export { FilterManager };
+export type { FilterManagerFilterProps, FilterManagerProps };

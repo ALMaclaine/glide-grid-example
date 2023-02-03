@@ -1,80 +1,54 @@
 import { ColumnsManager } from '../columns-manager/columns-manager';
 import type { StringKeys } from '../../../types/general';
-import { CellCache } from '../../caches/cell-cache';
 import type { GridCell, GridSelection, Item } from '@glideapps/glide-data-grid';
-import { TableSorter } from '../../sort/table-sorter';
-import { uuid } from '../../general';
-import { Levels } from '../../../levels';
-import { MiniCache } from '../../caches/mini-cache';
 import type { FilterSet } from '../../filters/types';
-import { SortMap } from '../../sort/sort-map';
-import { FilterManager } from '../filter-manager';
 
 import type { GenerateWrappedColumnProps } from '../../cells/generators';
 import { generateWrappedColumn } from '../../cells/generators';
 
-import type { GridEventHandlers, IdRow, WrappedGridColumn } from './types';
+import type { EventManagerEventProps } from '../event-manager';
 import { EventManager } from '../event-manager';
 import { SelectionManager } from '../selection-manager/selection-manager';
 import type { OnHeaderClickHandler } from './types';
-import type { DataManagerProps } from '../data-manager';
+import type { DataMangerInProps } from '../data-manager';
 import { DataManager } from '../data-manager';
+import type { FilterManagerFilterProps } from '../filter-manager';
 
-type GridManagerProps<T extends object> = DataManagerProps<T> & {
-  columns: GenerateWrappedColumnProps<T>[];
-  data: T[];
-  hiddenColumns?: StringKeys<T>[];
-  filterSet?: FilterSet<T>[];
-  searchTerms?: string[];
-  events?: GridEventHandlers;
-};
-
-const getTextKeys = <T extends object>(
-  columns: WrappedGridColumn<T>[]
-): StringKeys<T>[] => {
-  return columns.filter((e) => e.cell.kind !== 'number').map(({ id }) => id);
-};
+type GridManagerProps<T extends object> = DataMangerInProps &
+  FilterManagerFilterProps<T> &
+  EventManagerEventProps & {
+    columns: GenerateWrappedColumnProps<T>[];
+    data: T[];
+    hiddenColumns?: StringKeys<T>[];
+  };
 
 class GridManager<T extends object> {
   private readonly selectionManager = new SelectionManager();
   private readonly onHeaderClicked?: OnHeaderClickHandler;
 
-  private readonly sorter: TableSorter<IdRow<T>>;
-  private readonly levels: Levels<T>;
-  private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly columnsManager: ColumnsManager<T>;
   private readonly eventManager: EventManager<T>;
-  private readonly filterManager: FilterManager<T>;
-  private readonly dataManager: DataManager<IdRow<T>>;
+  private readonly dataManager: DataManager<T>;
   constructor({
     columns: _columns,
     data,
     hiddenColumns,
     pageSize,
-    filterSet = [],
+    filters = [],
     searchTerms = [],
     events: { onHeaderClicked } = {},
     events,
   }: GridManagerProps<T>) {
     this.onHeaderClicked = onHeaderClicked;
     const columns = _columns.map(generateWrappedColumn);
-    const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
 
-    this.dataManager = new DataManager<IdRow<T>>({
+    this.dataManager = new DataManager<T>({
       pageSize,
-      columnsManager: this.columnsManager,
-    });
-
-    this.levels = new Levels(getTextKeys(columns));
-    this.sorter = new TableSorter<IdRow<T>>({ sortMap });
-
-    this.filteredCache.cache([]);
-
-    this.filterManager = new FilterManager({
-      filters: filterSet,
-      sortMap,
+      columns,
+      filters,
       searchTerms,
+      columnsManager: this.columnsManager,
     });
 
     this.eventManager = new EventManager<T>({
@@ -85,22 +59,6 @@ class GridManager<T extends object> {
     });
 
     this.addData(data);
-  }
-
-  addData(data: T[]): void {
-    const rows = this.processRows(data);
-    this.sorter.addData(rows);
-    this.dataManager.addData(rows);
-    this.nextSortKey();
-  }
-
-  private processRows(rows: T[]): IdRow<T>[] {
-    for (const row of rows) {
-      const changeType = row as IdRow<T>;
-      changeType.rowUuid = uuid();
-      this.levels.processItem(row);
-    }
-    return rows as IdRow<T>[];
   }
 
   itemToCell([col, row]: Item): GridCell {
@@ -121,33 +79,21 @@ class GridManager<T extends object> {
     }
   }
 
-  getSortHistory(steps: number) {
-    return this.sorter.getSortHistory(steps);
-  }
-
-  clear() {
-    this.sorter.clear();
-    this.filteredCache.dirty();
-    this.dataManager.clear();
-  }
-
-  private filterSorted() {
-    const sorted = this.sorter.sorted;
-    const filtered = sorted.filter((item) => this.filterManager.testItem(item));
-    this.dataManager.setData(filtered);
-  }
-
-  private nextSortKey(key?: StringKeys<T>) {
-    if (key !== undefined && !this.columnsManager.isSortColumn(key)) {
-      return;
-    }
-    this.sorter.stateSort(key);
-    this.filterSorted();
-  }
-
   //
   // data manager only
   //
+  addData(data: T[]): void {
+    this.dataManager.addData(data);
+  }
+
+  getSortHistory(steps: number) {
+    return this.dataManager.getSortHistory(steps);
+  }
+
+  clear() {
+    this.dataManager.clear();
+  }
+
   get length() {
     return this.dataManager.length;
   }
@@ -172,12 +118,20 @@ class GridManager<T extends object> {
     this.dataManager.setPageSize(pageSize);
   }
 
+  setFilterGroups(filters: FilterSet<T>[]): void {
+    this.dataManager.setFilterGroups(filters);
+  }
+
+  setSearchTerms(terms: string[]): void {
+    this.dataManager.setSearchTerms(terms);
+  }
+
   //
   // event manager only
   //
   onHeaderClickedHandler(col: number) {
     const selectedHeader = this.columnsManager.getHeaderKey(col);
-    this.nextSortKey(selectedHeader);
+    this.dataManager.nextSortKey(selectedHeader);
     this.onHeaderClicked?.(selectedHeader);
   }
 
@@ -224,19 +178,6 @@ class GridManager<T extends object> {
   //
   get selection(): GridSelection {
     return this.selectionManager.selection;
-  }
-
-  //
-  // filter manager only
-  //
-  setFilterGroups(filterSet: FilterSet<T>[]): void {
-    this.filterManager.setFilterGroups(filterSet);
-    this.filterSorted();
-  }
-
-  setSearchTerms(terms: string[]): void {
-    this.filterManager.setSearchTerms(terms);
-    this.filterSorted();
   }
 }
 

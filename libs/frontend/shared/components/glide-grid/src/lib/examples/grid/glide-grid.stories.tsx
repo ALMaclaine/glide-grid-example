@@ -30,13 +30,15 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
     () =>
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
-        data: [],
-        onItemSelected: console.log,
-        onRowSelected: console.log,
-        onColSelected: console.log,
-        onAreaSelected: console.log,
+        data: [] as Property[],
+        events: {
+          onItemSelected: console.log,
+          onRowSelected: console.log,
+          onColSelected: console.log,
+          onAreaSelected: console.log,
+        },
         searchTerms: ['gateway', 'drive', 'vista'],
-        filterSet: [
+        filters: [
           {
             address: { type: 'identity' },
             investor: { type: 'identity' },
