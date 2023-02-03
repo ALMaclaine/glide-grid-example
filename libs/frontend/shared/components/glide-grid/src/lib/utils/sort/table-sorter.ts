@@ -1,11 +1,11 @@
 import type { StringKeys } from '../../types/general';
-import type { IdRow } from '../../types/grid';
 import type { StateSet } from './sort-state-machine';
 import { SortMap } from './sort-map';
 import { objectSort } from './object-sort';
 import { MiniCache } from '../caches/mini-cache';
 import { SortStateMachine } from './sort-state-machine';
 import { STATE_HISTORY_STEPS } from '../../constants';
+import { IdRow } from '../managers/grid-manager/types';
 
 type TableSorterProps<T extends object> = {
   sortMap: SortMap<T>;

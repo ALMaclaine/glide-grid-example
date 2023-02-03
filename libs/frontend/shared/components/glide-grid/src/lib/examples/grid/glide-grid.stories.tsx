@@ -1,6 +1,6 @@
 import { ComponentStory, Meta } from '@storybook/react';
 import { GlideGrid } from '../../glide-grid';
-import { GridManager } from '../../utils/managers/grid-manager';
+import { GridManager } from '../../utils/managers/grid-manager/grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
 import { useCallback, useMemo, useState } from 'react';
@@ -30,6 +30,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
         data: [],
+        onItemClicked: console.log,
         searchTerms: ['gateway', 'drive', 'vista'],
         filterSet: [
           {
@@ -146,7 +147,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
             refresh();
           }}
         />
-        <GlideGrid onItemClicked={console.log} gridManager={gridManager} />
+        <GlideGrid gridManager={gridManager} />
       </div>
     </div>
   );

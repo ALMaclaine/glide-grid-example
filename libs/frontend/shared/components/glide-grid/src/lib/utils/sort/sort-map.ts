@@ -1,7 +1,7 @@
 import type { StringKeys } from '../../types/general';
 import { SORT_TYPES } from './object-sort';
 import type { SortTypes } from './object-sort';
-import type { WrappedGridColumn } from '../../types/grid';
+import { WrappedGridColumn } from '../managers/grid-manager/types';
 
 class SortMap<T extends object> {
   private readonly sortMap: Map<StringKeys<T>, SortTypes>;

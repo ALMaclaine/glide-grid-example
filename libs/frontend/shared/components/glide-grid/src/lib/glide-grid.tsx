@@ -9,15 +9,14 @@ import { useCallback, useState } from 'react';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
 import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
-import type {
-  HeaderClickHandler,
-  HoverHandler,
-  OnItemClickedHandler,
-  OnRowClickedHandler,
-} from './types/func';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { GridManager } from './utils/managers/grid-manager';
+import { GridManager } from './utils/managers/grid-manager/grid-manager';
+import {
+  HeaderClickHandler,
+  HoverHandler,
+  OnRowClickedHandler,
+} from './utils/managers/grid-manager/types';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -57,21 +56,15 @@ const theme = {
 
 type GlideGridProps<T extends object> = {
   onItemHovered?: HoverHandler;
-  onItemClicked?: OnItemClickedHandler;
   onRowClicked?: OnRowClickedHandler;
   gridManager: GridManager<T>;
   getRowThemeOverride?: GetRowThemeCallback;
   onHeaderClicked?: HeaderClickHandler;
 };
 
-const isMarkerClick = ([col]: Item): boolean => {
-  return col === -1;
-};
-
 function GlideGrid<T extends object>({
   gridManager,
   onItemHovered = noOp,
-  onItemClicked = noOp,
   onRowClicked = noOp,
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
@@ -124,16 +117,29 @@ function GlideGrid<T extends object>({
         getCellsForSelection={true}
         gridSelection={gridManager.selection}
         onGridSelectionChange={(selection) => {
-          console.log(selection);
+          // handleSelectionChange must be called before accessing lastChangeType
           gridManager.handleSelectionChange(selection);
+
+          // const lastType = gridManager.lastChangeType;
+          // switch (lastType) {
+          //   case LAST_SELECTION_CHANGE_TYPE.rows: {
+          //   }
+          //   case LAST_SELECTION_CHANGE_TYPE.columns:
+          //     break;
+          //   case LAST_SELECTION_CHANGE_TYPE.rect:
+          //     break;
+          //   default: {
+          //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          //     const _default: never = lastType;
+          //   }
+          // }
+          // console.log(gridManager.lastChangeType);
+
           refresh();
         }}
         getCellContent={(item: Item) => gridManager.itemToCell(item)}
         onCellClicked={(itemPos: Item) => {
-          if (!isMarkerClick(itemPos)) {
-            const cellInfo = gridManager.onCellClicked(itemPos);
-            onItemClicked(cellInfo);
-          }
+          gridManager.cellClickedHandler(itemPos);
         }}
         onColumnMoved={(col1, col2) => {
           gridManager.swap(col1, col2);

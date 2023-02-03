@@ -3,6 +3,8 @@ import {
   GridSelection,
   Rectangle,
 } from '@glideapps/glide-data-grid';
+import LastSelectionChangeType from './types';
+import LAST_SELECTION_CHANGE_TYPE from './types';
 
 class SelectionManager {
   private columnSelections = CompactSelection.empty();
@@ -10,7 +12,7 @@ class SelectionManager {
   private currentSelections?: GridSelection['current'];
   private _selectedRows: number[] = [];
   private _selectedColumns: number[] = [];
-  private _selecedRect?: Rectangle;
+  private _selectedRect?: Rectangle;
 
   get selection(): GridSelection {
     return {
@@ -18,6 +20,19 @@ class SelectionManager {
       rows: this.rowsSelections,
       current: this.currentSelections,
     };
+  }
+
+  get lastChangeType(): LastSelectionChangeType {
+    // at time of writing, these events are mutually exclusive
+    if (this._selectedRect !== undefined) {
+      return LAST_SELECTION_CHANGE_TYPE.rect;
+    } else if (this._selectedRows.length > 0) {
+      return LAST_SELECTION_CHANGE_TYPE.rows;
+    } else if (this._selectedColumns.length > 0) {
+      return LAST_SELECTION_CHANGE_TYPE.columns;
+    } else {
+      throw new Error('Should not occur');
+    }
   }
 
   get selectedRows(): number[] {
@@ -29,7 +44,7 @@ class SelectionManager {
   }
 
   get selectedRect(): Rectangle | undefined {
-    return this._selecedRect;
+    return this._selectedRect;
   }
 
   updateSelections(selection: GridSelection) {
@@ -38,7 +53,7 @@ class SelectionManager {
     this.rowsSelections = selection.rows;
     this._selectedRows = selection.rows.toArray();
     this.currentSelections = selection.current;
-    this._selecedRect = selection.current?.range;
+    this._selectedRect = selection.current?.range;
   }
 }
 

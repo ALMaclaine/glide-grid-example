@@ -1,9 +1,12 @@
 import type { GridCell } from '@glideapps/glide-data-grid';
 import { GridCellKind } from '@glideapps/glide-data-grid';
-import type { CellPrototype, WrappedGridColumn } from '../../types/grid';
 import { SORT_TYPES } from '../sort/object-sort';
 import { uuid } from '../general';
 import type { ObjectValues } from '../../types/general';
+import {
+  CellPrototype,
+  WrappedGridColumn,
+} from '../managers/grid-manager/types';
 
 type GenGridCellBaseProps<T extends object> = {
   kind: GridCell['kind'];

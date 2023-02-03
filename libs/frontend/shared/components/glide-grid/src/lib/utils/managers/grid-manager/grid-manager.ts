@@ -1,22 +1,24 @@
-import { ColumnsManager } from './columns-manager/columns-manager';
-import type { IdRow, WrappedGridColumn } from '../../types/grid';
-import type { StringKeys } from '../../types/general';
-import { CellCache } from '../caches/cell-cache';
+import { ColumnsManager } from '../columns-manager/columns-manager';
+import type { StringKeys } from '../../../types/general';
+import { CellCache } from '../../caches/cell-cache';
 import type { GridCell, GridSelection, Item } from '@glideapps/glide-data-grid';
-import { TableSorter } from '../sort/table-sorter';
-import { uuid } from '../general';
-import { Levels } from '../../levels';
-import { MiniCache } from '../caches/mini-cache';
-import type { FilterSet } from '../filters/types';
-import { SortMap } from '../sort/sort-map';
-import { FilterManager } from './filter-manager';
-import { PageManager } from './page-manager';
+import { TableSorter } from '../../sort/table-sorter';
+import { noOp, uuid } from '../../general';
+import { Levels } from '../../../levels';
+import { MiniCache } from '../../caches/mini-cache';
+import type { FilterSet } from '../../filters/types';
+import { SortMap } from '../../sort/sort-map';
+import { FilterManager } from '../filter-manager';
+import { PageManager } from '../page-manager';
+
 import {
   generateWrappedColumn,
   GenerateWrappedColumnProps,
-} from '../cells/generators';
-import { OnItemClickedProps } from '../../types/func';
-import { SelectionManager } from './selection-manager';
+} from '../../cells/generators';
+
+import { SelectionManager } from '../selection-manager/selection-manager';
+import { IdRow, OnItemClickedHandler, WrappedGridColumn } from './types';
+import { LastSelectionChangeType } from '../selection-manager/types';
 
 type GridManagerProps<T extends object> = {
   columns: GenerateWrappedColumnProps<T>[];
@@ -25,6 +27,11 @@ type GridManagerProps<T extends object> = {
   hiddenColumns?: StringKeys<T>[];
   filterSet?: FilterSet<T>[];
   searchTerms?: string[];
+  onItemClicked?: OnItemClickedHandler;
+};
+
+const isMarkerClick = ([col]: Item): boolean => {
+  return col === -1;
 };
 
 const getTextKeys = <T extends object>(
@@ -41,6 +48,7 @@ class GridManager<T extends object> {
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly pageManager;
   private readonly selectionManager = new SelectionManager();
+  private readonly onItemClicked: OnItemClickedHandler;
 
   get selection(): GridSelection {
     return this.selectionManager.selection;
@@ -58,7 +66,9 @@ class GridManager<T extends object> {
     pageSize,
     filterSet = [],
     searchTerms = [],
+    onItemClicked = noOp,
   }: GridManagerProps<T>) {
+    this.onItemClicked = onItemClicked;
     const columns = _columns.map(generateWrappedColumn);
     this.pageManager = new PageManager<T>({ pageSize });
     const sortMap = new SortMap({ columns });
@@ -134,10 +144,13 @@ class GridManager<T extends object> {
     }
   }
 
-  onCellClicked([colPos, rowPos]: Item): OnItemClickedProps<T> {
-    const row = this.pageManager.getRow(rowPos);
-    const cell = this.cellCache.get(row.rowUuid, colPos);
-    return { row, cell };
+  cellClickedHandler(item: Item): void {
+    if (!isMarkerClick(item)) {
+      const [colPos, rowPos] = item;
+      const row = this.pageManager.getRow(rowPos);
+      const cell = this.cellCache.get(row.rowUuid, colPos);
+      this.onItemClicked({ row, cell });
+    }
   }
 
   get length() {
@@ -195,6 +208,10 @@ class GridManager<T extends object> {
     const sorted = this.sorter.sorted;
     const filtered = sorted.filter((item) => this.filterManager.testItem(item));
     this.pageManager.setData(filtered);
+  }
+
+  get lastChangeType(): LastSelectionChangeType {
+    return this.selectionManager.lastChangeType;
   }
 
   nextSortKey(key?: StringKeys<T>) {

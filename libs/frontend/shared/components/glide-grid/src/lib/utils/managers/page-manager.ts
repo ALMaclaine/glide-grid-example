@@ -1,5 +1,5 @@
-import { IdRow } from '../../types/grid';
 import { MiniCache } from '../caches/mini-cache';
+import { IdRow } from './grid-manager/types';
 
 type PageManagerProps = {
   pageSize?: number;
