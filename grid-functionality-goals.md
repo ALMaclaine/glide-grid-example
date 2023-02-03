@@ -12,5 +12,4 @@
 
 
 ## Todo
-- finish data manager
 - finish useGrid hook
