@@ -22,7 +22,7 @@ class HiddenColumnTranslator<T extends object> {
     }
     this.clear();
 
-    const out = [];
+    const out: WrappedGridColumn<T>[] = [];
     let i = 0;
     let j = 0;
     for (const { uuid } of sortTranslations) {

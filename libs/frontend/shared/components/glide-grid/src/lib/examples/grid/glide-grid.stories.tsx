@@ -25,7 +25,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
   const [, _refresh] = useState([]);
   const refresh = useCallback(() => _refresh([]), []);
 
-  const gridManager = useMemo(
+  const gridManager = useMemo<GridManager<Property>>(
     () =>
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
@@ -64,18 +64,22 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
 
   const onCompanyChange = (company: string) => {
     setCompany(company);
-    const companyData = dataManager.get(company)!;
-    gridManager.clearData();
-    gridManager.addData(companyData);
+    const companyData = dataManager.get(company);
+    if (companyData) {
+      gridManager.clearData();
+      gridManager.addData(companyData);
+    }
   };
 
   const updateData = async () => {
     setState('loading');
     const data = await asyncGenerate(10000, genProperty, Math.random() * 500);
-    const companyData = dataManager.get(company)!;
-    const newData = [...companyData, ...data];
-    gridManager.addData(data);
-    dataManager.set(company, newData);
+    const companyData = dataManager.get(company);
+    if (companyData) {
+      const newData = [...companyData, ...data];
+      gridManager.addData(data);
+      dataManager.set(company, newData);
+    }
     setState('waiting');
   };
 
@@ -119,7 +123,13 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
             </div>
           ))}
         </div>
-        <button onClick={() => updateData()}>Add Data</button>
+        <button
+          onClick={() => {
+            void updateData();
+          }}
+        >
+          Add Data
+        </button>
         <div>State: {state}</div>
         <div>Page Count: {gridManager.pageCount}</div>
         <select

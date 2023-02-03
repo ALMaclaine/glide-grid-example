@@ -7,17 +7,17 @@ type StackedTriangleProps = TriangleProps & {
 };
 
 class StackedTriangles {
-  private readonly _width;
+  private readonly _width: number;
   get width() {
     return this._width;
   }
-  private readonly itemHeight;
+  private readonly itemHeight: number;
 
-  private readonly _height;
+  private readonly _height: number;
   get height() {
     return this._height;
   }
-  private readonly triangle;
+  private readonly triangle: Triangle;
 
   private readonly easel: Easel;
   private dirty = true;

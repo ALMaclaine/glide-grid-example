@@ -75,7 +75,7 @@ class PageManager<T extends object> {
     if (!this._pageSize) {
       return this.windowedDataCache.cache(this.data);
     }
-    const windowedData = [];
+    const windowedData: IdRow<T>[] = [];
     const start = this._page * this._pageSize;
     const end = Math.min(this.data.length, (this._page + 1) * this._pageSize);
     for (let i = start; i < end; i++) {

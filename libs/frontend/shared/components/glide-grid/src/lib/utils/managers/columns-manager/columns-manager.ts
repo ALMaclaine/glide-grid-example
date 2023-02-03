@@ -6,7 +6,7 @@ import { CellPrototype, WrappedGridColumn } from '../grid-manager/types';
 
 class ColumnsManager<T extends object> {
   private readonly sortTranslator = new SortTranslator<T>();
-  private readonly hiddenTranslator;
+  private readonly hiddenTranslator: HiddenColumnTranslator<T>;
   private readonly _columnTitleIdMap: Record<string, StringKeys<T>> = {};
   private readonly _columnsUuids: string[] = [];
   private readonly sortColumns = new Set<StringKeys<T>>();

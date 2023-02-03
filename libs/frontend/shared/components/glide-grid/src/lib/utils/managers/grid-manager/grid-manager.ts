@@ -46,7 +46,7 @@ class GridManager<T extends object> {
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
-  private readonly pageManager;
+  private readonly pageManager: PageManager<T>;
   private readonly selectionManager = new SelectionManager();
   private readonly onItemClicked: OnItemClickedHandler;
 
@@ -132,7 +132,7 @@ class GridManager<T extends object> {
 
     if (cell.kind === 'number') {
       const clonedCell = { ...cell };
-      const displayNumber = parseFloat(clonedCell.displayData + '');
+      const displayNumber = parseFloat(clonedCell.displayData.toString());
       if (displayNumber < 0) {
         clonedCell.displayData = `(${Math.abs(displayNumber)})`;
       } else {

@@ -1,5 +1,4 @@
 import { ObjectValues } from '../../types/general';
-import { drawTextCell } from '@glideapps/glide-data-grid';
 
 const midPoint = (start: number, end: number) => (end + start) / 2;
 

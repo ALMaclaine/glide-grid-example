@@ -52,7 +52,7 @@ class FilterManager<T extends object> {
   // TODO: ignore numeric fields
   private testSearchTerm(key: StringKeys<T>, item: IdRow<T>) {
     for (const term of this.searchTerms) {
-      const toSearch = `${item[key as StringKeys<T>]}`;
+      const toSearch = `${item[key] as string}`;
       if (toSearch.toLowerCase().includes(term.toLowerCase())) {
         return true;
       }

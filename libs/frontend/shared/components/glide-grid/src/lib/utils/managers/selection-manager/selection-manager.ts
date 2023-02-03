@@ -3,8 +3,8 @@ import {
   GridSelection,
   Rectangle,
 } from '@glideapps/glide-data-grid';
-import LastSelectionChangeType from './types';
-import LAST_SELECTION_CHANGE_TYPE from './types';
+import type { LastSelectionChangeType } from './types';
+import { LAST_SELECTION_CHANGE_TYPE } from './types';
 
 class SelectionManager {
   private columnSelections = CompactSelection.empty();

@@ -39,7 +39,7 @@ class CellCache<T extends object> {
     if (rowCache === undefined) {
       throw new Error('Cache should be set before accessing');
     }
-    return rowCache.get(columnUuid) as CellInstance<T>;
+    return rowCache.get(columnUuid) ;
   }
 
   clear() {
@@ -51,10 +51,7 @@ class CellCache<T extends object> {
       this.cachedContent.set(rowUuid, new Map<string, CellInstance<T>>());
     }
 
-    const rowCache = this.cachedContent.get(rowUuid) as Map<
-      string,
-      CellInstance<T>
-    >;
+    const rowCache = this.cachedContent.get(rowUuid) ;
     rowCache.set(columnUuid, cell);
   }
 }

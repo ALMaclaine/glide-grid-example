@@ -158,12 +158,12 @@ const drawHeaderSort = <T extends object>(
         },
         theme,
         ctx,
-      } as any,
+      } as never,
       title,
       contentAlign
     );
   } else {
-    drawTextCell({ rect, theme, ctx } as any, title, contentAlign);
+    drawTextCell({ rect, theme, ctx } as never, title, contentAlign);
   }
 
   if (shouldSort) {
