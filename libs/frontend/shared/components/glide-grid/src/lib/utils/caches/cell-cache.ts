@@ -39,7 +39,12 @@ class CellCache<T extends object> {
     if (rowCache === undefined) {
       throw new Error('Cache should be set before accessing');
     }
-    return rowCache.get(columnUuid);
+
+    const cell = rowCache.get(columnUuid);
+    if (cell === undefined) {
+      throw new Error('Accessing cell that does not exist');
+    }
+    return cell;
   }
 
   clear() {
@@ -52,6 +57,9 @@ class CellCache<T extends object> {
     }
 
     const rowCache = this.cachedContent.get(rowUuid);
+    if (rowCache === undefined) {
+      throw new Error('Row cache does not exist');
+    }
     rowCache.set(columnUuid, cell);
   }
 }

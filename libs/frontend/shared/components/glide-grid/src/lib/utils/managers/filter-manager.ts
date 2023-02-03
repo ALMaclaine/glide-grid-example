@@ -9,7 +9,6 @@ import {
   VALID_NATURAL_FILTER_SET,
   VALID_NUMERIC_FILTER_SET,
 } from '../filters/types';
-import type { IdRow } from './grid-manager/types';
 
 type FilterManagerProps<T extends object> = {
   sortMap: SortMap<T>;
@@ -40,7 +39,7 @@ class FilterManager<T extends object> {
     this.searchTerms = terms;
   }
 
-  testItem(item: IdRow<T>) {
+  testItem(item: T) {
     for (const filterGroup of this.filterGroups) {
       const filterTest = this.testFilterGroup(filterGroup, item);
       if (filterTest && this.testSearchTerms(item)) {
@@ -51,7 +50,7 @@ class FilterManager<T extends object> {
   }
 
   // TODO: ignore numeric fields
-  private testSearchTerm(key: StringKeys<T>, item: IdRow<T>) {
+  private testSearchTerm(key: StringKeys<T>, item: T) {
     for (const term of this.searchTerms) {
       const toSearch = `${item[key] as string}`;
       if (toSearch.toLowerCase().includes(term.toLowerCase())) {
@@ -61,7 +60,7 @@ class FilterManager<T extends object> {
     return false;
   }
 
-  private testSearchTerms(item: IdRow<T>) {
+  private testSearchTerms(item: T) {
     if (this.searchTerms.length === 0) {
       return true;
     }
