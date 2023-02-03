@@ -3,7 +3,7 @@ import type { StringKeys } from '../../../types/general';
 import { CellCache } from '../../caches/cell-cache';
 import type { GridCell, GridSelection, Item } from '@glideapps/glide-data-grid';
 import { TableSorter } from '../../sort/table-sorter';
-import { noOp, uuid } from '../../general';
+import { uuid } from '../../general';
 import { Levels } from '../../../levels';
 import { MiniCache } from '../../caches/mini-cache';
 import type { FilterSet } from '../../filters/types';
@@ -15,8 +15,16 @@ import type { GenerateWrappedColumnProps } from '../../cells/generators';
 import { generateWrappedColumn } from '../../cells/generators';
 
 import { SelectionManager } from '../selection-manager/selection-manager';
-import type { IdRow, OnItemClickedHandler, WrappedGridColumn } from './types';
+import type {
+  IdRow,
+  OnAreaSelectedHandler,
+  OnColSelectedHandler,
+  OnItemSelectedHandler,
+  WrappedGridColumn,
+} from './types';
 import type { LastSelectionChangeType } from '../selection-manager/types';
+import { LAST_SELECTION_CHANGE_TYPE } from '../selection-manager/types';
+import type { OnRowSelectedHandler } from './types';
 
 type GridManagerProps<T extends object> = {
   columns: GenerateWrappedColumnProps<T>[];
@@ -25,7 +33,10 @@ type GridManagerProps<T extends object> = {
   hiddenColumns?: StringKeys<T>[];
   filterSet?: FilterSet<T>[];
   searchTerms?: string[];
-  onItemClicked?: OnItemClickedHandler;
+  onItemSelected?: OnItemSelectedHandler;
+  onRowSelected?: OnRowSelectedHandler;
+  onColSelected?: OnColSelectedHandler;
+  onAreaSelected?: OnAreaSelectedHandler;
 };
 
 const isMarkerClick = ([col]: Item): boolean => {
@@ -46,14 +57,13 @@ class GridManager<T extends object> {
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly pageManager: PageManager<IdRow<T>>;
   private readonly selectionManager = new SelectionManager();
-  private readonly onItemClicked: OnItemClickedHandler;
+  private readonly onItemSelected?: OnItemSelectedHandler;
+  private readonly onRowSelected?: OnRowSelectedHandler;
+  private readonly onColSelected?: OnColSelectedHandler;
+  private readonly onAreaSelected?: OnAreaSelectedHandler;
 
   get selection(): GridSelection {
     return this.selectionManager.selection;
-  }
-
-  handleSelectionChange(selection: GridSelection): void {
-    this.selectionManager.updateSelections(selection);
   }
 
   private filterManager: FilterManager<T>;
@@ -64,9 +74,15 @@ class GridManager<T extends object> {
     pageSize,
     filterSet = [],
     searchTerms = [],
-    onItemClicked = noOp,
+    onItemSelected,
+    onRowSelected,
+    onColSelected,
+    onAreaSelected,
   }: GridManagerProps<T>) {
-    this.onItemClicked = onItemClicked;
+    this.onItemSelected = onItemSelected;
+    this.onRowSelected = onRowSelected;
+    this.onColSelected = onColSelected;
+    this.onAreaSelected = onAreaSelected;
     const columns = _columns.map(generateWrappedColumn);
     this.pageManager = new PageManager<IdRow<T>>({ pageSize });
     const sortMap = new SortMap({ columns });
@@ -81,6 +97,91 @@ class GridManager<T extends object> {
       sortMap,
       searchTerms,
     });
+  }
+
+  private handleRowSelected(selection: GridSelection) {
+    // don't bother wasting cycles if we don't have a handler
+    if (!this.onRowSelected) {
+      return;
+    }
+    const lastSelectedIndex = selection.rows.last();
+    if (lastSelectedIndex === undefined) {
+      throw new Error('Should not occur');
+    }
+    const lastSelectedRow = this.pageManager.getRow(lastSelectedIndex);
+    const selectedIndices = selection.rows.toArray();
+    const selectedRows = selectedIndices.map((index) =>
+      this.pageManager.getRow(index)
+    );
+    this.onRowSelected({
+      lastSelectedIndex,
+      selectedIndices,
+      lastSelectedRow,
+      selectedRows,
+    });
+  }
+
+  private handleAreaSelected(selection: GridSelection) {
+    // don't bother wasting cycles if we don't have a handler
+    if (!this.onAreaSelected) {
+      return;
+    }
+    const rect = selection.current?.range;
+    if (!rect) {
+      throw new Error('Should not occur');
+    }
+    this.onAreaSelected({
+      rect,
+    });
+  }
+
+  private handleColSelected(selection: GridSelection) {
+    // don't bother wasting cycles if we don't have a handler
+    if (!this.onColSelected) {
+      return;
+    }
+    const lastSelectedIndex = selection.columns.last();
+    if (lastSelectedIndex === undefined) {
+      throw new Error('Should not occur');
+    }
+    const lastSelectedCol =
+      this.columnsManager.getCellByIndex(lastSelectedIndex);
+    const selectedIndices = selection.columns.toArray();
+    const selectedCols = selectedIndices.map((index) =>
+      this.columnsManager.getCellByIndex(index)
+    );
+    this.onColSelected({
+      lastSelectedIndex,
+      selectedIndices,
+      lastSelectedCol,
+      selectedCols,
+    });
+  }
+
+  handleSelectionChange(selection: GridSelection): void {
+    // updateSelections must be called before accessing lastChangeType
+    this.selectionManager.updateSelections(selection);
+    const lastType = this.lastChangeType;
+    switch (lastType) {
+      case LAST_SELECTION_CHANGE_TYPE.rows: {
+        this.handleRowSelected(selection);
+        return;
+      }
+      case LAST_SELECTION_CHANGE_TYPE.columns: {
+        this.handleColSelected(selection);
+        return;
+      }
+      case LAST_SELECTION_CHANGE_TYPE.rect: {
+        this.handleAreaSelected(selection);
+        return;
+      }
+      case LAST_SELECTION_CHANGE_TYPE.initial:
+        break;
+      default: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _default: never = lastType;
+      }
+    }
   }
 
   setFilterSet(filterSet: FilterSet<T>[]): void {
@@ -144,10 +245,14 @@ class GridManager<T extends object> {
 
   cellClickedHandler(item: Item): void {
     if (!isMarkerClick(item)) {
+      // don't bother wasting cycles if we don't have a handler
+      if (!this.onItemSelected) {
+        return;
+      }
       const [colPos, rowPos] = item;
       const row = this.pageManager.getRow(rowPos);
       const cell = this.cellCache.get(row.rowUuid, colPos);
-      this.onItemClicked({ row, cell });
+      this.onItemSelected({ row, cell });
     }
   }
 
@@ -195,7 +300,7 @@ class GridManager<T extends object> {
     return this.sorter.getSortHistory(steps);
   }
 
-  clearData() {
+  clear() {
     this.sorter.clear();
     this.filteredCache.dirty();
     this.pageManager.clear();

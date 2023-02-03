@@ -1,7 +1,7 @@
 import type { ComponentStory, Meta } from '@storybook/react';
 import { GlideGrid } from '../../glide-grid';
 import { GridManager } from '../../utils/managers/grid-manager/grid-manager';
-import type { Property} from './data/property';
+import type { Property } from './data/property';
 import { genProperty, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
 import { useCallback, useMemo, useState } from 'react';
@@ -31,7 +31,10 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
         data: [],
-        onItemClicked: console.log,
+        onItemSelected: console.log,
+        onRowSelected: console.log,
+        onColSelected: console.log,
+        onAreaSelected: console.log,
         searchTerms: ['gateway', 'drive', 'vista'],
         filterSet: [
           {
@@ -67,7 +70,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
     setCompany(company);
     const companyData = dataManager.get(company);
     if (companyData) {
-      gridManager.clearData();
+      gridManager.clear();
       gridManager.addData(companyData);
     }
   };

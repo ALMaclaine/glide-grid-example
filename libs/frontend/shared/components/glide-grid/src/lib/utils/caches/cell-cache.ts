@@ -11,7 +11,7 @@ class CellCache<T extends object> {
 
   private genCell(item: IdRow<T>, colUuid: string): CellInstance<T> {
     const { dataId, displayDataId, ...rest } =
-      this.columnsManager.getCell(colUuid);
+      this.columnsManager.getCellByUuid(colUuid);
     return {
       ...rest,
       dataId,

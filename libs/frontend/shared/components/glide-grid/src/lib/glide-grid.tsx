@@ -1,9 +1,5 @@
-import type {
-  GridMouseEventArgs,
-  Item} from '@glideapps/glide-data-grid';
-import {
-  DataEditor
-} from '@glideapps/glide-data-grid';
+import type { GridMouseEventArgs, Item } from '@glideapps/glide-data-grid';
+import { DataEditor } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
 import { useCallback, useState } from 'react';
@@ -16,7 +12,7 @@ import type { GridManager } from './utils/managers/grid-manager/grid-manager';
 import type {
   HeaderClickHandler,
   HoverHandler,
-  OnRowClickedHandler,
+  OnRowSelectedHandler,
 } from './utils/managers/grid-manager/types';
 
 const divStyles = {
@@ -57,7 +53,6 @@ const theme = {
 
 type GlideGridProps<T extends object> = {
   onItemHovered?: HoverHandler;
-  onRowClicked?: OnRowClickedHandler;
   gridManager: GridManager<T>;
   getRowThemeOverride?: GetRowThemeCallback;
   onHeaderClicked?: HeaderClickHandler;
@@ -66,7 +61,6 @@ type GlideGridProps<T extends object> = {
 function GlideGrid<T extends object>({
   gridManager,
   onItemHovered = noOp,
-  onRowClicked = noOp,
   getRowThemeOverride = noOpObj,
   onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
@@ -118,23 +112,7 @@ function GlideGrid<T extends object>({
         getCellsForSelection={true}
         gridSelection={gridManager.selection}
         onGridSelectionChange={(selection) => {
-          // handleSelectionChange must be called before accessing lastChangeType
           gridManager.handleSelectionChange(selection);
-
-          // const lastType = gridManager.lastChangeType;
-          // switch (lastType) {
-          //   case LAST_SELECTION_CHANGE_TYPE.rows: {
-          //   }
-          //   case LAST_SELECTION_CHANGE_TYPE.columns:
-          //     break;
-          //   case LAST_SELECTION_CHANGE_TYPE.rect:
-          //     break;
-          //   default: {
-          //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          //     const _default: never = lastType;
-          //   }
-          // }
-          // console.log(gridManager.lastChangeType);
 
           refresh();
         }}

@@ -73,7 +73,7 @@ class ColumnsManager<T extends object> {
   getHeaderKey(colPos: number): StringKeys<T> {
     const { id } = this.getColumns()[colPos];
     const { uuid } = this.sortTranslator.getTranslationById(id);
-    return this.getCell(uuid).displayDataId;
+    return this.getCellByUuid(uuid).displayDataId;
   }
 
   getColumns(): WrappedGridColumn<T>[] {
@@ -81,8 +81,17 @@ class ColumnsManager<T extends object> {
     return this.hiddenTranslator.getColumns(translations);
   }
 
-  getCell(colUuid: string): CellPrototype<T> {
+  getCellByUuid(colUuid: string): CellPrototype<T> {
     const column = this.hiddenTranslator.getColumn(colUuid);
+    if (column) {
+      return column.cell;
+    }
+    throw new Error('Column does not exist');
+  }
+
+  getCellByIndex(col: number): CellPrototype<T> {
+    this.validateBounds(col);
+    const column = this.hiddenTranslator.getColumn(this._columnsUuids[col]);
     if (column) {
       return column.cell;
     }

@@ -4,6 +4,7 @@ const LAST_SELECTION_CHANGE_TYPE = {
   columns: 'columns',
   rows: 'rows',
   rect: 'rect',
+  initial: 'initial',
 } as const;
 type LastSelectionChangeType = ObjectValues<typeof LAST_SELECTION_CHANGE_TYPE>;
 

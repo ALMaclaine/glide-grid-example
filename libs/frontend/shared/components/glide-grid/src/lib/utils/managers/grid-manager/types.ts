@@ -3,6 +3,7 @@ import type {
   GridCell,
   GridColumn,
   GridMouseEventArgs,
+  Rectangle,
   UriCell,
 } from '@glideapps/glide-data-grid';
 import type { SortTypes } from '../../sort/object-sort';
@@ -43,31 +44,52 @@ type IdColumn<T extends object> = T & {
   columnUuid: string;
 };
 
-type OnItemClickedProps<T extends object> = {
+type OnItemSelectedProps<T extends object> = {
   cell: CellPrototype<T>;
   row: IdRow<T>;
 };
 
-type OnItemClickedHandler = <T extends object>(
-  props: OnItemClickedProps<T>
+type OnItemSelectedHandler = <T extends object>(
+  props: OnItemSelectedProps<T>
 ) => void;
 
-type OnRowClickedProps<T extends object> = {
+type OnRowSelectedProps<T extends object> = {
   lastSelectedIndex: number;
   selectedIndices: number[];
   lastSelectedRow: IdRow<T>;
-  selectedRows: IdRow<T>;
+  selectedRows: IdRow<T>[];
 };
 
-type OnRowClickedHandler = <T extends object>(
-  props: OnRowClickedProps<T>
+type OnRowSelectedHandler = <T extends object>(
+  props: OnRowSelectedProps<T>
 ) => void;
 
+type OnColSelectedProps<T extends object> = {
+  lastSelectedIndex: number;
+  selectedIndices: number[];
+  lastSelectedCol: CellPrototype<T>;
+  selectedCols: CellPrototype<T>[];
+};
+
+type OnColSelectedHandler = <T extends object>(
+  props: OnColSelectedProps<T>
+) => void;
+
+type OnAreaSelectedProps = {
+  rect: Rectangle;
+};
+
+type OnAreaSelectedHandler = (props: OnAreaSelectedProps) => void;
+
 export type {
-  OnRowClickedHandler,
-  OnRowClickedProps,
-  OnItemClickedHandler,
-  OnItemClickedProps,
+  OnAreaSelectedProps,
+  OnAreaSelectedHandler,
+  OnRowSelectedHandler,
+  OnRowSelectedProps,
+  OnColSelectedProps,
+  OnColSelectedHandler,
+  OnItemSelectedHandler,
+  OnItemSelectedProps,
   HoverHandler,
   HeaderClickHandler,
   IdColumn,

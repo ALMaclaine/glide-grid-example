@@ -1,9 +1,5 @@
-import type {
-  GridSelection,
-  Rectangle} from '@glideapps/glide-data-grid';
-import {
-  CompactSelection
-} from '@glideapps/glide-data-grid';
+import type { GridSelection, Rectangle } from '@glideapps/glide-data-grid';
+import { CompactSelection } from '@glideapps/glide-data-grid';
 import type { LastSelectionChangeType } from './types';
 import { LAST_SELECTION_CHANGE_TYPE } from './types';
 
@@ -24,7 +20,6 @@ class SelectionManager {
   }
 
   get lastChangeType(): LastSelectionChangeType {
-    // at time of writing, these events are mutually exclusive
     if (this._selectedRect !== undefined) {
       return LAST_SELECTION_CHANGE_TYPE.rect;
     } else if (this._selectedRows.length > 0) {
@@ -32,7 +27,7 @@ class SelectionManager {
     } else if (this._selectedColumns.length > 0) {
       return LAST_SELECTION_CHANGE_TYPE.columns;
     } else {
-      throw new Error('Should not occur');
+      return LAST_SELECTION_CHANGE_TYPE.initial;
     }
   }
 
