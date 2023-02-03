@@ -1,4 +1,4 @@
-import { MiniCache } from '../caches/mini-cache';
+import { MiniCache } from '../utils/caches/mini-cache';
 import { IdRow } from './grid-manager/types';
 
 type PageManagerProps = {

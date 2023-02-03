@@ -1,4 +1,4 @@
-import type { StringKeys } from '../../../types/general';
+import type { StringKeys } from '../../types/general';
 import { HiddenColumnTranslator } from './hidden-column-translator';
 import { SortTranslator } from './sort-translator';
 import type { ColumnsProps } from './types';

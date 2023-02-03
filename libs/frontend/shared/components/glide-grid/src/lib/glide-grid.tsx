@@ -11,12 +11,12 @@ import { noOp, noOpObj } from './utils/general';
 import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
-import { GridManager } from './utils/managers/grid-manager/grid-manager';
+import { GridManager } from './managers/grid-manager/grid-manager';
 import {
   HeaderClickHandler,
   HoverHandler,
   OnRowClickedHandler,
-} from './utils/managers/grid-manager/types';
+} from './managers/grid-manager/types';
 
 const divStyles = {
   border: '1px solid #e9e9e9',

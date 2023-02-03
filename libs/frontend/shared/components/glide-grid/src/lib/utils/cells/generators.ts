@@ -6,7 +6,7 @@ import type { ObjectValues } from '../../types/general';
 import {
   CellPrototype,
   WrappedGridColumn,
-} from '../managers/grid-manager/types';
+} from '../../managers/grid-manager/types';
 
 type GenGridCellBaseProps<T extends object> = {
   kind: GridCell['kind'];

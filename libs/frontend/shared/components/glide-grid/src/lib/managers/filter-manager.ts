@@ -1,13 +1,13 @@
-import type { SortMap } from '../sort/sort-map';
-import type { Filter, FilterFunc, FilterSet } from '../filters/types';
-import { StringKeys } from '../../types/general';
-import { SORT_TYPES, SortTypes } from '../sort/object-sort';
-import { generateFilter, genereateRowAccessor } from '../filters/filters';
+import type { SortMap } from '../utils/sort/sort-map';
+import type { Filter, FilterFunc, FilterSet } from '../utils/filters/types';
+import { StringKeys } from '../types/general';
+import { SORT_TYPES, SortTypes } from '../utils/sort/object-sort';
+import { generateFilter, genereateRowAccessor } from '../utils/filters/filters';
 import {
   FILTER_TYPES,
   VALID_NATURAL_FILTER_SET,
   VALID_NUMERIC_FILTER_SET,
-} from '../filters/types';
+} from '../utils/filters/types';
 import { IdRow } from './grid-manager/types';
 
 type FilterManagerProps<T extends object> = {

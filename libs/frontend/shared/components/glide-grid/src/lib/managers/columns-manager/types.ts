@@ -1,4 +1,4 @@
-import { StringKeys } from '../../../types/general';
+import { StringKeys } from '../../types/general';
 import { WrappedGridColumn } from '../grid-manager/types';
 
 type ColumnsProps<T extends object> = {
