@@ -31,7 +31,7 @@ export const Primary: ComponentStory<typeof GlideGrid<Property>> = () => {
       new GridManager<Property>({
         columns: PROPERTY_COLUMNS,
         data: [] as Property[],
-        events: {
+        eventHandlers: {
           onItemSelected: console.log,
           onRowSelected: console.log,
           onColSelected: console.log,

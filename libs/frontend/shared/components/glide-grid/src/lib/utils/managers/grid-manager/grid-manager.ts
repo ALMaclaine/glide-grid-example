@@ -9,7 +9,6 @@ import { generateWrappedColumn } from '../../cells/generators';
 import type { EventManagerEventProps } from '../event-manager';
 import { EventManager } from '../event-manager';
 import { SelectionManager } from '../selection-manager/selection-manager';
-import type { OnHeaderClickHandler } from './types';
 import type { DataMangerInProps } from '../data-manager';
 import { DataManager } from '../data-manager';
 import type { FilterManagerFilterProps } from '../filter-manager';
@@ -24,7 +23,6 @@ type GridManagerProps<T extends object> = DataMangerInProps &
 
 class GridManager<T extends object> {
   private readonly selectionManager = new SelectionManager();
-  private readonly onHeaderClicked?: OnHeaderClickHandler;
 
   private readonly columnsManager: ColumnsManager<T>;
   private readonly eventManager: EventManager<T>;
@@ -36,10 +34,8 @@ class GridManager<T extends object> {
     pageSize,
     filters = [],
     searchTerms = [],
-    events: { onHeaderClicked } = {},
-    events,
+    eventHandlers,
   }: GridManagerProps<T>) {
-    this.onHeaderClicked = onHeaderClicked;
     const columns = _columns.map(generateWrappedColumn);
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
 
@@ -55,7 +51,7 @@ class GridManager<T extends object> {
       selectionManager: this.selectionManager,
       columnsManager: this.columnsManager,
       dataManager: this.dataManager,
-      events,
+      eventHandlers,
     });
 
     this.addData(data);
@@ -130,9 +126,7 @@ class GridManager<T extends object> {
   // event manager only
   //
   onHeaderClickedHandler(col: number) {
-    const selectedHeader = this.columnsManager.getHeaderKey(col);
-    this.dataManager.nextSortKey(selectedHeader);
-    this.onHeaderClicked?.(selectedHeader);
+    this.eventManager.onHeaderClickedHandler(col);
   }
 
   handleSelectionChange(selection: GridSelection): void {

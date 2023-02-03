@@ -2,6 +2,7 @@ import type {
   GridEventHandlers,
   OnAreaSelectedHandler,
   OnColSelectedHandler,
+  OnHeaderClickHandler,
   OnItemSelectedHandler,
   OnRowSelectedHandler,
 } from './grid-manager/types';
@@ -13,7 +14,7 @@ import type { SelectionManager } from './selection-manager/selection-manager';
 import type { DataManager } from './data-manager';
 
 type EventManagerEventProps = {
-  events?: GridEventHandlers;
+  eventHandlers?: GridEventHandlers;
 };
 
 type EventManagerProps<T extends object> = EventManagerEventProps & {
@@ -31,15 +32,17 @@ class EventManager<T extends object> {
   private readonly onRowSelected?: OnRowSelectedHandler;
   private readonly onColSelected?: OnColSelectedHandler;
   private readonly onAreaSelected?: OnAreaSelectedHandler;
+  private readonly onHeaderClicked?: OnHeaderClickHandler;
   private readonly columnsManager: ColumnsManager<T>;
   private readonly dataManager: DataManager<T>;
   private readonly selectionManager: SelectionManager;
 
   constructor({
     columnsManager,
-    events: {
+    eventHandlers: {
       onAreaSelected,
       onColSelected,
+      onHeaderClicked,
       onItemSelected,
       onRowSelected,
     } = {},
@@ -49,6 +52,7 @@ class EventManager<T extends object> {
     this.columnsManager = columnsManager;
     this.onAreaSelected = onAreaSelected;
     this.onColSelected = onColSelected;
+    this.onHeaderClicked = onHeaderClicked;
     this.onItemSelected = onItemSelected;
     this.onRowSelected = onRowSelected;
     this.dataManager = dataManager;
@@ -57,6 +61,12 @@ class EventManager<T extends object> {
 
   get selection(): GridSelection {
     return this.selectionManager.selection;
+  }
+
+  onHeaderClickedHandler(col: number) {
+    const selectedHeader = this.columnsManager.getHeaderKey(col);
+    this.dataManager.nextSortKey(selectedHeader);
+    this.onHeaderClicked?.(selectedHeader);
   }
 
   private handleRowSelected(selection: GridSelection) {
