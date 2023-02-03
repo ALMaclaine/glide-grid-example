@@ -1,5 +1,5 @@
 import type { StringKeys } from '../../types/general';
-import type { WrappedGridColumn } from '../../types/grid';
+import type { CellPrototype, WrappedGridColumn } from '../../types/grid';
 import { MiniCache } from '../caches/mini-cache';
 
 type ColumnsProps<T extends object> = {
@@ -14,20 +14,20 @@ type Translation<T extends object> = {
 };
 
 class SortTranslator<T extends object> {
-  private readonly _translate: Translation<T>[] = [];
+  private readonly _translations: Translation<T>[] = [];
   private readonly idMap = new Map<string, number>();
 
   addUuid(uuid: string, id: StringKeys<T>): void {
-    const length = this._translate.length;
+    const length = this._translations.length;
     this.idMap.set(id, length);
-    this._translate.push({ originalColumn: length, id, uuid });
+    this._translations.push({ originalColumn: length, id, uuid });
   }
 
   getTranslation(pos: number): Translation<T> {
-    if (pos > this._translate.length || pos < 0) {
+    if (pos > this._translations.length || pos < 0) {
       throw new Error('Out of bounds access');
     }
-    return this._translate[pos];
+    return this._translations[pos];
   }
 
   getTranslationById(id: StringKeys<T>): Translation<T> {
@@ -39,38 +39,38 @@ class SortTranslator<T extends object> {
   }
 
   get length(): number {
-    return this._translate.length;
+    return this._translations.length;
   }
 
-  private updateIdMap(translation: Translation<T>, pos: number) {
+  private updateIdMap(translation: Translation<T>, pos: number): void {
     const { id } = translation;
     this.idMap.set(id, pos);
   }
 
   private shiftRight(pos1: number, pos2: number): void {
-    const translateTmp = this._translate[pos2];
+    const translateTmp = this._translations[pos2];
     for (let i = pos2; i > pos1; i--) {
-      const translation = this._translate[i - 1];
+      const translation = this._translations[i - 1];
       this.updateIdMap(translation, i);
-      this._translate[i] = translation;
+      this._translations[i] = translation;
     }
     this.updateIdMap(translateTmp, pos1);
-    this._translate[pos1] = translateTmp;
+    this._translations[pos1] = translateTmp;
   }
 
   private shiftLeft(pos1: number, pos2: number): void {
-    const translateTmp = this._translate[pos1];
+    const translateTmp = this._translations[pos1];
     for (let i = pos1; i < pos2; i++) {
-      const translation = this._translate[i + 1];
+      const translation = this._translations[i + 1];
       this.updateIdMap(translation, i);
-      this._translate[i] = translation;
+      this._translations[i] = translation;
     }
     this.updateIdMap(translateTmp, pos2);
 
-    this._translate[pos2] = translateTmp;
+    this._translations[pos2] = translateTmp;
   }
 
-  swap(col1: number, col2: number) {
+  swap(col1: number, col2: number): void {
     if (col1 > col2) {
       this.shiftRight(col2, col1);
     } else {
@@ -78,8 +78,8 @@ class SortTranslator<T extends object> {
     }
   }
 
-  get translate() {
-    return [...this._translate];
+  get translations(): Translation<T>[] {
+    return this._translations;
   }
 }
 
@@ -96,7 +96,7 @@ class HiddenColumnTranslator<T extends object> {
     hiddenColumns.map((column) => this.columnIsShowing.set(column, false));
   }
 
-  getColumns(sortTranslations: Translation<T>[]) {
+  getColumns(sortTranslations: Translation<T>[]): WrappedGridColumn<T>[] {
     if (this.columnsCache.isClean) {
       return this.columnsCache.getCache();
     }
@@ -116,15 +116,15 @@ class HiddenColumnTranslator<T extends object> {
     return this.columnsCache.cache(out);
   }
 
-  clear() {
+  clear(): void {
     this.hiddenTranslatorMap.clear();
   }
 
-  dirty() {
+  dirty(): void {
     this.columnsCache.dirty();
   }
 
-  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
+  setHiddenColumns(hiddenColumns: StringKeys<T>[]): void {
     Array.from(this.columnIsShowing.keys()).forEach((column) => {
       this.toggleColumnVisibility(column, true);
     });
@@ -132,7 +132,10 @@ class HiddenColumnTranslator<T extends object> {
     hiddenColumns.forEach((key) => this.toggleColumnVisibility(key, false));
   }
 
-  toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
+  toggleColumnVisibility(
+    hiddenColumn: StringKeys<T>,
+    visibility?: boolean
+  ): void {
     if (this.columnIsShowing.has(hiddenColumn)) {
       this.columnIsShowing.set(
         hiddenColumn,
@@ -144,15 +147,15 @@ class HiddenColumnTranslator<T extends object> {
     this.dirty();
   }
 
-  isShowing(key: StringKeys<T>) {
-    return this.columnIsShowing.get(key);
+  isShowing(key: StringKeys<T>): boolean {
+    return !!this.columnIsShowing.get(key);
   }
 
-  setColumn(columnUuid: string, column: WrappedGridColumn<T>) {
+  setColumn(columnUuid: string, column: WrappedGridColumn<T>): void {
     this.columnMap.set(columnUuid, column);
   }
 
-  getColumn(columnUuid: string) {
+  getColumn(columnUuid: string): WrappedGridColumn<T> {
     const column = this.columnMap.get(columnUuid);
     if (column) {
       return column;
@@ -160,7 +163,7 @@ class HiddenColumnTranslator<T extends object> {
     throw new Error('Column does not exist');
   }
 
-  getHiddenTranslation(colPos: number) {
+  getHiddenTranslation(colPos: number): number {
     const translatedPosition = this.hiddenTranslatorMap.get(colPos);
     if (translatedPosition === undefined) {
       throw new Error('Should not occur');
@@ -194,27 +197,30 @@ class ColumnsManager<T extends object> {
     }
   }
 
-  isSortColumn(key: StringKeys<T>) {
+  isSortColumn(key: StringKeys<T>): boolean {
     return this.sortColumns.has(key);
   }
 
-  get columnTitleIdMap() {
+  get columnTitleIdMap(): Record<string, StringKeys<T>> {
     return this._columnTitleIdMap;
   }
 
-  get columnsUuids() {
+  get columnsUuids(): string[] {
     return this._columnsUuids;
   }
 
-  setHiddenColumns(hiddenColumns: StringKeys<T>[]) {
+  setHiddenColumns(hiddenColumns: StringKeys<T>[]): void {
     this.hiddenTranslator.setHiddenColumns(hiddenColumns);
   }
 
-  toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
+  toggleColumnVisibility(
+    hiddenColumn: StringKeys<T>,
+    visibility?: boolean
+  ): void {
     this.hiddenTranslator.toggleColumnVisibility(hiddenColumn, visibility);
   }
 
-  isShowing(key: StringKeys<T>) {
+  isShowing(key: StringKeys<T>): boolean {
     return this.hiddenTranslator.isShowing(key);
   }
 
@@ -223,27 +229,27 @@ class ColumnsManager<T extends object> {
     return this.sortTranslator.getTranslation(translatedPosition).uuid;
   }
 
-  get length() {
+  get length(): number {
     return this.getColumns().length;
   }
 
-  private getTranslatedPosition(colPos: number) {
+  private getTranslatedPosition(colPos: number): number {
     this.validateBounds(colPos);
     return this.hiddenTranslator.getHiddenTranslation(colPos);
   }
 
-  getHeaderKey(colPos: number) {
+  getHeaderKey(colPos: number): StringKeys<T> {
     const { id } = this.getColumns()[colPos];
     const { uuid } = this.sortTranslator.getTranslationById(id);
     return this.getCell(uuid).displayDataId;
   }
 
-  getColumns() {
-    const translations = this.sortTranslator.translate;
+  getColumns(): WrappedGridColumn<T>[] {
+    const translations = this.sortTranslator.translations;
     return this.hiddenTranslator.getColumns(translations);
   }
 
-  getCell(colUuid: string) {
+  getCell(colUuid: string): CellPrototype<T> {
     const column = this.hiddenTranslator.getColumn(colUuid);
     if (column) {
       return column.cell;
@@ -251,14 +257,14 @@ class ColumnsManager<T extends object> {
     throw new Error('Column does not exist');
   }
 
-  private validateBounds(col: number) {
+  private validateBounds(col: number): void {
     const columns = this.getColumns();
     if (col > columns.length || col < 0) {
       throw new Error('Out of bounds access');
     }
   }
 
-  swap(col1: number, col2: number) {
+  swap(col1: number, col2: number): void {
     const translatedPosition1 = this.getTranslatedPosition(col1);
     const translatedPosition2 = this.getTranslatedPosition(col2);
     this.sortTranslator.swap(translatedPosition1, translatedPosition2);

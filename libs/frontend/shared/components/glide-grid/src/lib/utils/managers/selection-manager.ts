@@ -1,0 +1,45 @@
+import {
+  CompactSelection,
+  GridSelection,
+  Rectangle,
+} from '@glideapps/glide-data-grid';
+
+class SelectionManager {
+  private columnSelections = CompactSelection.empty();
+  private rowsSelections = CompactSelection.empty();
+  private currentSelections?: GridSelection['current'];
+  private _selectedRows: number[] = [];
+  private _selectedColumns: number[] = [];
+  private _selecedRect?: Rectangle;
+
+  get selection(): GridSelection {
+    return {
+      columns: this.columnSelections,
+      rows: this.rowsSelections,
+      current: this.currentSelections,
+    };
+  }
+
+  get selectedRows(): number[] {
+    return this._selectedRows;
+  }
+
+  get selectedColumns(): number[] {
+    return this._selectedColumns;
+  }
+
+  get selectedRect(): Rectangle | undefined {
+    return this._selecedRect;
+  }
+
+  updateSelections(selection: GridSelection) {
+    this.columnSelections = selection.columns;
+    this._selectedColumns = selection.columns.toArray();
+    this.rowsSelections = selection.rows;
+    this._selectedRows = selection.rows.toArray();
+    this.currentSelections = selection.current;
+    this._selecedRect = selection.current?.range;
+  }
+}
+
+export { SelectionManager };

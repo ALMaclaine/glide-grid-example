@@ -122,8 +122,14 @@ function GlideGrid<T extends object>({
         columns={gridManager.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
+        gridSelection={gridManager.selection}
+        onGridSelectionChange={(selection) => {
+          console.log(selection);
+          gridManager.handleSelectionChange(selection);
+          refresh();
+        }}
         getCellContent={(item: Item) => gridManager.itemToCell(item)}
-        onCellClicked={(itemPos: Item, args) => {
+        onCellClicked={(itemPos: Item) => {
           if (!isMarkerClick(itemPos)) {
             const cellInfo = gridManager.onCellClicked(itemPos);
             onItemClicked(cellInfo);

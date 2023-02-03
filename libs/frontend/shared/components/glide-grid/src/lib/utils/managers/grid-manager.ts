@@ -2,7 +2,7 @@ import { ColumnsManager } from './columns-manager';
 import type { IdRow, WrappedGridColumn } from '../../types/grid';
 import type { StringKeys } from '../../types/general';
 import { CellCache } from '../caches/cell-cache';
-import type { GridCell, Item } from '@glideapps/glide-data-grid';
+import type { GridCell, GridSelection, Item } from '@glideapps/glide-data-grid';
 import { TableSorter } from '../sort/table-sorter';
 import { uuid } from '../general';
 import { Levels } from '../../levels';
@@ -16,6 +16,7 @@ import {
   GenerateWrappedColumnProps,
 } from '../cells/generators';
 import { OnItemClickedProps } from '../../types/func';
+import { SelectionManager } from './selection-manager';
 
 type GridManagerProps<T extends object> = {
   columns: GenerateWrappedColumnProps<T>[];
@@ -35,11 +36,19 @@ const getTextKeys = <T extends object>(
 class GridManager<T extends object> {
   private readonly columnsManager: ColumnsManager<T>;
   private readonly cellCache: CellCache<T>;
-
   private readonly sorter: TableSorter<T>;
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly pageManager;
+  private readonly selectionManager = new SelectionManager();
+
+  get selection(): GridSelection {
+    return this.selectionManager.selection;
+  }
+
+  handleSelectionChange(selection: GridSelection): void {
+    this.selectionManager.updateSelections(selection);
+  }
 
   private filterManager: FilterManager<T>;
   constructor({
@@ -66,21 +75,24 @@ class GridManager<T extends object> {
     });
   }
 
-  setFilterSet(filterSet: FilterSet<T>[]) {
+  setFilterSet(filterSet: FilterSet<T>[]): void {
     this.filterManager.setFilterGroups(filterSet);
     this.filterSorted();
   }
 
-  setSearchTerms(terms: string[]) {
+  setSearchTerms(terms: string[]): void {
     this.filterManager.setSearchTerms(terms);
     this.filterSorted();
   }
 
-  toggleColumnVisibility(hiddenColumn: StringKeys<T>, visibility?: boolean) {
+  toggleColumnVisibility(
+    hiddenColumn: StringKeys<T>,
+    visibility?: boolean
+  ): void {
     this.columnsManager.toggleColumnVisibility(hiddenColumn, visibility);
   }
 
-  isColumnShowing(key: StringKeys<T>) {
+  isColumnShowing(key: StringKeys<T>): boolean {
     return this.columnsManager.isShowing(key);
   }
 
