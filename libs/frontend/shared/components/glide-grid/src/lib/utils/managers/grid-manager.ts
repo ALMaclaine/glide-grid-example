@@ -1,4 +1,4 @@
-import { ColumnsManager } from './columns-manager';
+import { ColumnsManager } from './columns-manager/columns-manager';
 import type { IdRow, WrappedGridColumn } from '../../types/grid';
 import type { StringKeys } from '../../types/general';
 import { CellCache } from '../caches/cell-cache';
