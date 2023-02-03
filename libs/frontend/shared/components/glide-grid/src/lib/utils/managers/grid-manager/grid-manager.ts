@@ -9,7 +9,6 @@ import { MiniCache } from '../../caches/mini-cache';
 import type { FilterSet } from '../../filters/types';
 import { SortMap } from '../../sort/sort-map';
 import { FilterManager } from '../filter-manager';
-import { PageManager } from '../page-manager';
 
 import type { GenerateWrappedColumnProps } from '../../cells/generators';
 import { generateWrappedColumn } from '../../cells/generators';
@@ -18,15 +17,17 @@ import type { GridEventHandlers, IdRow, WrappedGridColumn } from './types';
 import { EventManager } from '../event-manager';
 import { SelectionManager } from '../selection-manager/selection-manager';
 import type { OnHeaderClickHandler } from './types';
+import type { DataManagerProps } from '../data-manager';
+import { DataManager } from '../data-manager';
 
-type GridManagerProps<T extends object> = GridEventHandlers & {
-  columns: GenerateWrappedColumnProps<T>[];
-  data: T[];
-  pageSize?: number;
-  hiddenColumns?: StringKeys<T>[];
-  filterSet?: FilterSet<T>[];
-  searchTerms?: string[];
-};
+type GridManagerProps<T extends object> = GridEventHandlers &
+  DataManagerProps<T> & {
+    columns: GenerateWrappedColumnProps<T>[];
+    data: T[];
+    hiddenColumns?: StringKeys<T>[];
+    filterSet?: FilterSet<T>[];
+    searchTerms?: string[];
+  };
 
 const getTextKeys = <T extends object>(
   columns: WrappedGridColumn<T>[]
@@ -43,9 +44,9 @@ class GridManager<T extends object> {
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly columnsManager: ColumnsManager<T>;
-  private readonly pageManager: PageManager<IdRow<T>>;
   private readonly eventManager: EventManager<T>;
-  private filterManager: FilterManager<T>;
+  private readonly filterManager: FilterManager<T>;
+  private readonly dataManager: DataManager<IdRow<T>>;
   constructor({
     columns: _columns,
     data,
@@ -61,7 +62,7 @@ class GridManager<T extends object> {
   }: GridManagerProps<T>) {
     this.onHeaderClicked = onHeaderClicked;
 
-    this.pageManager = new PageManager<IdRow<T>>({ pageSize });
+    this.dataManager = new DataManager<IdRow<T>>({ pageSize });
 
     const columns = _columns.map(generateWrappedColumn);
     const sortMap = new SortMap({ columns });
@@ -82,7 +83,7 @@ class GridManager<T extends object> {
     this.eventManager = new EventManager<T>({
       selectionManager: this.selectionManager,
       columnsManager: this.columnsManager,
-      pageManager: this.pageManager,
+      dataManager: this.dataManager,
       onItemSelected,
       onAreaSelected,
       onColSelected,
@@ -111,7 +112,7 @@ class GridManager<T extends object> {
   }
 
   itemToCell([col, row]: Item): GridCell {
-    const { rowUuid } = this.pageManager.getRow(row);
+    const { rowUuid } = this.dataManager.getRow(row);
     const cell = this.cellCache.get(rowUuid, col);
 
     if (cell.kind === 'number') {
@@ -135,14 +136,14 @@ class GridManager<T extends object> {
   clear() {
     this.sorter.clear();
     this.filteredCache.dirty();
-    this.pageManager.clear();
+    this.dataManager.clear();
     this.cellCache.clear();
   }
 
   private filterSorted() {
     const sorted = this.sorter.sorted;
     const filtered = sorted.filter((item) => this.filterManager.testItem(item));
-    this.pageManager.setData(filtered);
+    this.dataManager.setData(filtered);
   }
 
   private nextSortKey(key?: StringKeys<T>) {
@@ -154,30 +155,30 @@ class GridManager<T extends object> {
   }
 
   //
-  // page manager only
+  // data manager only
   //
   get length() {
-    return this.pageManager.length;
+    return this.dataManager.length;
   }
 
   setPage(page = 0) {
-    this.pageManager.setPage(page);
+    this.dataManager.setPage(page);
   }
 
   get page() {
-    return this.pageManager.page;
+    return this.dataManager.page;
   }
 
   get pageSize() {
-    return this.pageManager.pageSize;
+    return this.dataManager.pageSize;
   }
 
   get pageCount() {
-    return this.pageManager.pageCount;
+    return this.dataManager.pageCount;
   }
 
   setPageSize(pageSize: number | undefined) {
-    this.pageManager.setPageSize(pageSize);
+    this.dataManager.setPageSize(pageSize);
   }
 
   //

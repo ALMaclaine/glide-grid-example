@@ -13,10 +13,11 @@ import { LAST_SELECTION_CHANGE_TYPE } from './selection-manager/types';
 import type { CellCache } from '../caches/cell-cache';
 import type { Item } from '@glideapps/glide-data-grid';
 import type { SelectionManager } from './selection-manager/selection-manager';
+import type { DataManager } from './data-manager';
 
 type EventManagerProps<T extends object> = GridEventHandlers & {
   cellCache: CellCache<T>;
-  pageManager: PageManager<IdRow<T>>;
+  dataManager: DataManager<IdRow<T>>;
   columnsManager: ColumnsManager<T>;
   selectionManager: SelectionManager;
 };
@@ -31,7 +32,7 @@ class EventManager<T extends object> {
   private readonly onColSelected?: OnColSelectedHandler;
   private readonly onAreaSelected?: OnAreaSelectedHandler;
   private readonly columnsManager: ColumnsManager<T>;
-  private readonly pageManager: PageManager<IdRow<T>>;
+  private readonly dataManager: DataManager<IdRow<T>>;
   private readonly cellCache: CellCache<T>;
   private readonly selectionManager: SelectionManager;
 
@@ -42,7 +43,7 @@ class EventManager<T extends object> {
     onColSelected,
     onItemSelected,
     onRowSelected,
-    pageManager,
+    dataManager,
     selectionManager,
   }: EventManagerProps<T>) {
     this.cellCache = cellCache;
@@ -51,7 +52,7 @@ class EventManager<T extends object> {
     this.onColSelected = onColSelected;
     this.onItemSelected = onItemSelected;
     this.onRowSelected = onRowSelected;
-    this.pageManager = pageManager;
+    this.dataManager = dataManager;
     this.selectionManager = selectionManager;
   }
 
@@ -68,10 +69,10 @@ class EventManager<T extends object> {
     if (lastSelectedIndex === undefined) {
       throw new Error('Should not occur');
     }
-    const lastSelectedRow = this.pageManager.getRow(lastSelectedIndex);
+    const lastSelectedRow = this.dataManager.getRow(lastSelectedIndex);
     const selectedIndices = selection.rows.toArray();
     const selectedRows = selectedIndices.map((index) =>
-      this.pageManager.getRow(index)
+      this.dataManager.getRow(index)
     );
     this.onRowSelected({
       lastSelectedIndex,
@@ -151,7 +152,7 @@ class EventManager<T extends object> {
         return;
       }
       const [colPos, rowPos] = item;
-      const row = this.pageManager.getRow(rowPos);
+      const row = this.dataManager.getRow(rowPos);
       const cell = this.cellCache.get(row.rowUuid, colPos);
       this.onItemSelected({
         row,
