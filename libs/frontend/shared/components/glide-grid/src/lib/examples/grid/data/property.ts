@@ -1,8 +1,5 @@
-import type {
-  GenerateWrappedColumnProps} from '../../../utils/cells/generators';
-import {
-  GENERATOR_TYPES,
-} from '../../../utils/cells/generators';
+import type { GenerateWrappedColumnProps } from '../../../utils/cells/generators';
+import { GENERATOR_TYPES } from '../../../utils/cells/generators';
 import { randAddress, randCompanyName } from '@ngneat/falso';
 
 interface Property {
@@ -16,34 +13,38 @@ interface Property {
 const PROPERTY_COLUMNS: GenerateWrappedColumnProps<Property>[] = [
   {
     title: 'Property',
-    // grow: 2,
-    width: 200,
+    grow: 2,
+    // width: 200,
     cellType: GENERATOR_TYPES.uri,
     dataId: 'property',
     shouldSort: true,
   },
   {
     title: 'Address',
-    width: 500,
+    grow: 2,
+    // width: 500,
     cellType: GENERATOR_TYPES.text,
     dataId: 'address',
   },
   {
     title: 'Investor',
-    width: 500,
+    grow: 2,
+    // width: 500,
     cellType: GENERATOR_TYPES.text,
     dataId: 'investor',
   },
   {
     title: 'Units',
-    width: 500,
+    grow: 1,
+    // width: 500,
     shouldSort: true,
     cellType: GENERATOR_TYPES.numeric,
     dataId: 'units',
   },
   {
     title: 'Rent Owed',
-    width: 500,
+    grow: 1,
+    // width: 500,
     cellType: GENERATOR_TYPES.numeric,
     dataId: 'rentOwed',
     contentAlign: 'right',
