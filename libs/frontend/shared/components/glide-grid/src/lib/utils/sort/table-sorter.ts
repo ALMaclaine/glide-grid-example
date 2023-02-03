@@ -5,7 +5,6 @@ import { objectSort } from './object-sort';
 import { MiniCache } from '../caches/mini-cache';
 import { SortStateMachine } from './sort-state-machine';
 import { STATE_HISTORY_STEPS } from '../../constants';
-import type { IdRow } from '../managers/grid-manager/types';
 
 type TableSorterProps<T extends object> = {
   sortMap: SortMap<T>;
@@ -13,7 +12,7 @@ type TableSorterProps<T extends object> = {
 
 class TableSorter<T extends object> {
   private stateHistory: StateSet<T>[] = [];
-  private readonly sortCache = new MiniCache<IdRow<T>[]>();
+  private readonly sortCache = new MiniCache<T[]>();
   private readonly sortStateMachine: SortStateMachine<T> =
     new SortStateMachine<T>();
   private readonly sortMap: SortMap<T>;
@@ -35,7 +34,7 @@ class TableSorter<T extends object> {
     return this.sortCache.isClean;
   }
 
-  addData(data: IdRow<T>[]) {
+  addData(data: T[]) {
     const toAdd = this.isClean ? this.sorted : [];
     this.sort([...toAdd, ...data]);
   }
@@ -48,7 +47,7 @@ class TableSorter<T extends object> {
     return this.sortCache.getCache().length;
   }
 
-  private sort(cache: IdRow<T>[]) {
+  private sort(cache: T[]) {
     const sorted = objectSort(
       cache,
       this.stateHistory.map(({ state, key }) => ({

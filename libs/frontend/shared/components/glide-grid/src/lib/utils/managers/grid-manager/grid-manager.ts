@@ -11,11 +11,8 @@ import { SortMap } from '../../sort/sort-map';
 import { FilterManager } from '../filter-manager';
 import { PageManager } from '../page-manager';
 
-import type {
-  GenerateWrappedColumnProps} from '../../cells/generators';
-import {
-  generateWrappedColumn
-} from '../../cells/generators';
+import type { GenerateWrappedColumnProps } from '../../cells/generators';
+import { generateWrappedColumn } from '../../cells/generators';
 
 import { SelectionManager } from '../selection-manager/selection-manager';
 import type { IdRow, OnItemClickedHandler, WrappedGridColumn } from './types';
@@ -44,7 +41,7 @@ const getTextKeys = <T extends object>(
 class GridManager<T extends object> {
   private readonly columnsManager: ColumnsManager<T>;
   private readonly cellCache: CellCache<T>;
-  private readonly sorter: TableSorter<T>;
+  private readonly sorter: TableSorter<IdRow<T>>;
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
   private readonly pageManager: PageManager<T>;
@@ -75,7 +72,7 @@ class GridManager<T extends object> {
     const sortMap = new SortMap({ columns });
     this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
     this.cellCache = new CellCache<T>(this.columnsManager);
-    this.sorter = new TableSorter({ sortMap });
+    this.sorter = new TableSorter<IdRow<T>>({ sortMap });
     this.addData(data);
     this.levels = new Levels(getTextKeys(columns));
     this.filteredCache.cache([]);
