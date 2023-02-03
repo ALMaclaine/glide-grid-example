@@ -2,6 +2,7 @@ import type {
   GridEventHandlers,
   OnAreaSelectedHandler,
   OnColSelectedHandler,
+  OnHeaderClickHandler,
   OnItemSelectedHandler,
   OnRowSelectedHandler,
 } from './grid-manager/types';
@@ -9,13 +10,12 @@ import type { GridSelection } from '@glideapps/glide-data-grid';
 import type { ColumnsManager } from './columns-manager/columns-manager';
 import type { PageManager } from './page-manager';
 import type { IdRow } from './grid-manager/types';
-import type { LastSelectionChangeType } from './selection-manager/types';
 import { LAST_SELECTION_CHANGE_TYPE } from './selection-manager/types';
 import type { CellCache } from '../caches/cell-cache';
 import type { Item } from '@glideapps/glide-data-grid';
 import type { SelectionManager } from './selection-manager/selection-manager';
 
-type EventManagerProps<T extends object> = GridEventHandlers<T> & {
+type EventManagerProps<T extends object> = GridEventHandlers & {
   cellCache: CellCache<T>;
   pageManager: PageManager<IdRow<T>>;
   columnsManager: ColumnsManager<T>;
@@ -37,23 +37,23 @@ class EventManager<T extends object> {
   private readonly selectionManager: SelectionManager;
 
   constructor({
+    cellCache,
+    columnsManager,
+    onAreaSelected,
+    onColSelected,
     onItemSelected,
     onRowSelected,
-    onColSelected,
-    onAreaSelected,
     pageManager,
-    columnsManager,
-    cellCache,
     selectionManager,
   }: EventManagerProps<T>) {
-    this.selectionManager = selectionManager;
     this.cellCache = cellCache;
+    this.columnsManager = columnsManager;
+    this.onAreaSelected = onAreaSelected;
+    this.onColSelected = onColSelected;
     this.onItemSelected = onItemSelected;
     this.onRowSelected = onRowSelected;
-    this.onColSelected = onColSelected;
-    this.onAreaSelected = onAreaSelected;
     this.pageManager = pageManager;
-    this.columnsManager = columnsManager;
+    this.selectionManager = selectionManager;
   }
 
   get selection(): GridSelection {

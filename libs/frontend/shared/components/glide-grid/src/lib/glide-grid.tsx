@@ -1,4 +1,9 @@
-import type { GridMouseEventArgs, Item } from '@glideapps/glide-data-grid';
+import type {
+  DrawHeaderCallback,
+  GridMouseEventArgs,
+  GridSelection,
+  Item,
+} from '@glideapps/glide-data-grid';
 import { DataEditor } from '@glideapps/glide-data-grid';
 import '@glideapps/glide-data-grid/dist/index.css';
 
@@ -9,11 +14,7 @@ import { useRowHoverHighlight } from './hooks/use-row-hover-highlight';
 import { drawHeaderSort } from './utils/canvas/draw-helpers';
 import { STATE_HISTORY_STEPS } from './constants';
 import type { GridManager } from './utils/managers/grid-manager/grid-manager';
-import type {
-  HeaderClickHandler,
-  HoverHandler,
-  OnRowSelectedHandler,
-} from './utils/managers/grid-manager/types';
+import type { HoverHandler } from './utils/managers/grid-manager/types';
 
 const divStyles = {
   border: '1px solid #e9e9e9',
@@ -55,27 +56,82 @@ type GlideGridProps<T extends object> = {
   onItemHovered?: HoverHandler;
   gridManager: GridManager<T>;
   getRowThemeOverride?: GetRowThemeCallback;
-  onHeaderClicked?: HeaderClickHandler;
+};
+
+const useGridManager = <T extends object>(gridManager: GridManager<T>) => {
+  const [, _refresh] = useState([]);
+  const refresh = useCallback(() => _refresh([]), []);
+
+  const onColumnMoved = useCallback(
+    (col1: number, col2: number) => {
+      gridManager.swap(col1, col2);
+      refresh();
+    },
+    [gridManager, refresh]
+  );
+
+  const onHeaderClicked = useCallback(
+    (col: number) => {
+      gridManager.onHeaderClickedHandler(col);
+      refresh();
+    },
+    [gridManager, refresh]
+  );
+
+  const getCellContent = useCallback(
+    (item: Item) => gridManager.itemToCell(item),
+    [gridManager]
+  );
+
+  const onCellClicked = useCallback(
+    (itemPos: Item) => {
+      gridManager.cellSelectedHandler(itemPos);
+    },
+    [gridManager]
+  );
+
+  const onGridSelectionChanged = useCallback(
+    (selection: GridSelection) => {
+      gridManager.handleSelectionChange(selection);
+      refresh();
+    },
+    [gridManager, refresh]
+  );
+
+  const drawHeader = useCallback<DrawHeaderCallback>(
+    (args) => {
+      if (args.columnIndex === -1) {
+        return false;
+      }
+      drawHeaderSort(args, gridManager.getSortHistory(STATE_HISTORY_STEPS));
+      return true;
+    },
+    [gridManager]
+  );
+
+  return {
+    onColumnMoved,
+    onGridSelectionChanged,
+    onHeaderClicked,
+    onCellClicked,
+    getCellContent,
+    drawHeader,
+  };
 };
 
 function GlideGrid<T extends object>({
   gridManager,
   onItemHovered = noOp,
   getRowThemeOverride = noOpObj,
-  onHeaderClicked = noOp,
 }: GlideGridProps<T>) {
-  const [, _refresh] = useState([]);
-  const refresh = useCallback(() => _refresh([]), []);
-
-  const _onHeaderClicked = useCallback(
-    (col: number) => {
-      const selectedHeader = gridManager.getHeaderKey(col);
-      gridManager.nextSortKey(selectedHeader);
-      onHeaderClicked(selectedHeader);
-      refresh();
-    },
-    [gridManager, onHeaderClicked, refresh]
-  );
+  const {
+    onColumnMoved,
+    onGridSelectionChanged,
+    onHeaderClicked,
+    onCellClicked,
+    getCellContent,
+    drawHeader,
+  } = useGridManager(gridManager);
 
   const {
     onItemHovered: onItemHoveredHighlight,
@@ -106,34 +162,19 @@ function GlideGrid<T extends object>({
         // width 100% needed otherwise grow/resizing animates slowly to fill extra width
         width="100%"
         freezeColumns={1}
-        rowMarkers="both"
-        columns={gridManager.getColumns()}
         // turns on copy support
         getCellsForSelection={true}
-        gridSelection={gridManager.selection}
-        onGridSelectionChange={(selection) => {
-          gridManager.handleSelectionChange(selection);
-
-          refresh();
-        }}
-        getCellContent={(item: Item) => gridManager.itemToCell(item)}
-        onCellClicked={(itemPos: Item) => {
-          gridManager.cellSelectedHandler(itemPos);
-        }}
-        onColumnMoved={(col1, col2) => {
-          gridManager.swap(col1, col2);
-          refresh();
-        }}
-        onHeaderClicked={_onHeaderClicked}
         smoothScrollX={true}
         smoothScrollY={true}
-        drawHeader={(args) => {
-          if (args.columnIndex === -1) {
-            return false;
-          }
-          drawHeaderSort(args, gridManager.getSortHistory(STATE_HISTORY_STEPS));
-          return true;
-        }}
+        rowMarkers="both"
+        columns={gridManager.getColumns()}
+        gridSelection={gridManager.selection}
+        onGridSelectionChange={onGridSelectionChanged}
+        getCellContent={getCellContent}
+        onCellClicked={onCellClicked}
+        onColumnMoved={onColumnMoved}
+        onHeaderClicked={onHeaderClicked}
+        drawHeader={drawHeader}
         theme={theme}
         onItemHovered={_onItemHovered}
         getRowThemeOverride={_getRowThemeOverride}

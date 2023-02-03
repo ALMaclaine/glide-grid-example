@@ -8,7 +8,7 @@ import type {
 } from '@glideapps/glide-data-grid';
 import type { SortTypes } from '../../sort/object-sort';
 
-type HeaderClickHandler = <T extends object>(
+type OnHeaderClickHandler = <T extends object>(
   headerVal: StringKeys<T>,
   col?: number
 ) => void;
@@ -83,11 +83,12 @@ type OnAreaSelectedProps = {
 
 type OnAreaSelectedHandler = (props: OnAreaSelectedProps) => void;
 
-type GridEventHandlers<T> = {
-  onAreaSelected: OnAreaSelectedHandler;
-  onRowSelected: OnRowSelectedHandler;
-  onColSelected: OnColSelectedHandler;
-  onItemSelected: OnItemSelectedHandler;
+type GridEventHandlers = {
+  onAreaSelected?: OnAreaSelectedHandler;
+  onRowSelected?: OnRowSelectedHandler;
+  onColSelected?: OnColSelectedHandler;
+  onItemSelected?: OnItemSelectedHandler;
+  onHeaderClicked?: OnHeaderClickHandler;
 };
 
 export type {
@@ -101,7 +102,7 @@ export type {
   OnItemSelectedHandler,
   OnItemSelectedProps,
   HoverHandler,
-  HeaderClickHandler,
+  OnHeaderClickHandler,
   IdColumn,
   IdRow,
   WrappedGridColumn,

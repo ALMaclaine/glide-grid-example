@@ -17,8 +17,9 @@ import { generateWrappedColumn } from '../../cells/generators';
 import type { GridEventHandlers, IdRow, WrappedGridColumn } from './types';
 import { EventManager } from '../event-manager';
 import { SelectionManager } from '../selection-manager/selection-manager';
+import type { OnHeaderClickHandler } from './types';
 
-type GridManagerProps<T extends object> = GridEventHandlers<T> & {
+type GridManagerProps<T extends object> = GridEventHandlers & {
   columns: GenerateWrappedColumnProps<T>[];
   data: T[];
   pageSize?: number;
@@ -35,6 +36,7 @@ const getTextKeys = <T extends object>(
 
 class GridManager<T extends object> {
   private readonly selectionManager = new SelectionManager();
+  private readonly onHeaderClicked?: OnHeaderClickHandler;
 
   private readonly cellCache: CellCache<T>;
   private readonly sorter: TableSorter<IdRow<T>>;
@@ -55,7 +57,9 @@ class GridManager<T extends object> {
     onAreaSelected,
     onColSelected,
     onRowSelected,
+    onHeaderClicked,
   }: GridManagerProps<T>) {
+    this.onHeaderClicked = onHeaderClicked;
     const columns = _columns.map(generateWrappedColumn);
     this.pageManager = new PageManager<IdRow<T>>({ pageSize });
     const sortMap = new SortMap({ columns });
@@ -80,8 +84,15 @@ class GridManager<T extends object> {
       onAreaSelected,
       onColSelected,
       onRowSelected,
+      onHeaderClicked,
       cellCache: this.cellCache,
     });
+  }
+
+  onHeaderClickedHandler(col: number) {
+    const selectedHeader = this.getHeaderKey(col);
+    this.nextSortKey(selectedHeader);
+    this.onHeaderClicked?.(selectedHeader);
   }
 
   get selection(): GridSelection {
