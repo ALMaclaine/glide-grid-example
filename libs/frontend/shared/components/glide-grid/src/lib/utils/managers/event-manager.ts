@@ -7,19 +7,17 @@ import type {
 } from './grid-manager/types';
 import type { GridSelection } from '@glideapps/glide-data-grid';
 import type { ColumnsManager } from './columns-manager/columns-manager';
-import type { PageManager } from './page-manager';
 import type { IdRow } from './grid-manager/types';
 import { LAST_SELECTION_CHANGE_TYPE } from './selection-manager/types';
-import type { CellCache } from '../caches/cell-cache';
 import type { Item } from '@glideapps/glide-data-grid';
 import type { SelectionManager } from './selection-manager/selection-manager';
 import type { DataManager } from './data-manager';
 
-type EventManagerProps<T extends object> = GridEventHandlers & {
-  cellCache: CellCache<T>;
+type EventManagerProps<T extends object> = {
   dataManager: DataManager<IdRow<T>>;
   columnsManager: ColumnsManager<T>;
   selectionManager: SelectionManager;
+  events?: GridEventHandlers;
 };
 
 const isMarkerClick = ([col]: Item): boolean => {
@@ -33,20 +31,19 @@ class EventManager<T extends object> {
   private readonly onAreaSelected?: OnAreaSelectedHandler;
   private readonly columnsManager: ColumnsManager<T>;
   private readonly dataManager: DataManager<IdRow<T>>;
-  private readonly cellCache: CellCache<T>;
   private readonly selectionManager: SelectionManager;
 
   constructor({
-    cellCache,
     columnsManager,
-    onAreaSelected,
-    onColSelected,
-    onItemSelected,
-    onRowSelected,
+    events: {
+      onAreaSelected,
+      onColSelected,
+      onItemSelected,
+      onRowSelected,
+    } = {},
     dataManager,
     selectionManager,
   }: EventManagerProps<T>) {
-    this.cellCache = cellCache;
     this.columnsManager = columnsManager;
     this.onAreaSelected = onAreaSelected;
     this.onColSelected = onColSelected;
@@ -153,7 +150,7 @@ class EventManager<T extends object> {
       }
       const [colPos, rowPos] = item;
       const row = this.dataManager.getRow(rowPos);
-      const cell = this.cellCache.get(row.rowUuid, colPos);
+      const cell = this.dataManager.getCell(row.rowUuid, colPos);
       this.onItemSelected({
         row,
         cell,

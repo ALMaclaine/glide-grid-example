@@ -20,14 +20,14 @@ import type { OnHeaderClickHandler } from './types';
 import type { DataManagerProps } from '../data-manager';
 import { DataManager } from '../data-manager';
 
-type GridManagerProps<T extends object> = GridEventHandlers &
-  DataManagerProps<T> & {
-    columns: GenerateWrappedColumnProps<T>[];
-    data: T[];
-    hiddenColumns?: StringKeys<T>[];
-    filterSet?: FilterSet<T>[];
-    searchTerms?: string[];
-  };
+type GridManagerProps<T extends object> = DataManagerProps<T> & {
+  columns: GenerateWrappedColumnProps<T>[];
+  data: T[];
+  hiddenColumns?: StringKeys<T>[];
+  filterSet?: FilterSet<T>[];
+  searchTerms?: string[];
+  events?: GridEventHandlers;
+};
 
 const getTextKeys = <T extends object>(
   columns: WrappedGridColumn<T>[]
@@ -39,7 +39,6 @@ class GridManager<T extends object> {
   private readonly selectionManager = new SelectionManager();
   private readonly onHeaderClicked?: OnHeaderClickHandler;
 
-  private readonly cellCache: CellCache<T>;
   private readonly sorter: TableSorter<IdRow<T>>;
   private readonly levels: Levels<T>;
   private readonly filteredCache = new MiniCache<IdRow<T>[]>();
@@ -54,24 +53,22 @@ class GridManager<T extends object> {
     pageSize,
     filterSet = [],
     searchTerms = [],
-    onItemSelected,
-    onAreaSelected,
-    onColSelected,
-    onRowSelected,
-    onHeaderClicked,
+    events: { onHeaderClicked } = {},
+    events,
   }: GridManagerProps<T>) {
     this.onHeaderClicked = onHeaderClicked;
-
-    this.dataManager = new DataManager<IdRow<T>>({ pageSize });
-
     const columns = _columns.map(generateWrappedColumn);
     const sortMap = new SortMap({ columns });
+    this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
+
+    this.dataManager = new DataManager<IdRow<T>>({
+      pageSize,
+      columnsManager: this.columnsManager,
+    });
+
     this.levels = new Levels(getTextKeys(columns));
     this.sorter = new TableSorter<IdRow<T>>({ sortMap });
 
-    this.columnsManager = new ColumnsManager<T>({ columns, hiddenColumns });
-
-    this.cellCache = new CellCache<T>(this.columnsManager);
     this.filteredCache.cache([]);
 
     this.filterManager = new FilterManager({
@@ -84,25 +81,20 @@ class GridManager<T extends object> {
       selectionManager: this.selectionManager,
       columnsManager: this.columnsManager,
       dataManager: this.dataManager,
-      onItemSelected,
-      onAreaSelected,
-      onColSelected,
-      onRowSelected,
-      onHeaderClicked,
-      cellCache: this.cellCache,
+      events,
     });
 
     this.addData(data);
   }
 
-  addData(data: T[]) {
+  addData(data: T[]): void {
     const rows = this.processRows(data);
     this.sorter.addData(rows);
-    this.cellCache.addData(rows);
+    this.dataManager.addData(rows);
     this.nextSortKey();
   }
 
-  private processRows(rows: T[]) {
+  private processRows(rows: T[]): IdRow<T>[] {
     for (const row of rows) {
       const changeType = row as IdRow<T>;
       changeType.rowUuid = uuid();
@@ -113,7 +105,7 @@ class GridManager<T extends object> {
 
   itemToCell([col, row]: Item): GridCell {
     const { rowUuid } = this.dataManager.getRow(row);
-    const cell = this.cellCache.get(rowUuid, col);
+    const cell = this.dataManager.getCell(rowUuid, col);
 
     if (cell.kind === 'number') {
       const clonedCell = { ...cell };
@@ -137,7 +129,6 @@ class GridManager<T extends object> {
     this.sorter.clear();
     this.filteredCache.dirty();
     this.dataManager.clear();
-    this.cellCache.clear();
   }
 
   private filterSorted() {
