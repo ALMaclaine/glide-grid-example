@@ -1,20 +1,20 @@
 import { ColumnsManager } from '../columns-manager/columns-manager';
-import type { StringKeys } from '../../types/general';
-import { CellCache } from '../../utils/caches/cell-cache';
+import type { StringKeys } from '../../../types/general';
+import { CellCache } from '../../caches/cell-cache';
 import type { GridCell, GridSelection, Item } from '@glideapps/glide-data-grid';
-import { TableSorter } from '../../utils/sort/table-sorter';
-import { noOp, uuid } from '../../utils/general';
-import { Levels } from '../../levels';
-import { MiniCache } from '../../utils/caches/mini-cache';
-import type { FilterSet } from '../../utils/filters/types';
-import { SortMap } from '../../utils/sort/sort-map';
+import { TableSorter } from '../../sort/table-sorter';
+import { noOp, uuid } from '../../general';
+import { Levels } from '../../../levels';
+import { MiniCache } from '../../caches/mini-cache';
+import type { FilterSet } from '../../filters/types';
+import { SortMap } from '../../sort/sort-map';
 import { FilterManager } from '../filter-manager';
 import { PageManager } from '../page-manager';
 
 import {
   generateWrappedColumn,
   GenerateWrappedColumnProps,
-} from '../../utils/cells/generators';
+} from '../../cells/generators';
 
 import { SelectionManager } from '../selection-manager/selection-manager';
 import { IdRow, OnItemClickedHandler, WrappedGridColumn } from './types';

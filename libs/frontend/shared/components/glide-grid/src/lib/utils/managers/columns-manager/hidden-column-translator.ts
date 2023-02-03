@@ -1,5 +1,5 @@
-import { MiniCache } from '../../utils/caches/mini-cache';
-import type { StringKeys } from '../../types/general';
+import { MiniCache } from '../../caches/mini-cache';
+import type { StringKeys } from '../../../types/general';
 import type { ColumnsProps, Translation } from './types';
 import { WrappedGridColumn } from '../grid-manager/types';
 

@@ -6,7 +6,7 @@ import { SORT_STATES, SortStates } from '../sort/object-sort';
 import { positioner } from './utils';
 import { drawTextCell } from '@glideapps/glide-data-grid';
 import { Rectangle } from './rectangle';
-import { WrappedGridColumn } from '../../managers/grid-manager/types';
+import { WrappedGridColumn } from '../managers/grid-manager/types';
 
 const WIDTH = 8;
 const HEIGHT = 5;

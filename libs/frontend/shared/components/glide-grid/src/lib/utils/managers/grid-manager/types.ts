@@ -1,11 +1,11 @@
-import type { StringKeys } from '../../types/general';
+import type { StringKeys } from '../../../types/general';
 import {
   GridCell,
   GridColumn,
   GridMouseEventArgs,
   UriCell,
 } from '@glideapps/glide-data-grid';
-import type { SortTypes } from '../../utils/sort/object-sort';
+import type { SortTypes } from '../../sort/object-sort';
 
 type HeaderClickHandler = <T extends object>(
   headerVal: StringKeys<T>,

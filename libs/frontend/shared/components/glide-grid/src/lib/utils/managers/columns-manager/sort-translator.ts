@@ -1,4 +1,4 @@
-import type { StringKeys } from '../../types/general';
+import type { StringKeys } from '../../../types/general';
 import type { Translation } from './types';
 
 class SortTranslator<T extends object> {

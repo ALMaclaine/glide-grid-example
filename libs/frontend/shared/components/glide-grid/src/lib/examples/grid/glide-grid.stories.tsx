@@ -1,6 +1,6 @@
 import { ComponentStory, Meta } from '@storybook/react';
 import { GlideGrid } from '../../glide-grid';
-import { GridManager } from '../../managers/grid-manager/grid-manager';
+import { GridManager } from '../../utils/managers/grid-manager/grid-manager';
 import { genProperty, Property, PROPERTY_COLUMNS } from './data/property';
 import { asyncGenerate } from './utils';
 import { useCallback, useMemo, useState } from 'react';

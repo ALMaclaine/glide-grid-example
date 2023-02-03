@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { GridMouseEventArgs } from '@glideapps/glide-data-grid';
 import { GetRowThemeCallback } from '@glideapps/glide-data-grid/dist/ts/data-grid/data-grid-render';
-import { HoverHandler } from '../managers/grid-manager/types';
+import { HoverHandler } from '../utils/managers/grid-manager/types';
 
 type UseRowHoverHighlightReturn = {
   hoverRow: number;
