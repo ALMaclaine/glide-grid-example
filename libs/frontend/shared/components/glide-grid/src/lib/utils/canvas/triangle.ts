@@ -24,7 +24,7 @@ class Triangle extends Easel {
     super.draw((ctx) => {
       this.drawBackground();
       const _midPoint = midPoint(0, this._width);
-      ctx.fillStyle = this.fill;
+      ctx.fillStyle = this.getFill();
       ctx.beginPath();
       ctx.moveTo(_midPoint, 0);
       ctx.lineTo(0, this._height);
@@ -37,7 +37,7 @@ class Triangle extends Easel {
     super.draw((ctx) => {
       this.drawBackground();
       const _midPoint = midPoint(0, this._width);
-      ctx.fillStyle = this.fill;
+      ctx.fillStyle = this.getFill();
       ctx.beginPath();
       ctx.moveTo(_midPoint, this._height);
       ctx.lineTo(0, 0);
@@ -50,7 +50,7 @@ class Triangle extends Easel {
     super.draw((ctx) => {
       this.drawBackground();
       const _midPoint = midPoint(0, this._height);
-      ctx.fillStyle = this.fill;
+      ctx.fillStyle = this.getFill();
       ctx.beginPath();
       ctx.moveTo(this._width, _midPoint);
       ctx.lineTo(0, 0);
@@ -63,7 +63,7 @@ class Triangle extends Easel {
     super.draw((ctx) => {
       this.drawBackground();
       const _midPoint = midPoint(0, this._height);
-      ctx.fillStyle = this.fill;
+      ctx.fillStyle = this.getFill();
       ctx.beginPath();
       ctx.moveTo(0, _midPoint);
       ctx.lineTo(this._width, this._height);

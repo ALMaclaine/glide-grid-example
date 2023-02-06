@@ -15,8 +15,8 @@ class Easel {
   private readonly context: OffscreenCanvasRenderingContext2D;
   protected readonly _width: number;
   protected readonly _height: number;
-  private _background = 'white';
-  private _fill = 'black';
+  private background = 'white';
+  private fill = 'black';
 
   constructor(props?: EaselProps) {
     this._width = props?.width ? props.width : DEFAULT_WIDTH;
@@ -43,37 +43,33 @@ class Easel {
     return this._height;
   }
 
-  get fill() {
-    return this._fill;
+  getFill() {
+    return this.fill;
   }
 
-  set fill(color: string) {
-    this._fill = color;
+  setFill(color: string) {
+    this.fill = color;
     this.clear();
   }
 
   drawBackground() {
-    this.context.fillStyle = this._background;
+    this.context.fillStyle = this.background;
     this.context.beginPath();
     this.context.rect(0, 0, this._width, this._height);
     this.context.fill();
   }
 
-  set background(color: string) {
-    this._background = color;
+  setBackground(color: string) {
+    this.background = color;
     this.clear();
   }
 
-  get background() {
-    return this._background;
-  }
-
-  private clearScreen() {
-    this.context.clearRect(0, 0, this._width, this._height);
+  getBackground() {
+    return this.background;
   }
 
   clear() {
-    this.clearScreen();
+    this.context.clearRect(0, 0, this._width, this._height);
   }
 
   drawImage(canvas: OffscreenCanvas, { x, y }: Position) {

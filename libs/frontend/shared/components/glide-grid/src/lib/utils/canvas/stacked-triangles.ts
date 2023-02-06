@@ -26,14 +26,14 @@ class StackedTriangles extends Easel {
     return super.canvas();
   }
 
-  set fill(color: string) {
-    this.triangle.fill = color;
-    super.fill = color;
+  setFill(color: string) {
+    this.triangle.setFill(color);
+    super.setFill(color);
   }
 
-  set background(color: string) {
-    this.triangle.background = color;
-    super.background = color;
+  setBackground(color: string) {
+    this.triangle.setBackground(color);
+    super.setBackground(color);
   }
 
   clear() {

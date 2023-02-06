@@ -11,64 +11,46 @@ import type { WrappedGridColumn } from '../managers/grid-manager/types';
 
 const WIDTH = 8;
 const HEIGHT = 5;
-const ZOOM_FACTOR = 2;
-const ZOOM_WIDTH = ZOOM_FACTOR * WIDTH;
-const ZOOM_HEIGHT = ZOOM_FACTOR * HEIGHT;
 const GAP = 4;
 
-const zoomX1Triangle = new Triangle({
+const triangle = new Triangle({
   width: WIDTH,
   height: HEIGHT,
 });
 
-const zoomX2Triangle = new Triangle({
-  width: ZOOM_WIDTH,
-  height: ZOOM_HEIGHT,
-});
-
-const zoomX1StackedTriangles = new StackedTriangles({
+const stackedTriangles = new StackedTriangles({
   width: WIDTH,
   height: HEIGHT,
   gap: GAP,
 });
 
-const zoomX2StackedTriangles = new StackedTriangles({
-  width: ZOOM_WIDTH,
-  height: ZOOM_HEIGHT,
-  gap: GAP,
-});
-
-const getTriangle = (
-  zoomed = false,
-  colors: { backgroundColor: string; fillColor: string }
-): Triangle => {
-  const triangle = zoomed ? zoomX2Triangle : zoomX1Triangle;
+const getTriangle = (colors: {
+  backgroundColor: string;
+  fillColor: string;
+}): Triangle => {
   if (colors.backgroundColor) {
-    triangle.background = colors.backgroundColor;
+    triangle.setBackground(colors.backgroundColor);
   }
 
   if (colors.fillColor) {
-    triangle.fill = colors.fillColor;
+    triangle.setFill(colors.fillColor);
   }
 
   return triangle;
 };
 
-const getStackedTriangle = (
-  zoomed = false,
-  colors: { backgroundColor: string; fillColor: string }
-): StackedTriangles => {
-  const stackedTriangles = zoomed
-    ? zoomX2StackedTriangles
-    : zoomX1StackedTriangles;
-
+const getStackedTriangle = (colors: {
+  backgroundColor: string;
+  fillColor: string;
+}): StackedTriangles => {
   if (colors.backgroundColor) {
-    stackedTriangles.background(colors.backgroundColor);
+    stackedTriangles.setBackground(colors.backgroundColor);
   }
 
   if (colors.fillColor) {
-    stackedTriangles.fill(colors.fillColor);
+    stackedTriangles.setFill(colors.fillColor);
   }
+
   return stackedTriangles;
 };
 
@@ -87,19 +69,19 @@ const headerThemePriority = (header: Parameters<DrawHeaderCallback>[0]) => {
 type GetHeaderImageProps = {
   isSorted: boolean;
   sortState: SortStates;
-  zoomed: boolean;
   backgroundColor: string;
   fillColor: string;
 };
-const getHeaderSortImage = (props: GetHeaderImageProps) => {
-  const { isSorted, sortState, zoomed, backgroundColor, fillColor } = props;
 
-  const stackedTriangles = getStackedTriangle(zoomed, {
+const getHeaderSortCanvas = (props: GetHeaderImageProps): OffscreenCanvas => {
+  const { isSorted, sortState, backgroundColor, fillColor } = props;
+
+  const stackedTriangles = getStackedTriangle({
     backgroundColor,
     fillColor,
   });
 
-  const triangle = getTriangle(zoomed, {
+  const triangle = getTriangle({
     backgroundColor,
     fillColor,
   });
@@ -108,23 +90,23 @@ const getHeaderSortImage = (props: GetHeaderImageProps) => {
     switch (sortState) {
       case SORT_STATES.initial: {
         stackedTriangles.draw();
-        return stackedTriangles.image();
+        return stackedTriangles.canvas();
       }
       case SORT_STATES.ascending: {
         triangle.drawTriangle(TRIANGLE_DIRECTIONS.up);
-        return triangle.image();
+        return triangle.canvas();
       }
       case SORT_STATES.descending: {
         triangle.drawTriangle(TRIANGLE_DIRECTIONS.down);
-        return triangle.image();
+        return triangle.canvas();
       }
       default: {
-        return triangle.image();
+        return triangle.canvas();
       }
     }
   } else {
     stackedTriangles.draw();
-    return stackedTriangles.image();
+    return stackedTriangles.canvas();
   }
 };
 
@@ -144,8 +126,6 @@ const drawHeaderSort = <T extends object>(
   } = column;
 
   const { x, y, width, height } = rect;
-  const zoomed = window.devicePixelRatio > 1;
-  const zoomFactor = zoomed ? 2 : 1;
 
   const stateSet = stateHistory.find((state) => state.key === id);
   const isSorted = stateSet !== undefined;
@@ -168,42 +148,37 @@ const drawHeaderSort = <T extends object>(
   }
 
   if (shouldSort) {
-    const image = getHeaderSortImage({
+    const image = getHeaderSortCanvas({
       isSorted,
       sortState,
       backgroundColor: headerThemePriority(headerProps),
       fillColor: theme.textHeaderSelected,
-      zoomed,
     });
 
     const pos = positioner({
       containerWidth: width,
-      containerHeight: zoomFactor * height,
+      containerHeight: height,
       itemWidth: image.width,
       itemHeight: image.height,
       position: 'midRight',
       padding: theme.cellHorizontalPadding,
     });
-    ctx.putImageData(image, zoomFactor * (pos.x + x), pos.y + y);
+    ctx.drawImage(image, pos.x + x, pos.y + y);
 
     if (isSelected) {
       const rectangle = new Rectangle({ width: rect.width, height: 2 });
-      rectangle.fill = theme.linkColor;
+      rectangle.setFill(theme.linkColor);
       rectangle.drawRectangle();
 
       const pos2 = positioner({
         containerWidth: width,
-        containerHeight: zoomFactor * height,
+        containerHeight: height,
         itemWidth: rectangle.width,
         itemHeight: rectangle.height,
         position: 'botMid',
       });
 
-      ctx.putImageData(
-        rectangle.image(),
-        zoomFactor * (pos2.x + x),
-        pos2.y + y
-      );
+      ctx.drawImage(rectangle.canvas(), pos2.x + x, pos2.y + y);
     }
   }
 };
@@ -212,6 +187,6 @@ export {
   getTriangle,
   getStackedTriangle,
   headerThemePriority,
-  getHeaderSortImage,
+  getHeaderSortCanvas,
   drawHeaderSort,
 };
