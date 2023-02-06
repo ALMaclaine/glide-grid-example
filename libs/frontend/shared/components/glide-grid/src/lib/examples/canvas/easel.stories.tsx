@@ -2,57 +2,40 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ComponentStory, Meta } from '@storybook/react';
 import { Easel } from '../../utils/canvas/easel';
 import { positioner } from '../../utils/canvas/utils';
-import { StackedTriangles } from '../../utils/canvas/stacked-triangles';
-import { Rectangle } from '../../utils/canvas/rectangle';
 
 const WIDTH = 1024;
 const HEIGHT = 512;
-const SIZE = 100;
 const CanvasDemo = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const easel = useMemo(() => new Easel({ width: WIDTH, height: HEIGHT }), []);
-  const triangle = useMemo<StackedTriangles>(
-    () => new StackedTriangles({ width: SIZE, height: SIZE / 2, gap: 24 }),
-    []
-  );
+  const easel = useMemo(() => new Easel({ width: 100, height: 100 }), []);
 
   const innerDraw = useCallback(() => {
     const context = canvasRef.current?.getContext('2d');
     if (!context) {
       throw new Error('Could not obtain context');
     }
-    triangle.fill = 'red';
-    triangle.draw();
 
-    const rectangle = new Rectangle({ width: WIDTH, height: 4 });
-    rectangle.fill = 'blue';
-    rectangle.drawRectangle();
+    easel.draw((ctx) => {
+      ctx.moveTo(0, 0);
+      ctx.lineTo(200, 100);
+      ctx.stroke();
+    });
 
     const pos1 = positioner({
       containerWidth: WIDTH,
       containerHeight: HEIGHT,
-      itemWidth: triangle.width,
-      itemHeight: triangle.height,
+      itemWidth: easel.width,
+      itemHeight: easel.height,
       position: 'midRight',
       padding: 32,
     });
 
-    const pos2 = positioner({
-      containerWidth: WIDTH,
-      containerHeight: HEIGHT,
-      itemWidth: rectangle.width,
-      itemHeight: rectangle.height,
-      position: 'botMid',
-    });
-
-    easel.drawImage(rectangle.canvas(), pos2);
-    easel.drawImage(triangle.canvas(), pos1);
-    context.drawImage(easel.canvas(), 0, 0);
+    context.drawImage(easel.canvas(), pos1.x, pos1.y);
     easel.clear();
-  }, [easel, triangle]);
+  }, [easel]);
 
   useEffect(() => {
-    const timeoutRef = setInterval(innerDraw, SIZE);
+    const timeoutRef = setInterval(innerDraw, 1000);
     return () => clearTimeout(timeoutRef);
   }, [innerDraw]);
 
@@ -77,7 +60,7 @@ const CanvasDemo = () => {
 };
 
 export default {
-  title: 'Canvas/Test',
+  title: 'Canvas/Easel',
   component: CanvasDemo,
 } as Meta;
 

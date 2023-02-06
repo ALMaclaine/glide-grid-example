@@ -74,13 +74,12 @@ class Triangle extends Easel {
 
   private lastDirection?: TriangleDirection;
   drawTriangle(direction: TriangleDirection = TRIANGLE_DIRECTIONS.up) {
-    if (this.lastDirection === direction || !this.isDirty) {
+    if (this.lastDirection === direction) {
       return;
     } else {
       this.lastDirection = direction;
     }
 
-    this.dirty();
     switch (direction) {
       case TRIANGLE_DIRECTIONS.up: {
         this.drawUp();

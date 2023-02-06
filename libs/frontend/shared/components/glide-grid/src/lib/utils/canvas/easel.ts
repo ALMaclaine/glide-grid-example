@@ -1,5 +1,4 @@
 import type { Position } from './utils';
-import { MiniCache } from '../caches/mini-cache';
 
 type Context2dProcessor = (ctx: OffscreenCanvasRenderingContext2D) => void;
 
@@ -11,8 +10,8 @@ type EaselProps = {
 const DEFAULT_WIDTH = 512;
 const DEFAULT_HEIGHT = 512;
 
-class Easel extends MiniCache<ImageData> {
-  private canvasRef: OffscreenCanvas;
+class Easel {
+  private readonly _canvas: OffscreenCanvas;
   private readonly context: OffscreenCanvasRenderingContext2D;
   protected readonly _width: number;
   protected readonly _height: number;
@@ -20,15 +19,14 @@ class Easel extends MiniCache<ImageData> {
   private _fill = 'black';
 
   constructor(props?: EaselProps) {
-    super();
     this._width = props?.width ? props.width : DEFAULT_WIDTH;
     this._height = props?.height ? props.height : DEFAULT_HEIGHT;
     if (!document.createElement) {
       throw new Error('OffscreenCanvas only works in DOM environment');
     }
 
-    this.canvasRef = new OffscreenCanvas(this._width, this._height);
-    const context = this.canvasRef.getContext('2d', {
+    this._canvas = new OffscreenCanvas(this._width, this._height);
+    const context = this._canvas.getContext('2d', {
       willReadFrequently: true,
     });
     if (!context) {
@@ -75,30 +73,18 @@ class Easel extends MiniCache<ImageData> {
   }
 
   clear() {
-    this.dirty();
     this.clearScreen();
   }
 
-  putImageData(image: ImageData, { x, y }: Position) {
-    this.context.putImageData(image, x, y);
+  drawImage(canvas: OffscreenCanvas, { x, y }: Position) {
+    this.context.drawImage(canvas, x, y);
   }
 
-  image() {
-    if (this.isClean) {
-      return this.getCache();
-    }
-    const imageData = this.context.getImageData(
-      0,
-      0,
-      this._width,
-      this._height
-    );
-    this.cache(imageData);
-    return this.getCache();
+  canvas() {
+    return this._canvas;
   }
 
   draw(processor: Context2dProcessor) {
-    this.dirty();
     processor(this.context);
   }
 }
